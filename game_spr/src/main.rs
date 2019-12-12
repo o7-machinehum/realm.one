@@ -18,7 +18,7 @@ struct MainState {
 
 impl MainState {
     fn new(ctx: &mut Context) -> GameResult<MainState> {
-        let image = graphics::Image::new(ctx, "/tile.png").unwrap();
+        let image = graphics::Image::new(ctx, "/cave.png").unwrap();
         let batch = graphics::spritebatch::SpriteBatch::new(image);
         let s = MainState { spritebatch: batch };
         Ok(s)
