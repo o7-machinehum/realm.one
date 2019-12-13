@@ -1,7 +1,7 @@
 //! An example of how to use a `SpriteBatch`.
 //!
 //! You really want to run this one in release mode.
-
+/*
 use ggez;
 
 use ggez::event;
@@ -103,4 +103,25 @@ pub fn main() -> GameResult {
 
     let state = &mut MainState::new(ctx)?;
     event::run(ctx, event_loop, state)
+}
+
+*/
+
+// extern crate serialize;
+extern crate tiled;
+
+use std::fs::File;
+use std::io::BufReader;
+use std::path::Path;
+
+fn main() {
+    let file = File::open(&Path::new("../sprits/first.tmx")).unwrap();
+    let tilepath = &Path::new("../sprits/basictiles.tsx");
+		
+    println!("Opened file");
+    let reader = BufReader::new(file);
+    // let map = parse(reader).unwrap();
+    let map = tiled::parse_with_path(reader, &tilepath).unwrap();
+    println!("{:?}", map);
+    // println!("{:?}", map.get_tileset_by_gid(22));
 }
