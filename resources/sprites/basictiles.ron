@@ -1,0 +1,8 @@
+#![enable(implicit_some)]
+
+(
+    texture_width: 128,
+    texture_height: 240,
+    columns: 8,
+    rows: 15,
+)
