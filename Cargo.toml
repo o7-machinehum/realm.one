@@ -5,7 +5,7 @@ authors = ["Hilmar Wiegand <me@hwgnd.de>"]
 edition = "2018"
 
 [dependencies]
-amethyst = "0.13.0"
+amethyst = "0.13.2"
 log = { version = "0.4.8", features = ["serde"] }
 
 [features]

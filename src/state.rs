@@ -107,6 +107,7 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
             sprite_number: i,
         })
         .collect()
+ 
 }
 
 fn init_sprites(world: &mut World, sprites: &[SpriteRender], dimensions: &ScreenDimensions) {
