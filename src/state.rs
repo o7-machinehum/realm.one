@@ -8,6 +8,7 @@ use amethyst::{
 };
 
 use log::info;
+pub use tiles;
 
 pub struct MyState;
 
@@ -22,6 +23,7 @@ impl SimpleState for MyState {
         // place our sprites correctly later. We'll clone this since we'll
         // pass the world mutably to the following functions.
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
+        let rm = tiles::Room::new("resources/sprites/first.tmx".to_string()).getInfo();
 
         // Place the camera
         init_camera(world, &dimensions);
@@ -101,7 +103,7 @@ fn load_sprites(world: &mut World) -> Vec<SpriteRender> {
     // Create our sprite renders. Each will have a handle to the texture
     // that it renders from. The handle is safe to clone, since it just
     // references the asset.
-    (0..3)
+    (0..20)
         .map(|i| SpriteRender {
             sprite_sheet: sheet_handle.clone(),
             sprite_number: i,
