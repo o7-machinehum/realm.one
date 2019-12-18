@@ -19,8 +19,8 @@ impl SimpleState for GamePlayState {
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
 
-        self.currentMap.load_sprites(world);
-        self.currentMap.load_room(world, &dimensions);
+        self.currentMap.load_sprites(world);             // Load in all the sprites
+        self.currentMap.load_room(world, &dimensions);   // Paint the initial room
         
     }
 
@@ -73,9 +73,3 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
         .with(transform)
         .build();
 }
-
-
-
-// fn load_room(world: &mut World, sprites: &[SpriteRender], dimensions: &ScreenDimensions) {
-// 
-// }
