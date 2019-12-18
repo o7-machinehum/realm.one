@@ -1,4 +1,4 @@
-#eg: python3 ronMaker.sh <fname.ron> <texture_width> <texture_height> <width> <height>
+#eg: python3 ronMaker.py <fname.ron> <texture_width> <texture_height> <width> <height>
 
 import sys
 

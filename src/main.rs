@@ -9,8 +9,7 @@ use amethyst::{
     utils::application_root_dir,
 };
 
-mod state;
-mod tiles;
+mod gameplaystate;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -18,7 +17,9 @@ fn main() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
     let display_config = resources.join("display_config.ron");
-    //let rm = tiles::Room::new("resources/sprites/first.tmx".to_string()).getInfo();
+    
+    let rm = gameplaystate::map::Room::new("resources/sprites/first.tmx".to_string());
+    let gps = gameplaystate::GamePlayState{currentMap: rm};
 
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
@@ -31,7 +32,7 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default()),
         )?;
 
-    let mut game = Application::new(resources, state::MyState, game_data)?;
+    let mut game = Application::new(resources, gps, game_data)?;
     game.run();
 
     Ok(())
