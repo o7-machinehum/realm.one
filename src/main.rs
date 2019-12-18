@@ -19,7 +19,6 @@ fn main() -> amethyst::Result<()> {
     let display_config = resources.join("display_config.ron");
     
     let rm = gameplaystate::map::Room::new("resources/sprites/first.tmx".to_string());
-    let gps = gameplaystate::GamePlayState{currentMap: rm};
 
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
@@ -32,7 +31,9 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default()),
         )?;
 
-    let mut game = Application::new(resources, gps, game_data)?;
+    let mut game = Application::new(resources, 
+                                    gameplaystate::GamePlayState{currentMap: rm}, 
+                                    game_data)?;
     game.run();
 
     Ok(())
