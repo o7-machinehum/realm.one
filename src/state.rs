@@ -1,27 +1,43 @@
 use amethyst::{
-    assets::{AssetStorage, Loader},
     core::transform::Transform,
     input::{get_key, is_close_requested, is_key_down, VirtualKeyCode}, prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    renderer::{Camera},
     window::ScreenDimensions,
 };
 use log::info;
-pub mod map;
+
+use crate::map;
+use crate::obj::Location;
 
 pub struct GamePlayState {
-    pub currentMap: map::Room,
+    pub current_map: map::Room,
 }
+
 
 impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let mut world = data.world;
+        let world = data.world;
+       
+        // Example of creating an entity with a location.
+        //world.register::<Location>();
+        //let player = world.create_entity()
+        //                  .with(Location::new(0,0,0))
+        //                  .build();
+        //{ 
+        //    let mut storage = world.write_storage::<Location>();
+        //    let mut my = storage.get_mut(player).unwrap();
+        //    println!("{:?}", my.x);
+        //} 
+        
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
 
-        self.currentMap.load_sprites(world);             // Load in all the sprites
-        self.currentMap.load_room(world, &dimensions);   // Paint the initial room
-        
+        self.current_map.load_sprites(world);             // Load in all the sprites
+        self.current_map.load_room(world, &dimensions);   // Paint the initial room
+         
+        // self.currentMap.load_obj(); 
+         
     }
 
     fn handle_event(
@@ -39,26 +55,10 @@ impl SimpleState for GamePlayState {
             if let Some(event) = get_key(&event) {
                 info!("handling key event: {:?}", event);
             }
-
-            // If you're looking for a more sophisticated event handling solution,
-            // including key bindings and gamepad support, please have a look at
-            // https://book.amethyst.rs/stable/pong-tutorial/pong-tutorial-03.html#capturing-user-input
         }
 
-        // Keep going
         Trans::None
     }
-
-//    fn fixed_update{
-//        &mut self,
-//        mut _data: StateData<'_, GameData<'_, '_>>,
-//        event: StateEvent,
-//    ) -> SimpleTrans {
-//        // In this method we check to see if any of the objects have changed state 
-//        // 
-//    
-//        Trans::None
-//    }
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {

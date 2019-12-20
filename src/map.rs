@@ -1,18 +1,15 @@
 use amethyst::{
     assets::{AssetStorage, Loader},
     core::transform::Transform,
-    input::{get_key, is_close_requested, is_key_down, VirtualKeyCode}, prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    prelude::*,
+    renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     window::ScreenDimensions,
 };
-
 extern crate tiled;
-
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 use log::info;
-
 use tiled::parse;
 
 pub struct Room {
@@ -21,17 +18,8 @@ pub struct Room {
     pub sprites: Vec<SpriteRender>,
 }
 
+// Comment
 impl Room {
-    fn countTiles(mp: &tiled::Map) -> Vec<i32>{
-        let mut v: Vec<i32> = Vec::new();
-        for sets in &mp.tilesets{
-            v.push((sets.images[0].width / sets.tile_width as i32) * (sets.images[0].height / sets.tile_height as i32)) 
-        }
-        info!("Tiles in the images: {:?}", v);
-
-        v
-    }
-
     pub fn new(fname: String) -> Self{
         let file = File::open(&Path::new(&fname)).unwrap();
     	let reader = BufReader::new(file);
@@ -40,10 +28,20 @@ impl Room {
         info!("{:?}", mp);
 
         Self{
-            tiles: Room::countTiles(&mp), 
+            tiles: Room::count_tiles(&mp), 
             current: mp,
             sprites: Vec::new(), 
         }
+    }
+   
+    fn count_tiles(mp: &tiled::Map) -> Vec<i32>{
+        let mut v: Vec<i32> = Vec::new();
+        for sets in &mp.tilesets{
+            v.push((sets.images[0].width / sets.tile_width as i32) * (sets.images[0].height / sets.tile_height as i32)) 
+        }
+        info!("Tiles in the images: {:?}", v);
+
+        v
     }
     
     pub fn load_sprites(&mut self, world: &mut World) {
@@ -79,7 +77,7 @@ impl Room {
                 )
             };
             
-           for i in (0..self.tiles[ii]){ 
+           for i in 0..self.tiles[ii] { 
                self.sprites.push(SpriteRender{
                    sprite_sheet: sheet_handle.clone(),
                    sprite_number: i as usize,
@@ -101,10 +99,10 @@ impl Room {
                 let mut transform = Transform::default();
                 transform.set_translation_xyz(x, y, 0.);
                 
-                if(*col != 0){
+                if col.gid != 0 {
                     world
                         .create_entity()
-                        .with(self.sprites[*col as usize - 1].clone())
+                        .with(self.sprites[col.gid as usize - 1].clone())
                         .with(transform)
                         .build();
                 }
