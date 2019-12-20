@@ -9,7 +9,9 @@ use amethyst::{
     utils::application_root_dir,
 };
 
-mod gameplaystate;
+pub mod state;
+pub mod obj;
+pub mod map;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -18,7 +20,7 @@ fn main() -> amethyst::Result<()> {
     let resources = app_root.join("resources");
     let display_config = resources.join("display_config.ron");
     
-    let rm = gameplaystate::map::Room::new("resources/sprites/first.tmx".to_string());
+    let rm = map::Room::new("resources/sprites/first.tmx".to_string());
 
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
@@ -32,7 +34,7 @@ fn main() -> amethyst::Result<()> {
         )?;
 
     let mut game = Application::new(resources, 
-                                    gameplaystate::GamePlayState{currentMap: rm}, 
+                                    state::GamePlayState{current_map: rm}, 
                                     game_data)?;
     game.run();
 
