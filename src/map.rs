@@ -25,7 +25,7 @@ impl Room {
     	let reader = BufReader::new(file);
         let mp =  parse(reader).unwrap();
 
-        info!("{:?}", mp);
+        // info!("{:?}", mp);
 
         Self{
             tiles: Room::count_tiles(&mp), 
