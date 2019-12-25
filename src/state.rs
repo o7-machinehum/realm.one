@@ -5,6 +5,7 @@ use amethyst::{
     window::ScreenDimensions,
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
+use std::time::Instant;
 use log::info;
 
 use crate::map;
@@ -13,9 +14,10 @@ pub struct GamePlayState {
     pub current_map: map::Room,
 }
 
-pub struct Player{
+pub struct Player {
     pub x: f32,
     pub y: f32,
+    pub last_movement_instant: Instant,
 }
 
 impl Player {
@@ -23,11 +25,12 @@ impl Player {
         Player {
             x,
             y, 
+            last_movement_instant: Instant::now(),
         }
     }
 }
 
-impl Component for Player{
+impl Component for Player {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }
 
