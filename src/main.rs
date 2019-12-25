@@ -6,12 +6,13 @@ use amethyst::{
         types::DefaultBackend,
         RenderingBundle,
     },
-    input::{InputBundle, StringBindings},
+    input::InputBundle,
     utils::application_root_dir,
 };
 
 pub mod state;
 pub mod map;
+pub mod key_bindings;
 mod systems;
 
 fn main() -> amethyst::Result<()> {
@@ -22,7 +23,7 @@ fn main() -> amethyst::Result<()> {
     let display_config = resources.join("display_config.ron");
     let binding_path = resources.join("bindings.ron");
     
-    let input_bundle = InputBundle::<StringBindings>::new()
+    let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(binding_path)?;
 
     let rm = map::Room::new("resources/sprites/first.tmx".to_string());
