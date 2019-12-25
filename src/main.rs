@@ -26,7 +26,7 @@ fn main() -> amethyst::Result<()> {
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(binding_path)?;
 
-    let rm = map::Room::new("resources/sprites/first.tmx".to_string());
+    let room = map::Room::new("resources/sprites/first.tmx".to_string());
 
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
@@ -41,10 +41,15 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(input_bundle)? 
         .with(systems::PlayerSystem, "player_system", &["input_system"]);
 
-    let mut game = Application::new(resources, 
-                                    state::GamePlayState{current_map: rm}, 
-                                    game_data)?;
+
+    let mut game = Application::new(
+        resources, 
+        state::GamePlayState{current_map: room}, 
+        game_data,
+    )?;
+
     game.run();
 
     Ok(())
 }
+
