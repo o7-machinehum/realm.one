@@ -85,16 +85,16 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
 
 
 fn initialise_player(world: &mut World, sprite: &Vec<SpriteRender>) {
+    let mut player1 = Player::new( 64.0, 64.0 ); 
+
     let mut transform = Transform::default();
-    let mut p1 = Player::new( 64.0, 64.0 ); 
-    // Correctly position the paddles.
-    transform.set_translation_xyz(p1.x, p1.y, 0.0); 
+    transform.set_translation_xyz(player1.x, player1.y, 0.0); 
 
     // Create a player entity.
     world
         .create_entity()
         .with(sprite[125].clone())
-        .with(p1)
+        .with(player1)
         .with(transform)
         .build();
     
