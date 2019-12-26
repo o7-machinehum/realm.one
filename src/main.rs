@@ -10,8 +10,8 @@ use amethyst::{
     utils::application_root_dir,
 };
 
-pub mod map;
-pub mod key_bindings;
+mod map;
+mod key_bindings;
 
 mod states;
 mod components;
