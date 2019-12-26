@@ -43,7 +43,7 @@ impl SimpleState for GamePlayState {
         init_camera(world, &dimensions);
 
         self.current_map.load_sprites(world);             // Load in all the sprites
-        self.current_map.load_room(world, &dimensions);   // Paint the initial room
+        self.current_map.draw_room(world, &dimensions);   // Paint the initial room
          
         // self.currentMap.load_obj(); 
         initialise_player(world, &self.current_map.sprites);         
