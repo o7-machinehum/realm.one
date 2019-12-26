@@ -21,10 +21,10 @@ fn main() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
     let display_config = resources.join("display_config.ron");
-    let binding_path = resources.join("bindings.ron");
+    let key_bindings_config_path = resources.join("bindings.ron");
     
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
-        .with_bindings_from_file(binding_path)?;
+        .with_bindings_from_file(key_bindings_config_path)?;
 
     let room = map::Room::new("resources/sprites/first.tmx".to_string());
 
