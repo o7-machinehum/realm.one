@@ -5,6 +5,7 @@ use amethyst::{
     window::ScreenDimensions,
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
+use std::time::Instant;
 use log::info;
 
 use crate::map;
@@ -13,9 +14,10 @@ pub struct GamePlayState {
     pub current_map: map::Room,
 }
 
-pub struct Player{
+pub struct Player {
     pub x: f32,
     pub y: f32,
+    pub last_movement_instant: Instant,
 }
 
 impl Player {
@@ -23,11 +25,12 @@ impl Player {
         Player {
             x,
             y, 
+            last_movement_instant: Instant::now(),
         }
     }
 }
 
-impl Component for Player{
+impl Component for Player {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }
 
@@ -82,16 +85,16 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
 
 
 fn initialise_player(world: &mut World, sprite: &Vec<SpriteRender>) {
+    let mut player1 = Player::new( 64.0, 64.0 ); 
+
     let mut transform = Transform::default();
-    let mut p1 = Player::new( 64.0, 64.0 ); 
-    // Correctly position the paddles.
-    transform.set_translation_xyz(p1.x, p1.y, 0.0); 
+    transform.set_translation_xyz(player1.x, player1.y, 0.0); 
 
     // Create a player entity.
     world
         .create_entity()
         .with(sprite[125].clone())
-        .with(p1)
+        .with(player1)
         .with(transform)
         .build();
     
