@@ -8,6 +8,7 @@ edition = "2018"
 amethyst = "0.13.2"
 log = { version = "0.4.8", features = ["serde"] }
 tiled = { git = "https://github.com/mattyhall/rs-tiled" }
+serde = { version = "1", features = ["derive"] }
 
 [features]
 default = ["vulkan"]
