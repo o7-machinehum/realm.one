@@ -9,35 +9,16 @@ use std::time::Instant;
 use log::info;
 
 use crate::map;
+use crate::components::PlayerComponent;
 
 pub struct GamePlayState {
     pub current_map: map::Room,
 }
 
-pub struct Player {
-    pub x: f32,
-    pub y: f32,
-    pub last_movement_instant: Instant,
-}
-
-impl Player {
-    fn new( x: f32, y: f32 ) -> Player {
-        Player {
-            x,
-            y, 
-            last_movement_instant: Instant::now(),
-        }
-    }
-}
-
-impl Component for Player {
-    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
-}
-
 impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
-        world.register::<Player>();
+        world.register::<PlayerComponent>();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
@@ -85,7 +66,7 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
 
 
 fn initialise_player(world: &mut World, sprite: &Vec<SpriteRender>) {
-    let mut player1 = Player::new( 64.0, 64.0 ); 
+    let mut player1 = PlayerComponent::new( 64.0, 64.0 ); 
 
     let mut transform = Transform::default();
     transform.set_translation_xyz(player1.x, player1.y, 0.0); 

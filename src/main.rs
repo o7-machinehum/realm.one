@@ -13,6 +13,7 @@ use amethyst::{
 pub mod state;
 pub mod map;
 pub mod key_bindings;
+mod components;
 mod systems;
 
 fn main() -> amethyst::Result<()> {
