@@ -8,7 +8,7 @@ This project uses the [Amethyst](https://amethyst.rs/) game engine.
 
 ## Map creation
 
-Artwork comes from [OpenGameArt.org](https://opengameart.org/content/zelda-like-tilesets-and-sprites).
+Artwork comes from [OpenGameArt.org](https://opengameart.org/content/tiny-16-basic).
 
 Maps are assembled from sprites using the ["Tiled" map editor](https://www.mapeditor.org/). Which
 yields `.tmx` files we can then parse in rust using the [rs-tiled
