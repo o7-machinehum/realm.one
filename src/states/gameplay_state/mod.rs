@@ -1,10 +1,9 @@
 use amethyst::{
     core::transform::Transform,
     prelude::*,
-    renderer::{Camera, SpriteRender},
+    renderer::Camera,
     window::ScreenDimensions,
 };
-use log::info;
 
 use crate::map;
 use crate::components::PlayerComponent;
@@ -21,8 +20,8 @@ impl SimpleState for GamePlayState {
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
 
-        self.current_map.load_sprites(world);             // Load in all the sprites
-        self.current_map.draw_room(world, &dimensions);   // Paint the initial room
+        self.current_map.load_sprites(world);   // Load in all the sprites
+        self.current_map.draw_room(world);      // Paint the initial room
          
         // self.currentMap.load_obj(); 
         initialise_player(world, &self.current_map.sprites);
@@ -44,7 +43,7 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
 
 
 fn initialise_player(world: &mut World, sprite: &Vec<SpriteRender>) {
-    let mut player1 = PlayerComponent::new( 64.0, 64.0 ); 
+    let player1 = PlayerComponent::new( 64.0, 64.0 ); 
 
     let mut transform = Transform::default();
     transform.set_translation_xyz(player1.x, player1.y, 0.0); 

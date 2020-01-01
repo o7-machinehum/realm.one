@@ -6,8 +6,7 @@ use amethyst::input::InputHandler;
 use std::time::Instant;
 
 use crate::components::PlayerComponent;
-use crate::key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding};
-use log::info;
+use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 
 const TILE_SIZE : f32 = 16.0;
 const MOVEMENT_DELAY_MS : u128 = 150;
