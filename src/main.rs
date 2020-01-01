@@ -17,6 +17,8 @@ mod states;
 mod components;
 mod systems;
 
+mod character_sprites;
+
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
