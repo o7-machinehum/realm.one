@@ -1,11 +1,9 @@
 use amethyst::{
     core::transform::Transform,
-    input::{get_key, is_close_requested, is_key_down, VirtualKeyCode}, prelude::*,
+    prelude::*,
     renderer::{Camera, SpriteRender},
     window::ScreenDimensions,
-    ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
-use std::time::Instant;
 use log::info;
 
 use crate::map;
@@ -27,28 +25,8 @@ impl SimpleState for GamePlayState {
         self.current_map.draw_room(world, &dimensions);   // Paint the initial room
          
         // self.currentMap.load_obj(); 
-        initialise_player(world, &self.current_map.sprites);         
+        initialise_player(world, &self.current_map.sprites);
     }
-
-    //fn handle_event(
-    //    &mut self,
-    //    mut _data: StateData<'_, GameData<'_, '_>>,
-    //    event: StateEvent,
-    //) -> SimpleTrans {
-    //    if let StateEvent::Window(event) = &event {
-    //        // Check if the window should be closed
-    //        if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
-    //            return Trans::Quit;
-    //        }
-
-    //        // Listen to any key events
-    //        if let Some(event) = get_key(&event) {
-    //            // info!("handling key event: {:?}", event);
-    //        }
-    //    }
-
-    //    Trans::None
-    //}
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
@@ -80,3 +58,5 @@ fn initialise_player(world: &mut World, sprite: &Vec<SpriteRender>) {
         .build();
     
 }
+
+
