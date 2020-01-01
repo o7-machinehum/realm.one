@@ -3,7 +3,6 @@ use amethyst::{
     core::transform::Transform,
     prelude::*,
     renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    window::ScreenDimensions,
 };
 
 extern crate tiled;
@@ -92,8 +91,8 @@ impl Room {
         };
     }
 
-    pub fn draw_room(&mut self, world: &mut World, dimensions: &ScreenDimensions) {
-        let mut x = 0.0;
+    pub fn draw_room(&mut self, world: &mut World) {
+        let mut x;
         let mut y = 0.0;
 
         const TILE_SIZE : f32 = 16.0;
