@@ -10,9 +10,10 @@ use amethyst::{
     utils::application_root_dir,
 };
 
-pub mod state;
 pub mod map;
 pub mod key_bindings;
+
+mod states;
 mod components;
 mod systems;
 
@@ -45,7 +46,7 @@ fn main() -> amethyst::Result<()> {
 
     let mut game = Application::new(
         resources, 
-        state::GamePlayState{current_map: room}, 
+        states::GamePlayState{current_map: room}, 
         game_data,
     )?;
 
