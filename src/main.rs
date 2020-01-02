@@ -10,9 +10,11 @@ use amethyst::{
     utils::application_root_dir,
 };
 
-pub mod state;
-pub mod map;
-pub mod key_bindings;
+mod map;
+mod key_bindings;
+
+mod states;
+mod components;
 mod systems;
 
 fn main() -> amethyst::Result<()> {
@@ -21,10 +23,10 @@ fn main() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
     let display_config = resources.join("display_config.ron");
-    let binding_path = resources.join("bindings.ron");
+    let key_bindings_config_path = resources.join("bindings.ron");
     
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
-        .with_bindings_from_file(binding_path)?;
+        .with_bindings_from_file(key_bindings_config_path)?;
 
     let room = map::Room::new("resources/sprites/first.tmx".to_string());
 
@@ -44,7 +46,7 @@ fn main() -> amethyst::Result<()> {
 
     let mut game = Application::new(
         resources, 
-        state::GamePlayState{current_map: room}, 
+        states::GamePlayState{current_map: room}, 
         game_data,
     )?;
 

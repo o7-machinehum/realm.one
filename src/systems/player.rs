@@ -5,7 +5,7 @@ use amethyst::input::InputHandler;
 
 use std::time::Instant;
 
-use crate::state::{Player};
+use crate::components::PlayerComponent;
 use crate::key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding};
 use log::info;
 
@@ -18,7 +18,7 @@ pub struct PlayerSystem;
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
         WriteStorage<'s, Transform>,
-        WriteStorage<'s, Player>,
+        WriteStorage<'s, PlayerComponent>,
         Read<'s, InputHandler<MovementBindingTypes>>,
     );
 

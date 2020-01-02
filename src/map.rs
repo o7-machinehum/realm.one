@@ -7,9 +7,11 @@ use amethyst::{
 };
 
 extern crate tiled;
-use std::fs::File;
-use std::io::BufReader;
-use std::path::Path;
+use std::{
+    fs::File,
+    io::BufReader,
+    path::Path,
+};
 use log::info;
 
 pub struct Room {
@@ -64,7 +66,7 @@ impl Room {
                     &texture_storage,
                 )
             };
-    
+
             // Load the spritesheet definition file, which contains metadata on our
             // spritesheet texture.
             let sheet_handle = {
@@ -90,7 +92,7 @@ impl Room {
         };
     }
 
-    pub fn load_room(&mut self, world: &mut World, dimensions: &ScreenDimensions) {
+    pub fn draw_room(&mut self, world: &mut World, dimensions: &ScreenDimensions) {
         let mut x = 0.0;
         let mut y = 0.0;
 

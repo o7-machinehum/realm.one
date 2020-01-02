@@ -1,73 +1,32 @@
 use amethyst::{
     core::transform::Transform,
-    input::{get_key, is_close_requested, is_key_down, VirtualKeyCode}, prelude::*,
+    prelude::*,
     renderer::{Camera, SpriteRender},
     window::ScreenDimensions,
-    ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
-use std::time::Instant;
 use log::info;
 
 use crate::map;
+use crate::components::PlayerComponent;
 
 pub struct GamePlayState {
     pub current_map: map::Room,
 }
 
-pub struct Player {
-    pub x: f32,
-    pub y: f32,
-    pub last_movement_instant: Instant,
-}
-
-impl Player {
-    fn new( x: f32, y: f32 ) -> Player {
-        Player {
-            x,
-            y, 
-            last_movement_instant: Instant::now(),
-        }
-    }
-}
-
-impl Component for Player {
-    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
-}
-
 impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
-        world.register::<Player>();
+        world.register::<PlayerComponent>();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
 
         self.current_map.load_sprites(world);             // Load in all the sprites
-        self.current_map.load_room(world, &dimensions);   // Paint the initial room
+        self.current_map.draw_room(world, &dimensions);   // Paint the initial room
          
         // self.currentMap.load_obj(); 
-        initialise_player(world, &self.current_map.sprites);         
+        initialise_player(world, &self.current_map.sprites);
     }
-
-    //fn handle_event(
-    //    &mut self,
-    //    mut _data: StateData<'_, GameData<'_, '_>>,
-    //    event: StateEvent,
-    //) -> SimpleTrans {
-    //    if let StateEvent::Window(event) = &event {
-    //        // Check if the window should be closed
-    //        if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
-    //            return Trans::Quit;
-    //        }
-
-    //        // Listen to any key events
-    //        if let Some(event) = get_key(&event) {
-    //            // info!("handling key event: {:?}", event);
-    //        }
-    //    }
-
-    //    Trans::None
-    //}
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
@@ -85,7 +44,7 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
 
 
 fn initialise_player(world: &mut World, sprite: &Vec<SpriteRender>) {
-    let mut player1 = Player::new( 64.0, 64.0 ); 
+    let mut player1 = PlayerComponent::new( 64.0, 64.0 ); 
 
     let mut transform = Transform::default();
     transform.set_translation_xyz(player1.x, player1.y, 0.0); 
@@ -99,3 +58,5 @@ fn initialise_player(world: &mut World, sprite: &Vec<SpriteRender>) {
         .build();
     
 }
+
+
