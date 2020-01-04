@@ -3,6 +3,7 @@ use amethyst::{
     core::transform::Transform,
     prelude::*,
     renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 
 extern crate tiled;
@@ -24,6 +25,10 @@ pub struct Room {
     pub sprites: Vec<SpriteRender>,
 }
 
+impl Component for Room{
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+
 // Comment
 impl Room {
     pub fn new(file_name: String) -> Self {
@@ -31,7 +36,7 @@ impl Room {
     	let reader = BufReader::new(file);
         let map =  tiled::parse(reader).unwrap();
 
-        // info!("{:?}", map);
+        info!("{:?}", map);
 
         Self {
             tiles: Room::count_tiles(&map), 
@@ -49,6 +54,33 @@ impl Room {
         info!("Tiles in the images: {:?}", v);
 
         v
+    }
+
+    fn draw_layer(&mut self, world: &mut World, layer: Layers) {
+        let mut x;
+        let mut y = 0.0;
+
+        const TILE_SIZE : f32 = 8.0;
+
+        for row in self.current.layers[layer as usize].tiles.iter().rev() {
+            x = 0.0;
+            y += TILE_SIZE;
+
+            for col in row.iter() {
+                x += TILE_SIZE; 
+
+                let mut transform = Transform::default();
+                transform.set_translation_xyz(x, y, 0.);
+                
+                if col.gid != 0 {
+                    world
+                        .create_entity()
+                        .with(self.sprites[col.gid as usize - 1].clone())
+                        .with(transform)
+                        .build();
+                }
+            }
+        }
     }
 
     pub fn load_sprites(&mut self, world: &mut World) {
@@ -96,35 +128,10 @@ impl Room {
         };
     }
 
-    fn draw_layer(&mut self, world: &mut World, layer: Layers) {
-        let mut x;
-        let mut y = 0.0;
-
-        const TILE_SIZE : f32 = 8.0;
-
-        for row in self.current.layers[layer as usize].tiles.iter().rev() {
-            x = 0.0;
-            y += TILE_SIZE;
-
-            for col in row.iter() {
-                x += TILE_SIZE; 
-
-                let mut transform = Transform::default();
-                transform.set_translation_xyz(x, y, 0.);
-                
-                if col.gid != 0 {
-                    world
-                        .create_entity()
-                        .with(self.sprites[col.gid as usize - 1].clone())
-                        .with(transform)
-                        .build();
-                }
-            }
-        }
-    }
-
     pub fn draw_room(&mut self, world: &mut World) {
         self.draw_layer(world, Layers::L2Static);
         self.draw_layer(world, Layers::L1Static);
-    } 
+    
+    
+    }
 }
