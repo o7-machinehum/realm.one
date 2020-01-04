@@ -18,6 +18,7 @@ impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         world.register::<PlayerComponent>();
+        world.register::<map::Room>();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
@@ -29,6 +30,11 @@ impl SimpleState for GamePlayState {
 
         // self.currentMap.load_obj(); 
         initialise_player(world, character_spritesheet_handle);
+    
+        world
+            .create_entity()
+            .with(self.current_map) 
+            .build();
     }
 }
 
@@ -47,7 +53,7 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
 
 
 fn initialise_player(world: &mut World, spritesheet_handle: Handle<SpriteSheet>) {
-    let player1 = PlayerComponent::new( 64.0, 64.0, spritesheet_handle.clone() ); 
+    let player1 = PlayerComponent::new( 8.0, 8.0, spritesheet_handle.clone() ); 
 
     let mut transform = Transform::default();
     transform.set_translation_xyz(player1.x, player1.y, 0.0); 
