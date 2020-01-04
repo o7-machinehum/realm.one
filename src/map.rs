@@ -19,6 +19,9 @@ enum Layers {
     L2Static,
 }
 
+const TILE_SIZE : f32 = 8.0;
+const PLAYER_MOVE : f32 = 16.0;
+
 pub struct Room {
     pub current: tiled::Map,   // Current room 
     pub tiles: Vec<i32>,
@@ -59,9 +62,6 @@ impl Room {
     fn draw_layer(&mut self, world: &mut World, layer: Layers) {
         let mut x;
         let mut y = 0.0;
-
-        const TILE_SIZE : f32 = 8.0;
-
         for row in self.current.layers[layer as usize].tiles.iter().rev() {
             x = 0.0;
             y += TILE_SIZE;
@@ -131,5 +131,16 @@ impl Room {
     pub fn draw_room(&mut self, world: &mut World) {
         self.draw_layer(world, Layers::L2Static);
         self.draw_layer(world, Layers::L1Static);
+    }
+    
+    pub fn get_adj(&mut self, pos: &Transform) -> Vec<tiled::Properties> {
+        let mut prop: Vec<tiled::Properties> = Vec::new();
+        let x: u32 = ((pos.translation().data[0] - TILE_SIZE) / PLAYER_MOVE) as u32;
+        let y: u32 = ((pos.translation().data[1] - TILE_SIZE) / PLAYER_MOVE) as u32;
+        
+        // Now hunt through self and 
+        info!("{}, {}", x, y);
+
+        prop
     }
 }

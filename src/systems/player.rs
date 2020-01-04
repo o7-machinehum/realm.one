@@ -9,6 +9,7 @@ use std::time::Instant;
 use crate::components::PlayerComponent;
 use crate::character_sprites::{Orientation, get_oriented_sprite};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
+use crate::map::Room;
 
 const TILE_SIZE : f32 = 16.0;
 const MOVEMENT_DELAY_MS : u128 = 150;
@@ -21,11 +22,12 @@ impl<'s> System<'s> for PlayerSystem{
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, SpriteRender>,
+        WriteStorage<'s, Room>,
         Entities<'s>,
         Read<'s, InputHandler<MovementBindingTypes>>,
     );
 
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, entities, input): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut rooms, entities, input): Self::SystemData) {
         for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
             let now = Instant::now();
 
@@ -54,8 +56,13 @@ impl<'s> System<'s> for PlayerSystem{
                 player.last_movement_instant = now.clone();
                 
                 sprite_renders.insert(entity, get_oriented_sprite(player.spritesheet_handle.clone(), orientation));
-                transform.move_up(vertical * TILE_SIZE);
-                transform.move_right(horizontal * TILE_SIZE);
+                
+                for (room) in (&mut rooms).join() {
+                    let mut adj_tiles: Vec<tiled::Properties> = room.get_adj(transform);
+
+                    transform.move_up(vertical * TILE_SIZE);
+                    transform.move_right(horizontal * TILE_SIZE);
+                } 
             }
         } 
     }
