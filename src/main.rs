@@ -30,8 +30,6 @@ fn main() -> amethyst::Result<()> {
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(key_bindings_config_path)?;
 
-    let room = map::Room::new("resources/sprites/town.tmx".to_string());
-
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(
@@ -48,7 +46,7 @@ fn main() -> amethyst::Result<()> {
 
     let mut game = Application::new(
         resources, 
-        states::GamePlayState{current_map: room}, 
+        states::GamePlayState{},
         game_data,
     )?;
 
