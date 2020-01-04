@@ -13,6 +13,11 @@ use std::{
 };
 use log::info;
 
+enum Layers {
+    L1Static = 0,
+    L2Static,
+}
+
 pub struct Room {
     pub current: tiled::Map,   // Current room 
     pub tiles: Vec<i32>,
@@ -91,13 +96,13 @@ impl Room {
         };
     }
 
-    pub fn draw_room(&mut self, world: &mut World) {
+    fn draw_layer(&mut self, world: &mut World, layer: Layers) {
         let mut x;
         let mut y = 0.0;
 
-        const TILE_SIZE : f32 = 16.0;
+        const TILE_SIZE : f32 = 8.0;
 
-        for row in self.current.layers[0].tiles.iter().rev() {
+        for row in self.current.layers[layer as usize].tiles.iter().rev() {
             x = 0.0;
             y += TILE_SIZE;
 
@@ -117,4 +122,9 @@ impl Room {
             }
         }
     }
+
+    pub fn draw_room(&mut self, world: &mut World) {
+        self.draw_layer(world, Layers::L2Static);
+        self.draw_layer(world, Layers::L1Static);
+    } 
 }

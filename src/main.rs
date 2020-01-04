@@ -30,7 +30,7 @@ fn main() -> amethyst::Result<()> {
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(key_bindings_config_path)?;
 
-    let room = map::Room::new("resources/sprites/first.tmx".to_string());
+    let room = map::Room::new("resources/sprites/town.tmx".to_string());
 
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
