@@ -131,7 +131,5 @@ impl Room {
     pub fn draw_room(&mut self, world: &mut World) {
         self.draw_layer(world, Layers::L2Static);
         self.draw_layer(world, Layers::L1Static);
-    
-    
     }
 }
