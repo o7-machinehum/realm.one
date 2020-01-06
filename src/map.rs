@@ -28,11 +28,11 @@ pub struct Room {
 }
 
 pub struct Adj {
-    pub cur: tiled::Properties,
-    // pub n: tiled::Properties,
-    // pub s: tiled::Properties,
-    // pub e: tiled::Properties,
-    // pub w: tiled::Properties,
+    pub cur: Option<tiled::Properties>,
+    pub n: Option<tiled::Properties>,
+    pub e: Option<tiled::Properties>,
+    pub s: Option<tiled::Properties>,
+    pub w: Option<tiled::Properties>,
 }
 
 impl Component for Room{
@@ -46,8 +46,8 @@ impl Room {
     	let reader = BufReader::new(file);
         let map =  tiled::parse(reader).unwrap();
 
-        info!("{:?}", map.layers[0].tiles);
-        info!("Width/Height: {}, {}, ", map.width, map.height);
+        // info!("{:?}", map.layers[0].tiles);
+        // info!("Width/Height: {}, {}, ", map.width, map.height);
 
         Self {
             len_width: Room::count_tiles(&map), 
@@ -142,31 +142,30 @@ impl Room {
     }
     
     // Convert world coordinates to tiled coordinates
-    fn world_2_tiled(&mut self, (x, y): (u32, u32)) -> (u32, u32){
-        (x, (self.current.height- 1) - y)
+    fn world_2_tiled(&mut self, (x, y): (i32, i32)) -> (i32, i32){
+        (x, (self.current.height as i32 - 1) - y)
     }
 
-    pub fn get_pos(pos: &Transform) -> (u32, u32){
+    pub fn get_pos(pos: &Transform) -> (i32, i32){
          Room::px_2_world(pos.translation().data[0], pos.translation().data[1])
     }
     
     // Convert from pixel coordinates 
-    pub fn px_2_world(x: f32, y:f32) -> (u32, u32){
-        ((((x - constants::TILE_SIZE) / constants::TILE_SIZE) as u32),
-         (((y - constants::TILE_SIZE) / constants::TILE_SIZE) as u32)
+    pub fn px_2_world(x: f32, y:f32) -> (i32, i32){
+        ((((x - constants::TILE_SIZE) / constants::TILE_SIZE) as i32),
+         (((y - constants::TILE_SIZE) / constants::TILE_SIZE) as i32)
         )
     }
 
     // Check to see if the resulting position is inside the map
     pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32) -> bool{
         let (x, y) = Room::get_pos(pos);
-        info!("{}, {}", x, y);
 
-        if(vertical > 0.) && (y >= (self.current.height - constants::TILE_PER_PLAYER as u32)){
+        if(vertical > 0.) && (y >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32)){
             return false;
         }
         
-        else if (horizontal > 0.) && (x >= (self.current.width - constants::TILE_PER_PLAYER as u32)){
+        else if (horizontal > 0.) && (x >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32)){
             return false;
         }
         
@@ -181,14 +180,38 @@ impl Room {
         return true;
     }
     
+    fn get_prop(&mut self, (x, y): (i32, i32), (xoff, yoff): (i32, i32)) -> Option<tiled::Properties> {
+
+        if (x == 0 && xoff <= -1) || (y == 0 && yoff <= -1) {
+            return None;  
+        }
+
+        if x + xoff >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32) {
+            return None;
+        }
+
+        if y + yoff >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32) {
+            return None;
+        }
+        
+        let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
+        let tile = self.current.layers[0].tiles[y1 as usize][x1 as usize];
+
+        match self.current.get_tileset_by_gid(tile.gid){
+            Some(thing) => return Some(thing.tiles[tile.gid as usize].properties.clone()),
+            None => return None,
+        }
+    }
+    
     pub fn get_adj(&mut self, pos: &Transform) -> Adj {
-        let (x, y): (u32, u32) = self.world_2_tiled(Room::get_pos(pos));
-        let tile = self.current.layers[0].tiles[y as usize][x as usize];
-
-        info!("{:?}", self.current.get_tileset_by_gid(tile.gid).unwrap().tiles[tile.gid as usize]);
-
-        Adj {
-            cur:  self.current.get_tileset_by_gid(tile.gid).unwrap().tiles[tile.gid as usize].properties.clone()
+        let (x, y): (i32, i32) = Room::get_pos(pos);
+        
+        Adj{
+            cur: self.get_prop((x,y),(0,0)),
+            n:   self.get_prop((x,y),(0,constants::TILE_PER_PLAYER as i32)),
+            e:   self.get_prop((x,y),(constants::TILE_PER_PLAYER as i32,0)),
+            s:   self.get_prop((x,y),(0,-1 * constants::TILE_PER_PLAYER as i32)),
+            w:   self.get_prop((x,y),(-1 * constants::TILE_PER_PLAYER as i32,0)),
         }
     }
 }

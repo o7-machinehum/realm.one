@@ -5,11 +5,12 @@ use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
 
 use std::time::Instant;
+use log::info;
 
 use crate::components::PlayerComponent;
 use crate::character_sprites::{Orientation, get_oriented_sprite};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
-use crate::map::Room;
+use crate::map::{Room, Adj};
 
 use crate::constants;
 
@@ -61,8 +62,15 @@ impl<'s> System<'s> for PlayerSystem{
                 }
 
                 for room in (&mut rooms).join() {
-                    room.get_adj(transform);
+                    let adj: Adj = room.get_adj(transform);
+                    info!("cur:{:?}, n:{:?}, s:{:?}, e:{:?}, w:{:?} ", adj.cur, adj.n, adj.s, adj.e, adj.w);
                     
+                    match adj.n.unwrap()(&"Collision"){
+                        Some(&thing) => info!("match"),
+                        None => info!("object"),
+                        
+                    }
+
                     if room.allowed_move(transform, horizontal, vertical){
                         transform.move_up(vertical * constants::PLAYER_MOVE );
                         transform.move_right(horizontal * constants::PLAYER_MOVE );
