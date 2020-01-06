@@ -11,8 +11,9 @@ use crate::character_sprites::{Orientation, get_oriented_sprite};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::Room;
 
-const TILE_SIZE : f32 = 16.0;
-const MOVEMENT_DELAY_MS : u128 = 150;
+use log::info;
+
+use crate::constants;
 
 #[derive(SystemDesc)]
 pub struct PlayerSystem;
@@ -31,7 +32,7 @@ impl<'s> System<'s> for PlayerSystem{
         for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
             let now = Instant::now();
 
-            if now.duration_since(player.last_movement_instant).as_millis() >= MOVEMENT_DELAY_MS {
+            if now.duration_since(player.last_movement_instant).as_millis() >= constants::MOVEMENT_DELAY_MS {
                 let horizontal = input
                     .axis_value(&AxisBinding::Horizontal)
                     .unwrap_or(0.0);
@@ -54,15 +55,17 @@ impl<'s> System<'s> for PlayerSystem{
                 player.orientation = orientation.clone();
 
                 player.last_movement_instant = now.clone();
-                
+                 
                 sprite_renders.insert(entity, get_oriented_sprite(player.spritesheet_handle.clone(), orientation));
                 
                 for (room) in (&mut rooms).join() {
-                    let mut adj_tiles: Vec<tiled::Properties> = room.get_adj(transform);
-
-                    transform.move_up(vertical * TILE_SIZE);
-                    transform.move_right(horizontal * TILE_SIZE);
-                } 
+                    room.get_adj(transform);
+                    
+                    if(room.allowed_move(transform, horizontal, vertical)){
+                        transform.move_up(vertical * constants::PLAYER_MOVE );
+                        transform.move_right(horizontal * constants::PLAYER_MOVE );
+                    }
+                }
             }
         } 
     }

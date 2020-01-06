@@ -16,6 +16,7 @@ mod key_bindings;
 mod states;
 mod components;
 mod systems;
+mod constants;
 
 mod character_sprites;
 
