@@ -58,6 +58,10 @@ impl<'s> System<'s> for PlayerSystem{
                  
                 sprite_renders.insert(entity, get_oriented_sprite(player.spritesheet_handle.clone(), orientation));
                 
+                if horizontal == 0. && vertical == 0. {
+                    return;
+                }
+
                 for (room) in (&mut rooms).join() {
                     room.get_adj(transform);
                     
