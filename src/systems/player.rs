@@ -11,8 +11,6 @@ use crate::character_sprites::{Orientation, get_oriented_sprite};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::Room;
 
-use log::info;
-
 use crate::constants;
 
 #[derive(SystemDesc)]
@@ -62,10 +60,10 @@ impl<'s> System<'s> for PlayerSystem{
                     return;
                 }
 
-                for (room) in (&mut rooms).join() {
+                for room in (&mut rooms).join() {
                     room.get_adj(transform);
                     
-                    if(room.allowed_move(transform, horizontal, vertical)){
+                    if room.allowed_move(transform, horizontal, vertical){
                         transform.move_up(vertical * constants::PLAYER_MOVE );
                         transform.move_right(horizontal * constants::PLAYER_MOVE );
                     }
