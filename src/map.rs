@@ -151,6 +151,12 @@ impl Room {
     pub fn get_pos(pos: &Transform) -> (u32, u32){
          Room::char_2_world(pos.translation().data[0], pos.translation().data[1])
     }
+    
+    pub fn char_2_world(x: f32, y:f32) -> (u32, u32){
+        ((((x - constants::TILE_SIZE) / constants::TILE_SIZE) as u32),
+         (((y - constants::TILE_SIZE) / constants::TILE_SIZE) as u32)
+        )
+    }
 
     // Check to see if the resuting position is inside the map
     pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32) -> bool{
