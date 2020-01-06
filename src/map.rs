@@ -15,7 +15,6 @@ use std::{
 
 use log::info;
 use crate::constants;
-use crate::character_sprites::{Orientation};
 
 enum Layers {
     L1Static = 0,
@@ -149,33 +148,34 @@ impl Room {
     }
 
     pub fn get_pos(pos: &Transform) -> (u32, u32){
-         Room::char_2_world(pos.translation().data[0], pos.translation().data[1])
+         Room::px_2_world(pos.translation().data[0], pos.translation().data[1])
     }
     
-    pub fn char_2_world(x: f32, y:f32) -> (u32, u32){
+    // Convert from pixel coordinates 
+    pub fn px_2_world(x: f32, y:f32) -> (u32, u32){
         ((((x - constants::TILE_SIZE) / constants::TILE_SIZE) as u32),
          (((y - constants::TILE_SIZE) / constants::TILE_SIZE) as u32)
         )
     }
 
-    // Check to see if the resuting position is inside the map
+    // Check to see if the resulting position is inside the map
     pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32) -> bool{
         let (x, y) = Room::get_pos(pos);
         info!("{}, {}", x, y);
 
-        if((vertical > 0.) && (y >= (self.current.height - 2))){
+        if(vertical > 0.) && (y >= (self.current.height - 2)){
             return false;
         }
         
-        else if((horizontal > 0.) && (x >= (self.current.width- 2))){
+        else if (horizontal > 0.) && (x >= (self.current.width- 2)){
             return false;
         }
         
-        else if((vertical < 0.) && (y == 0) ){
+        else if(vertical < 0.) && (y == 0){
             return false;
         }
         
-        else if((horizontal < 0.) && (x == 0)){ 
+        else if(horizontal < 0.) && (x == 0){ 
             return false;
         }
         
