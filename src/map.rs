@@ -12,20 +12,29 @@ use std::{
     io::BufReader,
     path::Path,
 };
+
 use log::info;
+use crate::constants;
+use crate::character_sprites::{Orientation};
 
 enum Layers {
     L1Static = 0,
     L2Static,
 }
 
-const TILE_SIZE : f32 = 8.0;
-const PLAYER_MOVE : f32 = 16.0;
-
 pub struct Room {
     pub current: tiled::Map,   // Current room 
-    pub tiles: Vec<i32>,
+    pub len_width: Vec<i32>,   // How many tiles in the png
     pub sprites: Vec<SpriteRender>,
+}
+
+pub struct Adj {
+    pub i: u32, 
+    // pub cur: tiled::Properties,
+    // pub n: tiled::Properties,
+    // pub s: tiled::Properties,
+    // pub e: tiled::Properties,
+    // pub w: tiled::Properties,
 }
 
 impl Component for Room{
@@ -39,10 +48,11 @@ impl Room {
     	let reader = BufReader::new(file);
         let map =  tiled::parse(reader).unwrap();
 
-        info!("{:?}", map);
+        info!("{:?}", map.layers[0].tiles);
+        info!("Width/Height: {}, {}, ", map.width, map.height);
 
         Self {
-            tiles: Room::count_tiles(&map), 
+            len_width: Room::count_tiles(&map), 
             current: map,
             sprites: Vec::new(), 
         }
@@ -64,10 +74,10 @@ impl Room {
         let mut y = 0.0;
         for row in self.current.layers[layer as usize].tiles.iter().rev() {
             x = 0.0;
-            y += TILE_SIZE;
+            y += constants::TILE_SIZE;
 
             for col in row.iter() {
-                x += TILE_SIZE; 
+                x += constants::TILE_SIZE; 
 
                 let mut transform = Transform::default();
                 transform.set_translation_xyz(x, y, 0.);
@@ -118,7 +128,7 @@ impl Room {
                 )
             };
  
-            for i in 0..self.tiles[ii] { 
+            for i in 0..self.len_width[ii] { 
                 self.sprites.push(SpriteRender {
                     sprite_sheet: sheet_handle.clone(),
                     sprite_number: i as usize,
@@ -133,14 +143,47 @@ impl Room {
         self.draw_layer(world, Layers::L1Static);
     }
     
-    pub fn get_adj(&mut self, pos: &Transform) -> Vec<tiled::Properties> {
-        let mut prop: Vec<tiled::Properties> = Vec::new();
-        let x: u32 = ((pos.translation().data[0] - TILE_SIZE) / PLAYER_MOVE) as u32;
-        let y: u32 = ((pos.translation().data[1] - TILE_SIZE) / PLAYER_MOVE) as u32;
-        
-        // Now hunt through self and 
+    // Convert world coordinates to tiled coordinates
+    fn world_2_tiled(&mut self, (x, y): (u32, u32)) -> (u32, u32){
+        (x, (self.current.height- 1) - y)
+    }
+
+    pub fn get_pos(pos: &Transform) -> (u32, u32){
+         Room::char_2_world(pos.translation().data[0], pos.translation().data[1])
+    }
+
+    // Check to see if the resuting position is inside the map
+    pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32) -> bool{
+        let (x, y) = Room::get_pos(pos);
         info!("{}, {}", x, y);
 
-        prop
+        if((vertical > 0.) && (y >= (self.current.height - 2))){
+            return false;
+        }
+        
+        else if((horizontal > 0.) && (x >= (self.current.width- 2))){
+            return false;
+        }
+        
+        else if((vertical < 0.) && (y == 0) ){
+            return false;
+        }
+        
+        else if((horizontal < 0.) && (x == 0)){ 
+            return false;
+        }
+        
+        return true;
+    }
+    
+    pub fn get_adj(&mut self, pos: &Transform) -> Adj {
+        let (x, y): (u32, u32) = self.world_2_tiled(Room::get_pos(pos));
+        let tile = self.current.layers[0].tiles[y as usize][x as usize];
+
+        info!("{:?}", self.current.get_tileset_by_gid(tile.gid).unwrap().tiles[tile.gid as usize]);
+
+        Adj {
+            i: 0,
+        }
     }
 }
