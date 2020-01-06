@@ -28,8 +28,7 @@ pub struct Room {
 }
 
 pub struct Adj {
-    pub i: u32, 
-    // pub cur: tiled::Properties,
+    pub cur: tiled::Properties,
     // pub n: tiled::Properties,
     // pub s: tiled::Properties,
     // pub e: tiled::Properties,
@@ -163,11 +162,11 @@ impl Room {
         let (x, y) = Room::get_pos(pos);
         info!("{}, {}", x, y);
 
-        if(vertical > 0.) && (y >= (self.current.height - 2)){
+        if(vertical > 0.) && (y >= (self.current.height - constants::TILE_PER_PLAYER as u32)){
             return false;
         }
         
-        else if (horizontal > 0.) && (x >= (self.current.width- 2)){
+        else if (horizontal > 0.) && (x >= (self.current.width - constants::TILE_PER_PLAYER as u32)){
             return false;
         }
         
@@ -189,7 +188,7 @@ impl Room {
         info!("{:?}", self.current.get_tileset_by_gid(tile.gid).unwrap().tiles[tile.gid as usize]);
 
         Adj {
-            i: 0,
+            cur:  self.current.get_tileset_by_gid(tile.gid).unwrap().tiles[tile.gid as usize].properties.clone()
         }
     }
 }
