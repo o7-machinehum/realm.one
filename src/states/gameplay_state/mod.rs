@@ -10,25 +10,30 @@ use crate::map;
 use crate::components::PlayerComponent;
 use crate::character_sprites::{get_oriented_sprite, load_sprites};
 
-pub struct GamePlayState {
-    pub current_map: map::Room,
-}
+pub struct GamePlayState {}
 
 impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         world.register::<PlayerComponent>();
+        world.register::<map::Room>();
+
+        let mut room = map::Room::new("resources/sprites/town.tmx".to_string());
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
 
-        self.current_map.load_sprites(world);   // Load in all the sprites
-        self.current_map.draw_room(world);      // Paint the initial room
-         
+        room.load_sprites(world);   // Load in all the sprites
+        room.draw_room(world);      // Paint the initial room
+        
         let character_spritesheet_handle = load_sprites(world);
 
-        // self.currentMap.load_obj(); 
         initialise_player(world, character_spritesheet_handle);
+    
+        world
+            .create_entity()
+            .with(room)
+            .build();
     }
 }
 
@@ -47,7 +52,7 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
 
 
 fn initialise_player(world: &mut World, spritesheet_handle: Handle<SpriteSheet>) {
-    let player1 = PlayerComponent::new( 64.0, 64.0, spritesheet_handle.clone() ); 
+    let player1 = PlayerComponent::new( 8.0, 8.0, spritesheet_handle.clone() ); 
 
     let mut transform = Transform::default();
     transform.set_translation_xyz(player1.x, player1.y, 0.0); 
