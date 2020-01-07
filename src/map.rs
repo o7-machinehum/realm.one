@@ -143,7 +143,7 @@ impl Room {
 
     pub fn draw_room(&mut self, world: &mut World) {
         // self.draw_layer(world, Layers::L6);
-        // self.draw_layer(world, Layers::L5);
+        self.draw_layer(world, Layers::L5);
         self.draw_layer(world, Layers::L4);
         self.draw_layer(world, Layers::L3);
         self.draw_layer(world, Layers::L2);
