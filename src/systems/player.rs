@@ -63,15 +63,7 @@ impl<'s> System<'s> for PlayerSystem{
 
                 for room in (&mut rooms).join() {
                     let adj: Adj = room.get_adj(transform);
-                    info!("cur:{:?}, n:{:?}, s:{:?}, e:{:?}, w:{:?} ", adj.cur, adj.n, adj.s, adj.e, adj.w);
-                    
-                    match adj.n.unwrap()(&"Collision"){
-                        Some(&thing) => info!("match"),
-                        None => info!("object"),
-                        
-                    }
-
-                    if room.allowed_move(transform, horizontal, vertical){
+                    if room.allowed_move(transform, horizontal, vertical, adj){
                         transform.move_up(vertical * constants::PLAYER_MOVE );
                         transform.move_right(horizontal * constants::PLAYER_MOVE );
                     }

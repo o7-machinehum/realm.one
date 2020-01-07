@@ -1,4 +1,4 @@
 (
   title: "amethyst-cli-starter-2d",
-  dimensions: Some((480, 480)),
+  dimensions: Some((768, 768)),
 )
