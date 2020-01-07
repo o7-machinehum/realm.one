@@ -22,6 +22,8 @@ enum Layers {
     L2,
     L3,
     L4,
+    L5,
+    L6,
 }
 
 pub struct Room {
@@ -140,6 +142,8 @@ impl Room {
     }
 
     pub fn draw_room(&mut self, world: &mut World) {
+        // self.draw_layer(world, Layers::L6);
+        // self.draw_layer(world, Layers::L5);
         self.draw_layer(world, Layers::L4);
         self.draw_layer(world, Layers::L3);
         self.draw_layer(world, Layers::L2);
@@ -209,7 +213,7 @@ impl Room {
         }
         
         let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
-        let tile = self.current.layers[Layers::L3 as usize].tiles[y1 as usize][x1 as usize];
+        let tile = self.current.layers[Layers::L4 as usize].tiles[y1 as usize][x1 as usize];
 
         match self.current.get_tileset_by_gid(tile.gid){
             Some(thing) => return Some(thing.tiles[tile.gid as usize].properties.clone()),
