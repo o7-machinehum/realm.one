@@ -15,10 +15,13 @@ use std::{
 
 use log::info;
 use crate::constants;
+use crate::mech::colision;
 
 enum Layers {
-    L1Static = 0,
-    L2Static,
+    L1 = 0,
+    L2,
+    L3,
+    L4,
 }
 
 pub struct Room {
@@ -137,8 +140,10 @@ impl Room {
     }
 
     pub fn draw_room(&mut self, world: &mut World) {
-        self.draw_layer(world, Layers::L2Static);
-        self.draw_layer(world, Layers::L1Static);
+        self.draw_layer(world, Layers::L4);
+        self.draw_layer(world, Layers::L3);
+        self.draw_layer(world, Layers::L2);
+        self.draw_layer(world, Layers::L1);
     }
     
     // Convert world coordinates to tiled coordinates
@@ -158,22 +163,30 @@ impl Room {
     }
 
     // Check to see if the resulting position is inside the map
-    pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32) -> bool{
+    pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32, adj: Adj) -> bool{
         let (x, y) = Room::get_pos(pos);
-
-        if(vertical > 0.) && (y >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32)){
+       
+        // North
+        if(vertical > 0.) && ((y >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32)) 
+                          || colision(&adj.n)){
             return false;
         }
         
-        else if (horizontal > 0.) && (x >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32)){
+        // East
+        else if (horizontal > 0.) && ((x >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32))
+                                  || colision(&adj.e)){
             return false;
         }
         
-        else if(vertical < 0.) && (y == 0){
+        // South
+        else if(vertical < 0.) && ((y == 0)
+                               || colision(&adj.s)){
             return false;
         }
         
-        else if(horizontal < 0.) && (x == 0){ 
+        // West
+        else if(horizontal < 0.) && ((x == 0)
+                                 || colision(&adj.w)){
             return false;
         }
         
@@ -181,21 +194,22 @@ impl Room {
     }
     
     fn get_prop(&mut self, (x, y): (i32, i32), (xoff, yoff): (i32, i32)) -> Option<tiled::Properties> {
-
+        
+        // Bottom left
         if (x == 0 && xoff <= -1) || (y == 0 && yoff <= -1) {
             return None;  
         }
-
-        if x + xoff >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32) {
+        
+        if x + xoff > (self.current.width as i32 - constants::TILE_PER_PLAYER as i32) {
             return None;
         }
 
-        if y + yoff >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32) {
+        if y + yoff > (self.current.height as i32 - constants::TILE_PER_PLAYER as i32) {
             return None;
         }
         
         let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
-        let tile = self.current.layers[0].tiles[y1 as usize][x1 as usize];
+        let tile = self.current.layers[Layers::L3 as usize].tiles[y1 as usize][x1 as usize];
 
         match self.current.get_tileset_by_gid(tile.gid){
             Some(thing) => return Some(thing.tiles[tile.gid as usize].properties.clone()),
