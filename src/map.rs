@@ -3,6 +3,7 @@ use amethyst::{
     core::transform::Transform,
     prelude::*,
     renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 
 extern crate tiled;
@@ -11,12 +12,34 @@ use std::{
     io::BufReader,
     path::Path,
 };
+
 use log::info;
+use crate::constants;
+use crate::mech::colision;
+
+enum Layers {
+    L1 = 0,
+    L2,
+    L3,
+    L4,
+}
 
 pub struct Room {
     pub current: tiled::Map,   // Current room 
-    pub tiles: Vec<i32>,
+    pub len_width: Vec<i32>,   // How many tiles in the png
     pub sprites: Vec<SpriteRender>,
+}
+
+pub struct Adj {
+    pub cur: Option<tiled::Properties>,
+    pub n: Option<tiled::Properties>,
+    pub e: Option<tiled::Properties>,
+    pub s: Option<tiled::Properties>,
+    pub w: Option<tiled::Properties>,
+}
+
+impl Component for Room{
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }
 
 // Comment
@@ -26,10 +49,11 @@ impl Room {
     	let reader = BufReader::new(file);
         let map =  tiled::parse(reader).unwrap();
 
-        // info!("{:?}", map);
+        // info!("{:?}", map.layers[0].tiles);
+        // info!("Width/Height: {}, {}, ", map.width, map.height);
 
         Self {
-            tiles: Room::count_tiles(&map), 
+            len_width: Room::count_tiles(&map), 
             current: map,
             sprites: Vec::new(), 
         }
@@ -44,6 +68,30 @@ impl Room {
         info!("Tiles in the images: {:?}", v);
 
         v
+    }
+
+    fn draw_layer(&mut self, world: &mut World, layer: Layers) {
+        let mut x;
+        let mut y = 0.0;
+        for row in self.current.layers[layer as usize].tiles.iter().rev() {
+            x = 0.0;
+            y += constants::TILE_SIZE;
+
+            for col in row.iter() {
+                x += constants::TILE_SIZE; 
+
+                let mut transform = Transform::default();
+                transform.set_translation_xyz(x, y, 0.);
+                
+                if col.gid != 0 {
+                    world
+                        .create_entity()
+                        .with(self.sprites[col.gid as usize - 1].clone())
+                        .with(transform)
+                        .build();
+                }
+            }
+        }
     }
 
     pub fn load_sprites(&mut self, world: &mut World) {
@@ -81,7 +129,7 @@ impl Room {
                 )
             };
  
-            for i in 0..self.tiles[ii] { 
+            for i in 0..self.len_width[ii] { 
                 self.sprites.push(SpriteRender {
                     sprite_sheet: sheet_handle.clone(),
                     sprite_number: i as usize,
@@ -92,29 +140,92 @@ impl Room {
     }
 
     pub fn draw_room(&mut self, world: &mut World) {
-        let mut x;
-        let mut y = 0.0;
+        self.draw_layer(world, Layers::L4);
+        self.draw_layer(world, Layers::L3);
+        self.draw_layer(world, Layers::L2);
+        self.draw_layer(world, Layers::L1);
+    }
+    
+    // Convert world coordinates to tiled coordinates
+    fn world_2_tiled(&mut self, (x, y): (i32, i32)) -> (i32, i32){
+        (x, (self.current.height as i32 - 1) - y)
+    }
 
-        const TILE_SIZE : f32 = 16.0;
+    pub fn get_pos(pos: &Transform) -> (i32, i32){
+         Room::px_2_world(pos.translation().data[0], pos.translation().data[1])
+    }
+    
+    // Convert from pixel coordinates 
+    pub fn px_2_world(x: f32, y:f32) -> (i32, i32){
+        ((((x - constants::TILE_SIZE) / constants::TILE_SIZE) as i32),
+         (((y - constants::TILE_SIZE) / constants::TILE_SIZE) as i32)
+        )
+    }
 
-        for row in self.current.layers[0].tiles.iter().rev() {
-            x = 0.0;
-            y += TILE_SIZE;
+    // Check to see if the resulting position is inside the map
+    pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32, adj: Adj) -> bool{
+        let (x, y) = Room::get_pos(pos);
+       
+        // North
+        if(vertical > 0.) && ((y >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32)) 
+                          || colision(&adj.n)){
+            return false;
+        }
+        
+        // East
+        else if (horizontal > 0.) && ((x >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32))
+                                  || colision(&adj.e)){
+            return false;
+        }
+        
+        // South
+        else if(vertical < 0.) && ((y == 0)
+                               || colision(&adj.s)){
+            return false;
+        }
+        
+        // West
+        else if(horizontal < 0.) && ((x == 0)
+                                 || colision(&adj.w)){
+            return false;
+        }
+        
+        return true;
+    }
+    
+    fn get_prop(&mut self, (x, y): (i32, i32), (xoff, yoff): (i32, i32)) -> Option<tiled::Properties> {
+        
+        // Bottom left
+        if (x == 0 && xoff <= -1) || (y == 0 && yoff <= -1) {
+            return None;  
+        }
+        
+        if x + xoff > (self.current.width as i32 - constants::TILE_PER_PLAYER as i32) {
+            return None;
+        }
 
-            for col in row.iter() {
-                x += TILE_SIZE; 
+        if y + yoff > (self.current.height as i32 - constants::TILE_PER_PLAYER as i32) {
+            return None;
+        }
+        
+        let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
+        let tile = self.current.layers[Layers::L3 as usize].tiles[y1 as usize][x1 as usize];
 
-                let mut transform = Transform::default();
-                transform.set_translation_xyz(x, y, 0.);
-                
-                if col.gid != 0 {
-                    world
-                        .create_entity()
-                        .with(self.sprites[col.gid as usize - 1].clone())
-                        .with(transform)
-                        .build();
-                }
-            }
+        match self.current.get_tileset_by_gid(tile.gid){
+            Some(thing) => return Some(thing.tiles[tile.gid as usize].properties.clone()),
+            None => return None,
+        }
+    }
+    
+    pub fn get_adj(&mut self, pos: &Transform) -> Adj {
+        let (x, y): (i32, i32) = Room::get_pos(pos);
+        
+        Adj{
+            cur: self.get_prop((x,y),(0,0)),
+            n:   self.get_prop((x,y),(0,constants::TILE_PER_PLAYER as i32)),
+            e:   self.get_prop((x,y),(constants::TILE_PER_PLAYER as i32,0)),
+            s:   self.get_prop((x,y),(0,-1 * constants::TILE_PER_PLAYER as i32)),
+            w:   self.get_prop((x,y),(-1 * constants::TILE_PER_PLAYER as i32,0)),
         }
     }
 }
