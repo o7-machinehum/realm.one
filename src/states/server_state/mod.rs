@@ -1,9 +1,5 @@
 use amethyst::{
-    assets::Handle,
-    core::transform::Transform,
     prelude::*,
-    renderer::{Camera, SpriteSheet},
-    window::ScreenDimensions,
 };
 
 pub struct ServerState;

@@ -1,15 +1,11 @@
 use amethyst::{
-    core::{frame_limiter::FrameRateLimitStrategy, SystemDesc},
+    core::{SystemDesc},
     derive::SystemDesc,
     ecs::{Component, Entities, Join, System, SystemData, VecStorage, World, WriteStorage},
     network::*,
-    prelude::*,
     shrev::ReaderId,
-    utils::application_root_dir,
-    Result,
 };
 use log::info;
-use std::time::Duration;
 
 pub struct SpamReader(ReaderId<NetEvent<String>>);
 
