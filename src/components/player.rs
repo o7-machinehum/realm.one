@@ -31,4 +31,3 @@ impl PlayerComponent {
 impl Component for PlayerComponent {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }
-

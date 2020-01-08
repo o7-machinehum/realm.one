@@ -85,7 +85,8 @@ fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
     let network_bundle = NetworkBundle::<String>::new(socket);
      
     let game_data = GameDataBuilder::default()
-        .with_bundle(network_bundle)?; 
+        .with_bundle(network_bundle)? 
+        .with(systems::ServerSystem, "server_system", &[]);
 
     let mut game = Application::new(
         resources, 
