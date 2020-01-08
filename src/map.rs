@@ -169,32 +169,15 @@ impl Room {
     // Check to see if the resulting position is inside the map
     pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32, adj: Adj) -> bool{
         let (x, y) = Room::get_pos(pos);
-       
-        // North
-        if(vertical > 0.) && ((y >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32)) 
-                          || colision(&adj.n)){
-            return false;
-        }
-        
-        // East
-        else if (horizontal > 0.) && ((x >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32))
-                                  || colision(&adj.e)){
-            return false;
-        }
-        
-        // South
-        else if(vertical < 0.) && ((y == 0)
-                               || colision(&adj.s)){
-            return false;
-        }
-        
-        // West
-        else if(horizontal < 0.) && ((x == 0)
-                                 || colision(&adj.w)){
-            return false;
-        }
-        
-        return true;
+        let north = (vertical > 0.)
+            && ((y >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32))
+                || colision(&adj.n));
+        let east = (horizontal > 0.)
+            && ((x >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32))
+                || colision(&adj.e));
+        let south = (vertical < 0.) && ((y == 0) || colision(&adj.s));
+        let west = (horizontal < 0.) && ((x == 0) || colision(&adj.w));
+        return !north && !east && !south && !west;
     }
     
     fn get_prop(&mut self, (x, y): (i32, i32), (xoff, yoff): (i32, i32)) -> Option<tiled::Properties> {
