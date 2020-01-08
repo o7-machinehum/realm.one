@@ -1,3 +1,5 @@
 mod gameplay_state;
-pub use self::gameplay_state::GamePlayState;
+mod server_state;
 
+pub use self::gameplay_state::GamePlayState;
+pub use self::server_state::ServerState;

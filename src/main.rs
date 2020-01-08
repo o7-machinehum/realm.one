@@ -89,7 +89,7 @@ fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
 
     let mut game = Application::new(
         resources, 
-        states::GamePlayState{},
+        states::ServerState{},
         game_data,
     )?;
 
