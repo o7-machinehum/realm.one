@@ -13,7 +13,9 @@ Tiles are taken from [here](https://opengameart.org/content/tiny-16-basic?page=1
 ```bash
 git clone https://github.com/Machine-Hum/realm.one
 cd realm.one
-cargo run --release
+cargo run --release server                # For the server
+cargo run --release client 127.0.0.1:666  # For the client 
+
 ```
 
 ## Features
