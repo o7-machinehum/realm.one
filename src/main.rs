@@ -11,7 +11,6 @@ use amethyst::{
     network::NetworkBundle,
 };
 
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::env; 
 use log::info;
 
@@ -33,7 +32,7 @@ fn main() -> amethyst::Result<()> {
     
     if args[1] == "client" {
         info!("Starting the client");
-        rtn = client(resources);
+        rtn = client(resources, args[2].clone());
     }
 
     else if args[1] == "server"{
@@ -45,7 +44,7 @@ fn main() -> amethyst::Result<()> {
     rtn
 }
 
-fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
+fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
     
@@ -72,7 +71,7 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
 
     let mut game = Application::new(
         resources, 
-        states::GamePlayState{},
+        states::GamePlayState{ip},
         game_data,
     )?;
 

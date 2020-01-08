@@ -11,7 +11,9 @@ use crate::map;
 use crate::components::PlayerComponent;
 use crate::character_sprites::{get_oriented_sprite, load_sprites};
 
-pub struct GamePlayState {}
+pub struct GamePlayState {
+    pub ip: String, // IP of server to connect to
+}
 
 impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -35,7 +37,7 @@ impl SimpleState for GamePlayState {
             .create_entity()
             .with(room)
             .with(NetConnection::<String>::new(
-                "127.0.0.1:3456".parse().unwrap(),
+                self.ip.parse().unwrap(),
             ))
             .build();
     }
