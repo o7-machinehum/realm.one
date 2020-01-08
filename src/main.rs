@@ -67,7 +67,8 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
         )?
         .with_bundle(input_bundle)? 
         .with_bundle(network_bundle)? 
-        .with(systems::PlayerSystem, "player_system", &["input_system"]);
+        .with(systems::PlayerSystem, "player_system", &["input_system"])
+        .with(systems::ClientSystem, "client_system", &[]);
 
 
     let mut game = Application::new(

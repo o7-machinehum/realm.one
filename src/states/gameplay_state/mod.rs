@@ -4,6 +4,7 @@ use amethyst::{
     prelude::*,
     renderer::{Camera, SpriteSheet},
     window::ScreenDimensions,
+    network::NetConnection,
 };
 
 use crate::map;
@@ -33,6 +34,9 @@ impl SimpleState for GamePlayState {
         world
             .create_entity()
             .with(room)
+            .with(NetConnection::<String>::new(
+                "127.0.0.1:3455".parse().unwrap(),
+            ))
             .build();
     }
 }

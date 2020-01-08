@@ -5,7 +5,6 @@ use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
 
 use std::time::Instant;
-use log::info;
 
 use crate::components::PlayerComponent;
 use crate::character_sprites::{Orientation, get_oriented_sprite};
