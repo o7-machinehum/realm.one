@@ -38,7 +38,11 @@ impl<'s> System<'s> for PlayerSystem{
                 let vertical = input
                     .axis_value(&AxisBinding::Vertical)
                     .unwrap_or(0.0);
-
+                
+                if horizontal == 0. && vertical == 0. {
+                    return;
+                }
+                
                 let orientation : Orientation;
                 if horizontal > 0. {
                     orientation = Orientation::East;
@@ -51,15 +55,10 @@ impl<'s> System<'s> for PlayerSystem{
                 } else {
                     orientation = player.orientation.clone()
                 }
-                player.orientation = orientation.clone();
-
-                player.last_movement_instant = now.clone();
-                 
-                sprite_renders.insert(entity, get_oriented_sprite(player.spritesheet_handle.clone(), orientation));
                 
-                if horizontal == 0. && vertical == 0. {
-                    return;
-                }
+                player.orientation = orientation.clone();
+                player.last_movement_instant = now.clone();
+                sprite_renders.insert(entity, get_oriented_sprite(player.spritesheet_handle.clone(), orientation));
 
                 for room in (&mut rooms).join() {
                     let adj: Adj = room.get_adj(transform);
