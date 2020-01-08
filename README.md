@@ -13,5 +13,18 @@ Tiles are taken from [here](https://opengameart.org/content/tiny-16-basic?page=1
 ```bash
 git clone https://github.com/Machine-Hum/realm.one
 cd realm.one
-cargo run
+cargo run --release
 ```
+
+## Features
+The game is under heavy development.
+
+### Current Features
+  - Map can be drawn with the Tiled map editor
+  - The little guy can walk around, stay on the map and not walk through walls or off the map
+
+### Future Features
+  - little guy can go up and down stairs and to different sections of the map
+  - MMO style, will be able to interact with other players
+  - Will be able to fight monsters and gain exp
+  - Will be able to equipt items
