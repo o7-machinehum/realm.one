@@ -35,7 +35,7 @@ impl SimpleState for GamePlayState {
             .create_entity()
             .with(room)
             .with(NetConnection::<String>::new(
-                "127.0.0.1:3455".parse().unwrap(),
+                "127.0.0.1:3456".parse().unwrap(),
             ))
             .build();
     }

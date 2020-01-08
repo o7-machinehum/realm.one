@@ -52,9 +52,6 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(key_bindings_config_path)?;
     
-    let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080);
-    let network_bundle = NetworkBundle::<String>::new(socket);
-     
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(
@@ -66,7 +63,9 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(input_bundle)? 
-        .with_bundle(network_bundle)? 
+        .with_bundle(NetworkBundle::<String>::new(
+            "127.0.0.1:3455".parse().unwrap(),
+        ))?
         .with(systems::PlayerSystem, "player_system", &["input_system"])
         .with(systems::ClientSystem, "client_system", &[]);
 
@@ -82,11 +81,11 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
 }
 
 fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
-    let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080);
-    let network_bundle = NetworkBundle::<String>::new(socket);
      
     let game_data = GameDataBuilder::default()
-        .with_bundle(network_bundle)? 
+        .with_bundle(NetworkBundle::<String>::new(
+            "127.0.0.1:3456".parse().unwrap(),
+        ))?
         .with(systems::ServerSystem, "server_system", &[]);
 
     let mut game = Application::new(
