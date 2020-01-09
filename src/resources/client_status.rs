@@ -1,5 +1,3 @@
-use amethyst::ecs::{Component, DenseVecStorage, FlaggedStorage};
-
 pub struct ClientStatus{
     pub connected: bool,
 }

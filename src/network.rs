@@ -1,7 +1,5 @@
 use amethyst::{
-    core::{SystemDesc, Time},
-    derive::SystemDesc,
-    ecs::{Component, Join, Read, System, SystemData, World, WriteStorage, VecStorage},
+    ecs::{Component, VecStorage},
     network::*,
     shrev::ReaderId,
 };
@@ -22,7 +20,7 @@ impl Component for Reader {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub enum ids {
+pub enum Cmd {
     Nothing,
     Connect,
     CreateMonster,  // Create a monsters
@@ -30,7 +28,7 @@ pub enum ids {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Pack {
-    id: ids,
+    pub cmd: Cmd,
     ints: Vec<u32>,
     floats: Vec<f32>,
     strings: Vec<String>,
@@ -42,21 +40,16 @@ impl Pack {
     }
 
     pub fn pack_monster(mon_id: u32, xpos: f32, ypos: f32, hp: f32, tile: u32, name: String) -> Self {
-        let mut ints =  Vec::new();
+        let (mut ints, mut floats, mut strings) =  Pack::fill();
         ints.push(tile);
-
-        let mut floats=  Vec::new();
         floats.push(xpos);
         floats.push(ypos);
         floats.push(hp);
-
-        let mut strings =  Vec::new();
         strings.push(name);
-
         ints.push(mon_id);
         
         Self {
-            id: ids::CreateMonster,
+            cmd: Cmd::CreateMonster,
             ints,
             floats,
             strings,
@@ -68,7 +61,7 @@ impl Pack {
         strings.push(proof);
 
         Self {
-            id: ids::Connect,
+            cmd: Cmd::Connect,
             ints,
             floats,
             strings,

@@ -8,7 +8,6 @@ use amethyst::{
 };
 
 use crate::map;
-use crate::network;
 use crate::components::PlayerComponent;
 use crate::resources::ClientStatus;
 
