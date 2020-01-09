@@ -5,7 +5,7 @@ use amethyst::{
     network::*,
 };
 use log::info;
-use crate::network;
+use crate::network::Pack;
 
 /// A simple system that sends a ton of messages to all connections.
 /// In this case, only the server is connected.
@@ -22,14 +22,15 @@ impl<'a> System<'a> for ClientSystem {
         for conn in (&mut connections).join() {
             info!("Sending 10k messages.");
             for i in 0..500 {
-                let packet = NetEvent::Packet(NetPacket::unreliable(format!(
-                    "CL: frame:{},abs_time:{},c:{}",
-                    time.frame_number(),
-                    time.absolute_time_seconds(),
-                    i
-                )));
-
-                conn.queue(packet);
+                // let packet = NetEvent::Packet(NetPacket::unreliable(format!(
+                //     "CL: frame:{},abs_time:{},c:{}",
+                //     time.frame_number(),
+                //     time.absolute_time_seconds(),
+                //     i
+                // )));
+                
+                let mut packet = Pack::pack_monster(1, 16.0, 16.0, 100.0, 32, "Evil Fucker".to_string());  
+                conn.queue(NetEvent::Packet(NetPacket::unreliable(packet.to_string())));
             }
         }
     }
