@@ -1,7 +1,7 @@
 use amethyst::{
     core::{SystemDesc},
     derive::SystemDesc,
-    ecs::{Component, Entities, Join, System, SystemData, VecStorage, World, WriteStorage},
+    ecs::{Entities, Join, System, SystemData, World, WriteStorage},
     network::*,
 };
 use log::info;
@@ -13,10 +13,11 @@ pub struct ServerSystem;
 
 fn handle(str: String) {
     let pk = network::Pack::from_string(str);
-    match pk.id {
-        network::ids::Nothing       => {},
-        network::ids::Connect       => info!("Player Connected!"),
-        network::ids::CreateMonster => {},
+    match pk.cmd {
+        network::Cmd::Nothing       => {},
+        network::Cmd::Connect       => info!("Player Connected!"),
+        network::Cmd::CreateMonster => {},
+    }
 }
 
 impl<'a> System<'a> for ServerSystem {

@@ -1,7 +1,7 @@
 use amethyst::{
-    core::{SystemDesc, Time},
+    core::{SystemDesc},
     derive::SystemDesc,
-    ecs::{Component, Entities, Join, Read, System, SystemData, World, Write, WriteStorage, VecStorage},
+    ecs::{Entities, Join, System, SystemData, World, Write, WriteStorage},
     network::*,
 };
 use log::info;
@@ -23,7 +23,7 @@ impl<'a> System<'a> for ClientSystem {
     );
 
     fn run(&mut self, (mut status, mut connections, mut readers, entities): Self::SystemData) {
-        for (conn) in (&mut connections ).join() {
+        for conn in (&mut connections ).join() {
             if !status.connected {
                 info!("Authenticating");
                 let mut packet = Pack::connect("pubkey or some shit".to_string());  
