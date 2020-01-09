@@ -6,6 +6,7 @@ use amethyst::{
     shrev::ReaderId,
 };
 use log::info;
+use crate::network;
 
 pub struct SpamReader(ReaderId<NetEvent<String>>);
 

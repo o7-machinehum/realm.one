@@ -5,6 +5,7 @@ use amethyst::{
     network::*,
 };
 use log::info;
+use crate::network;
 
 /// A simple system that sends a ton of messages to all connections.
 /// In this case, only the server is connected.
@@ -13,7 +14,7 @@ pub struct ClientSystem;
 
 impl<'a> System<'a> for ClientSystem {
     type SystemData = (
-        WriteStorage<'a, NetConnection<String>>, 
+        WriteStorage<'a, NetConnection<String>>,
         Read<'a, Time>
     );
 
