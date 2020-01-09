@@ -8,6 +8,7 @@ use amethyst::{
 };
 
 use crate::map;
+use crate::network;
 use crate::components::PlayerComponent;
 use crate::character_sprites::{get_oriented_sprite, load_sprites};
 

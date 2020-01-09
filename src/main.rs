@@ -22,6 +22,7 @@ mod systems;
 mod constants;
 mod mech;
 mod character_sprites;
+mod network;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -29,6 +30,7 @@ fn main() -> amethyst::Result<()> {
     let mut rtn : amethyst::Result<()> = Ok(()); 
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
+    
     
     if args[1] == "client" {
         info!("Starting the client");
