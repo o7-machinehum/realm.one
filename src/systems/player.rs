@@ -7,8 +7,7 @@ use amethyst::renderer::SpriteRender;
 use std::time::Instant;
 use log::info;
 
-use crate::components::PlayerComponent;
-use crate::character_sprites::{Orientation, get_oriented_sprite};
+use crate::components::{PlayerComponent, Orientation};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::{Room, Adj};
 
@@ -58,7 +57,8 @@ impl<'s> System<'s> for PlayerSystem{
                 
                 player.orientation = orientation.clone();
                 player.last_movement_instant = now.clone();
-                sprite_renders.insert(entity, get_oriented_sprite(player.spritesheet_handle.clone(), orientation));
+
+                sprite_renders.insert(entity, player.get_orientated());
 
                 for room in (&mut rooms).join() {
                     let adj: Adj = room.get_adj(transform);
