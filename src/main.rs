@@ -19,8 +19,6 @@ mod systems;
 mod constants;
 mod mech;
 
-mod character_sprites;
-
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
