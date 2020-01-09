@@ -22,6 +22,7 @@ mod systems;
 mod constants;
 mod mech;
 mod network;
+mod resources;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());

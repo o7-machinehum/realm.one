@@ -3,25 +3,26 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Component, Entities, Join, System, SystemData, VecStorage, World, WriteStorage},
     network::*,
-    shrev::ReaderId,
 };
 use log::info;
 use crate::network;
-
-pub struct SpamReader(ReaderId<NetEvent<String>>);
-
-impl Component for SpamReader {
-    type Storage = VecStorage<Self>;
-}
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
 pub struct ServerSystem;
 
+fn handle(str: String) {
+    let pk = network::Pack::from_string(str);
+    match pk.id {
+        network::ids::Nothing       => {},
+        network::ids::Connect       => info!("Player Connected!"),
+        network::ids::CreateMonster => {},
+}
+
 impl<'a> System<'a> for ServerSystem {
     type SystemData = (
         WriteStorage<'a, NetConnection<String>>,
-        WriteStorage<'a, SpamReader>,
+        WriteStorage<'a, network::Reader>,
         Entities<'a>,
     );
 
@@ -33,15 +34,15 @@ impl<'a> System<'a> for ServerSystem {
             let reader = readers
                 .entry(e)
                 .expect("Cannot get reader")
-                .or_insert_with(|| SpamReader(connection.register_reader()));
+                .or_insert_with(|| network::Reader(connection.register_reader()));
 
             let mut client_disconnected = false;
 
             for ev in connection.received_events(&mut reader.0) {
                 count += 1;
                 match ev {
-                    NetEvent::Packet(packet) => info!("{}", packet.content()),
-                    NetEvent::Connected(addr) => info!("New Client Connection: {}", addr),
+                    NetEvent::Packet(packet) => handle(packet.content().to_string()),
+                    NetEvent::Connected(addr) => info!("Client Connected!"), //greet(),
                     NetEvent::Disconnected(_addr) => {
                         client_disconnected = true;
                     }
@@ -58,9 +59,9 @@ impl<'a> System<'a> for ServerSystem {
 
             connection_count += 1;
         }
-        println!(
-            "Received {} messages this frame connections: {}",
-            count, connection_count
-        );
+        // println!(
+        //     "Received {} messages this frame connections: {}",
+        //     count, connection_count
+        // );
     }
 }

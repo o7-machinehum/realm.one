@@ -1,3 +1,10 @@
+use amethyst::{
+    core::{SystemDesc, Time},
+    derive::SystemDesc,
+    ecs::{Component, Join, Read, System, SystemData, World, WriteStorage, VecStorage},
+    network::*,
+    shrev::ReaderId,
+};
 use serde::{Serialize, Deserialize};
 use serde_json;
 
@@ -8,9 +15,16 @@ use serde_json;
 // let t = network::pack::from_string(p);
 // info!("{:?}", t);
 
+pub struct Reader(pub ReaderId<NetEvent<String>>);
+
+impl Component for Reader {
+    type Storage = VecStorage<Self>;
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub enum ids {
     Nothing,
+    Connect,
     CreateMonster,  // Create a monsters
 }
 
@@ -23,7 +37,11 @@ pub struct Pack {
 }
 
 impl Pack {
-    pub fn pack_monster(mon_id: u32, xpos: f32, ypos: f32, hp: f32, tile: u32, name: String) -> Self{
+    fn fill() -> (Vec<u32>, Vec<f32>, Vec<String>) {
+        (Vec::<u32>::new(), Vec::<f32>::new(), Vec::<String>::new())
+    }
+
+    pub fn pack_monster(mon_id: u32, xpos: f32, ypos: f32, hp: f32, tile: u32, name: String) -> Self {
         let mut ints =  Vec::new();
         ints.push(tile);
 
@@ -39,6 +57,18 @@ impl Pack {
         
         Self {
             id: ids::CreateMonster,
+            ints,
+            floats,
+            strings,
+        }
+    }
+
+    pub fn connect(proof: String) -> Self {
+        let (mut ints, mut floats, mut strings) =  Pack::fill();
+        strings.push(proof);
+
+        Self {
+            id: ids::Connect,
             ints,
             floats,
             strings,
