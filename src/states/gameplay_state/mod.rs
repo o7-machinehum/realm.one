@@ -1,8 +1,7 @@
 use amethyst::{
-    assets::Handle,
     core::transform::Transform,
     prelude::*,
-    renderer::{Camera, SpriteSheet},
+    renderer::{Camera},
     window::ScreenDimensions,
     network::NetConnection,
 };
@@ -10,7 +9,6 @@ use amethyst::{
 use crate::map;
 use crate::network;
 use crate::components::PlayerComponent;
-use crate::character_sprites::{get_oriented_sprite, load_sprites};
 
 pub struct GamePlayState {
     pub ip: String, // IP of server to connect to
@@ -30,9 +28,8 @@ impl SimpleState for GamePlayState {
         room.load_sprites(world);   // Load in all the sprites
         room.draw_room(world);      // Paint the initial room
         
-        let character_spritesheet_handle = load_sprites(world);
-
-        initialise_player(world, character_spritesheet_handle);
+        let player1 = PlayerComponent::new( 8.0, 8.0, (159, 147, 123, 135), &room.sprites);
+        player1.insert(world);
     
         world
             .create_entity()
@@ -56,22 +53,3 @@ fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
         .with(transform)
         .build();
 }
-
-
-fn initialise_player(world: &mut World, spritesheet_handle: Handle<SpriteSheet>) {
-    let player1 = PlayerComponent::new( 8.0, 8.0, spritesheet_handle.clone() ); 
-
-    let mut transform = Transform::default();
-    transform.set_translation_xyz(player1.x, player1.y, 0.0); 
-
-    // Create a player entity.
-    world
-        .create_entity()
-        .with(get_oriented_sprite(spritesheet_handle, player1.orientation.clone()))
-        .with(player1)
-        .with(transform)
-        .build();
-    
-}
-
-

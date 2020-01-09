@@ -21,7 +21,6 @@ mod components;
 mod systems;
 mod constants;
 mod mech;
-mod character_sprites;
 mod network;
 
 fn main() -> amethyst::Result<()> {
