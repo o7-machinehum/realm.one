@@ -23,12 +23,15 @@ impl<'a> System<'a> for ClientSystem {
     );
 
     fn run(&mut self, (mut status, mut connections, mut readers, entities): Self::SystemData) {
-        for conn in (&mut connections ).join() {
+        for (e, conn) in (&entities, &mut connections).join() {
             if !status.connected {
                 info!("Authenticating");
                 let mut packet = Pack::connect("pubkey or some shit".to_string());  
                 conn.queue(NetEvent::Packet(NetPacket::unreliable(packet.to_string())));
                 status.connected = true;
+            }
+            else {
+                
             }
         }
     }

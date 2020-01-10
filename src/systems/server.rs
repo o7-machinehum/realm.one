@@ -6,18 +6,27 @@ use amethyst::{
 };
 use log::info;
 use crate::network;
+use crate::network::Pack;
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
 pub struct ServerSystem;
 
-fn handle(str: String) {
+
+fn welcome() -> Pack {
+    info!("Player Connected, sending map!");
+    Pack::send_tmx("map1".to_string(), "Map contents".to_string())
+}
+
+fn handle(str: String) -> Pack {
     let pk = network::Pack::from_string(str);
     match pk.cmd {
         network::Cmd::Nothing       => {},
-        network::Cmd::Connect       => info!("Player Connected!"),
+        network::Cmd::TransferMap   => {}, 
+        network::Cmd::Connect       => return welcome(),
         network::Cmd::CreateMonster => {},
     }
+    network::Pack::nothing() 
 }
 
 impl<'a> System<'a> for ServerSystem {
@@ -39,16 +48,24 @@ impl<'a> System<'a> for ServerSystem {
 
             let mut client_disconnected = false;
 
+            let mut str = String::new();
             for ev in connection.received_events(&mut reader.0) {
                 count += 1;
                 match ev {
-                    NetEvent::Packet(packet) => handle(packet.content().to_string()),
-                    NetEvent::Connected(addr) => info!("Client Connected!"), //greet(),
+                    NetEvent::Packet(packet) => str.push_str(&packet.content().to_string()),
+                    NetEvent::Connected(addr) => info!("Client Connected!"), 
                     NetEvent::Disconnected(_addr) => {
                         client_disconnected = true;
                     }
                     _ => {}
                 }
+            }
+            
+            if !str.is_empty() {
+                let mut pkout = handle(str);
+                if pkout.cmd != network::Cmd::Nothing{ 
+                    connection.queue(NetEvent::Packet(NetPacket::unreliable(pkout.to_string())));
+                } 
             }
 
             if client_disconnected {
