@@ -1,3 +1,5 @@
+pub mod server;
+
 use amethyst::{
     ecs::{Component, VecStorage},
     network::*,
