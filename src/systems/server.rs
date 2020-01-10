@@ -7,27 +7,11 @@ use amethyst::{
 use log::info;
 use crate::network;
 use crate::network::Pack;
+use crate::network::server;
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
 pub struct ServerSystem;
-
-
-fn welcome() -> Pack {
-    info!("Player Connected, sending map!");
-    Pack::send_tmx("map1".to_string(), "Map contents".to_string())
-}
-
-fn handle(str: String) -> Pack {
-    let pk = network::Pack::from_string(str);
-    match pk.cmd {
-        network::Cmd::Nothing       => {},
-        network::Cmd::TransferMap   => {}, 
-        network::Cmd::Connect       => return welcome(),
-        network::Cmd::CreateMonster => {},
-    }
-    network::Pack::nothing() 
-}
 
 impl<'a> System<'a> for ServerSystem {
     type SystemData = (
@@ -58,7 +42,7 @@ impl<'a> System<'a> for ServerSystem {
             }
             
             if !str.is_empty() {
-                let mut pkout = handle(str);
+                let mut pkout = server::handle(str);
                 if pkout.cmd != network::Cmd::Nothing{ 
                     connection.queue(NetEvent::Packet(NetPacket::unreliable(pkout.to_string())));
                 } 
