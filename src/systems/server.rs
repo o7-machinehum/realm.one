@@ -32,7 +32,7 @@ impl<'a> System<'a> for ServerSystem {
 
             for ev in connection.received_events(&mut reader.0) {
                 match ev {
-                    NetEvent::Packet(packet) =>  recv.extend(&mut packet.content_mut().to_vec()),
+                    NetEvent::Packet(packet) =>  recv.append(packet.content_mut()),
                     NetEvent::Connected(addr) => info!("Client Connected!, {}", addr), 
                     NetEvent::Disconnected(_addr) => {
                         client_disconnected = true;
