@@ -15,7 +15,7 @@ pub struct ServerSystem;
 
 impl<'a> System<'a> for ServerSystem {
     type SystemData = (
-        WriteStorage<'a, NetConnection<String>>,
+        WriteStorage<'a, NetConnection<Vec<u8>>>,
         WriteStorage<'a, network::Reader>,
         Entities<'a>,
     );
@@ -28,11 +28,11 @@ impl<'a> System<'a> for ServerSystem {
                 .or_insert_with(|| network::Reader(connection.register_reader()));
 
             let mut client_disconnected = false;
+            let mut recv = Vec::<u8>::new();
 
-            let mut str = String::new();
             for ev in connection.received_events(&mut reader.0) {
                 match ev {
-                    NetEvent::Packet(packet) => str.push_str(&packet.content().to_string()),
+                    NetEvent::Packet(packet) =>  recv.extend(&mut packet.content_mut().to_vec()),
                     NetEvent::Connected(addr) => info!("Client Connected!, {}", addr), 
                     NetEvent::Disconnected(_addr) => {
                         client_disconnected = true;
@@ -41,10 +41,12 @@ impl<'a> System<'a> for ServerSystem {
                 }
             }
             
-            if !str.is_empty() {
-                let mut pkout = server::handle(str);
+            info!("{:?}", reader.0);
+            
+            if recv.is_empty() {
+                let mut pkout = server::handle(recv);
                 if pkout.cmd != network::Cmd::Nothing{ 
-                    connection.queue(NetEvent::Packet(NetPacket::unreliable(pkout.to_string())));
+                    connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(pkout.to_bin(), None)));
                 } 
             }
 

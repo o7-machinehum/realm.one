@@ -64,7 +64,7 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(input_bundle)? 
-        .with_bundle(NetworkBundle::<String>::new(
+        .with_bundle(NetworkBundle::<Vec<u8>>::new(
             "127.0.0.1:3455".parse().unwrap(),
         ))?
         .with(systems::PlayerSystem, "player_system", &["input_system"])
@@ -84,7 +84,7 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
 fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
      
     let game_data = GameDataBuilder::default()
-        .with_bundle(NetworkBundle::<String>::new(
+        .with_bundle(NetworkBundle::<Vec<u8>>::new(
             "127.0.0.1:3456".parse().unwrap(),
         ))?
         .with(systems::ServerSystem, "server_system", &[]);

@@ -7,6 +7,7 @@ use amethyst::{
     ecs::World,
 };
 
+use log::info;
 use crate::map;
 use crate::components::PlayerComponent;
 use crate::resources::ClientStatus;
@@ -32,12 +33,13 @@ impl SimpleState for GamePlayState {
         
         let player1 = PlayerComponent::new( 8.0, 8.0, (159, 147, 123, 135), &room.sprites);
         player1.insert(world);
-        
+        info!("Hello");
+
         world.insert(status);
         world
             .create_entity()
             .with(room)
-            .with(NetConnection::<String>::new(
+            .with(NetConnection::<Vec<u8>>::new(
                 self.ip.parse().unwrap(),
             ))
             .build();

@@ -6,7 +6,7 @@ use amethyst::{
     shrev::ReaderId,
 };
 use serde::{Serialize, Deserialize};
-use serde_json;
+use bincode;
 
 // eg:
 // let mut k = network::pack::new(10);
@@ -15,7 +15,7 @@ use serde_json;
 // let t = network::pack::from_string(p);
 // info!("{:?}", t);
 
-pub struct Reader(pub ReaderId<NetEvent<String>>);
+pub struct Reader(pub ReaderId<NetEvent<Vec<u8>>>);
 
 impl Component for Reader {
     type Storage = VecStorage<Self>;
@@ -94,12 +94,20 @@ impl Pack {
         }
     }
 
-    pub fn from_string(str: String) -> Self {
-       serde_json::from_str(&str).unwrap()
+    // pub fn from_string(str: String) -> Self {
+    //     from_str(&str).unwrap()
+    // }
+    //  
+    // pub fn to_string(&mut self) -> String {
+    //     to_string(&self).unwrap()
+    // }
+
+    pub fn from_bin(bin: Vec<u8>) -> Self {
+        bincode::deserialize(&bin[..]).unwrap() 
     }
      
-    pub fn to_string(&mut self) -> String {
-        serde_json::to_string(&self).unwrap()
+    pub fn to_bin(&mut self) -> Vec<u8> {
+        bincode::serialize(self).unwrap()
     }
 }
 
