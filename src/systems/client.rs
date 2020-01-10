@@ -23,15 +23,37 @@ impl<'a> System<'a> for ClientSystem {
     );
 
     fn run(&mut self, (mut status, mut connections, mut readers, entities): Self::SystemData) {
-        for (e, conn) in (&entities, &mut connections).join() {
+        for (e, connection) in (&entities, &mut connections).join() {
             if !status.connected {
-                info!("Authenticating");
-                let mut packet = Pack::connect("pubkey or some shit".to_string());  
-                conn.queue(NetEvent::Packet(NetPacket::unreliable(packet.to_string())));
-                status.connected = true;
+                 info!("Authenticating");
+                 let mut packet = Pack::connect("pubkey or some shit".to_string());  
+                 connection.queue(NetEvent::Packet(NetPacket::unreliable(packet.to_string())));
+                 status.connected = true;
             }
+            
             else {
+                let reader = readers
+                    .entry(e)
+                    .expect("Cannot get reader")
+                    .or_insert_with(|| network::Reader(connection.register_reader()));
+
+                let mut str = String::new();
+                for ev in connection.received_events(&mut reader.0) {
+                    match ev {
+                        NetEvent::Packet(packet) => str.push_str(&packet.content().to_string()),
+                        NetEvent::Connected(addr) => info!("Client Connected!"), 
+                        NetEvent::Disconnected(_addr) => {}
+                        _ => {}
+                    }
+                    info!("{}", str);
+                }
                 
+                // if !str.is_empty() {
+                //     let mut pkout = handle(str);
+                //     if pkout.cmd != network::Cmd::Nothing{ 
+                //         connection.queue(NetEvent::Packet(NetPacket::unreliable(pkout.to_string())));
+                //     } 
+                // }
             }
         }
     }
