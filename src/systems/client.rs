@@ -17,7 +17,7 @@ pub struct ClientSystem;
 impl<'a> System<'a> for ClientSystem {
     type SystemData = (
         Write<'a, ClientStatus>, 
-        WriteStorage<'a, NetConnection<String>>,
+        WriteStorage<'a, NetConnection<Vec::<u8>>>,
         WriteStorage<'a, network::Reader>,
         Entities<'a>,
     );
@@ -27,7 +27,7 @@ impl<'a> System<'a> for ClientSystem {
             if !status.connected {
                  info!("Authenticating");
                  let mut packet = Pack::connect("pubkey or some shit".to_string());  
-                 connection.queue(NetEvent::Packet(NetPacket::unreliable(packet.to_string())));
+                 connection.queue(NetEvent::Packet(NetPacket::unreliable(packet.to_bin())));
                  status.connected = true;
             }
             
@@ -37,16 +37,19 @@ impl<'a> System<'a> for ClientSystem {
                     .expect("Cannot get reader")
                     .or_insert_with(|| network::Reader(connection.register_reader()));
 
-                let mut str = String::new();
+                let mut recv = Vec::<u8>::new();
+                
                 for ev in connection.received_events(&mut reader.0) {
                     match ev {
-                        NetEvent::Packet(packet) => str.push_str(&packet.content().to_string()),
+                        NetEvent::Packet(packet) => {}, //recv.append(packet.content_mut()),
                         NetEvent::Connected(addr) => info!("Client Connected! {}", addr), 
                         NetEvent::Disconnected(_addr) => {}
                         _ => {}
                     }
-                    info!("{}", str);
+                    // info!("{:?}", Pack::from_bin(recv));
                 }
+            
+                info!("{:?}", reader.0);
                 
                 // if !str.is_empty() {
                 //     let mut pkout = handle(str);
