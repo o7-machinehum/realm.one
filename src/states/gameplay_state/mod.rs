@@ -33,7 +33,7 @@ impl SimpleState for GamePlayState {
         let player1 = PlayerComponent::new( 8.0, 8.0, (159, 147, 123, 135), &room.sprites);
         player1.insert(world);
         
-        world.add_resource(status);
+        world.insert(status);
         world
             .create_entity()
             .with(room)
