@@ -19,10 +19,12 @@ impl Component for Reader {
     type Storage = VecStorage<Self>;
 }
 
+#[derive(PartialEq)]
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Cmd {
     Nothing,
     Connect,
+    TransferMap,
     CreateMonster,  // Create a monsters
 }
 
@@ -56,8 +58,21 @@ impl Pack {
         }
     }
 
+    pub fn send_tmx(mapName: String, tmx: String) -> Self {
+        let (ints, floats, mut strings) =  Pack::fill();
+        strings.push(mapName);
+        strings.push(tmx);
+
+        Self {
+            cmd: Cmd::TransferMap,
+            ints,
+            floats,
+            strings,
+        }
+    }
+
     pub fn connect(proof: String) -> Self {
-        let (mut ints, mut floats, mut strings) =  Pack::fill();
+        let (ints, floats, mut strings) =  Pack::fill();
         strings.push(proof);
 
         Self {
@@ -68,6 +83,15 @@ impl Pack {
         }
     }
     
+    pub fn nothing() -> Self {
+        let (ints, floats, mut strings) =  Pack::fill();
+
+        Self {
+            cmd: Cmd::Connect,
+            ints, floats, strings,
+        }
+    }
+
     pub fn from_string(str: String) -> Self {
        serde_json::from_str(&str).unwrap()
     }
