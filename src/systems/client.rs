@@ -41,7 +41,7 @@ impl<'a> System<'a> for ClientSystem {
                 for ev in connection.received_events(&mut reader.0) {
                     match ev {
                         NetEvent::Packet(packet) => str.push_str(&packet.content().to_string()),
-                        NetEvent::Connected(addr) => info!("Client Connected!"), 
+                        NetEvent::Connected(addr) => info!("Client Connected! {}", addr), 
                         NetEvent::Disconnected(_addr) => {}
                         _ => {}
                     }

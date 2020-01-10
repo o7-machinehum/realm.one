@@ -37,9 +37,6 @@ impl<'a> System<'a> for ServerSystem {
     );
 
     fn run(&mut self, (mut connections, mut readers, entities): Self::SystemData) {
-        let mut count = 0;
-        let mut connection_count = 0;
-
         for (e, connection) in (&entities, &mut connections).join() {
             let reader = readers
                 .entry(e)
@@ -50,10 +47,9 @@ impl<'a> System<'a> for ServerSystem {
 
             let mut str = String::new();
             for ev in connection.received_events(&mut reader.0) {
-                count += 1;
                 match ev {
                     NetEvent::Packet(packet) => str.push_str(&packet.content().to_string()),
-                    NetEvent::Connected(addr) => info!("Client Connected!"), 
+                    NetEvent::Connected(addr) => info!("Client Connected!, {}", addr), 
                     NetEvent::Disconnected(_addr) => {
                         client_disconnected = true;
                     }
@@ -74,12 +70,6 @@ impl<'a> System<'a> for ServerSystem {
                     .delete(e)
                     .expect("Cannot delete connection from world!");
             }
-
-            connection_count += 1;
         }
-        // println!(
-        //     "Received {} messages this frame connections: {}",
-        //     count, connection_count
-        // );
     }
 }

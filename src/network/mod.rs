@@ -58,9 +58,9 @@ impl Pack {
         }
     }
 
-    pub fn send_tmx(mapName: String, tmx: String) -> Self {
+    pub fn send_tmx(map_name: String, tmx: String) -> Self {
         let (ints, floats, mut strings) =  Pack::fill();
-        strings.push(mapName);
+        strings.push(map_name);
         strings.push(tmx);
 
         Self {
@@ -84,7 +84,7 @@ impl Pack {
     }
     
     pub fn nothing() -> Self {
-        let (ints, floats, mut strings) =  Pack::fill();
+        let (ints, floats, strings) =  Pack::fill();
 
         Self {
             cmd: Cmd::Connect,
