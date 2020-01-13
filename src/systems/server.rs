@@ -27,9 +27,7 @@ impl<'a> System<'a> for ServerSystem {
                 .expect("Cannot get reader")
                 .or_insert_with(|| network::Reader(connection.register_reader()));
 
-            let mut client_disconnected = false;
-            // let mut recv = Vec::<u8>::new();
-
+            let mut recv = Vec::<Pack>::new();
             for ev in connection.received_events(&mut reader.0) {
                 // Get Pack 
                 let rtn = match ev {
@@ -45,19 +43,17 @@ impl<'a> System<'a> for ServerSystem {
                     None => None, 
                 };
 
-                // Respond to pack (or not)
+                // Add to vector of responces 
                 match out {
-                    Some(mut out) => connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(out.to_bin(), None))),
+                    Some(mut out) => recv.push(out), 
                     None => {},    
                 }
-
             }
             
-            if client_disconnected {
-                println!("Client Disconnects");
-                entities
-                    .delete(e)
-                    .expect("Cannot delete connection from world!");
+            // Respond
+            // TODO: There's this member that can be used for vectors. Should use that.
+            for mut resp in recv {
+                connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(resp.to_bin(), None)));
             }
         }
     }

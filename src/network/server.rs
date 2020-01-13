@@ -25,10 +25,10 @@ pub fn handle(bin: Vec<u8>) -> Option<Pack> {
     info!("{:?}", pk);
 
     match pk.cmd {
-        network::Cmd::Nothing       => {},
-        network::Cmd::TransferMap   => {}, 
-        network::Cmd::Connect       => return welcome(),
-        network::Cmd::CreateMonster => {},
+        network::Cmd::Nothing       => None,
+        network::Cmd::TransferMap   => None, 
+        network::Cmd::Connect       => welcome(),
+        network::Cmd::CreateMonster => None,
     }
-    None
+    // None
 }
