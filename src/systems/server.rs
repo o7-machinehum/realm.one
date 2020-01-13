@@ -28,28 +28,31 @@ impl<'a> System<'a> for ServerSystem {
                 .or_insert_with(|| network::Reader(connection.register_reader()));
 
             let mut client_disconnected = false;
-            let mut recv = Vec::<u8>::new();
+            // let mut recv = Vec::<u8>::new();
 
             for ev in connection.received_events(&mut reader.0) {
-                match ev {
-                    NetEvent::Packet(packet) =>  recv.append(packet.content_mut()),
-                    NetEvent::Connected(addr) => info!("Client Connected!, {}", addr), 
-                    NetEvent::Disconnected(_addr) => {
-                        client_disconnected = true;
-                    }
-                    _ => {}
-                }
-            }
-            
-            info!("{:?}", reader.0);
-            
-            if recv.is_empty() {
-                let mut pkout = server::handle(recv);
-                if pkout.cmd != network::Cmd::Nothing{ 
-                    connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(pkout.to_bin(), None)));
-                } 
-            }
+                // Get Pack 
+                let rtn = match ev {
+                    NetEvent::Packet(packet) => Some(packet),
+                    NetEvent::Connected(addr) => None,
+                    NetEvent::Disconnected(_addr) => None,
+                    _ => None
+                };
+                
+                // Process Pack
+                let out = match rtn {
+                    Some(rtn) => server::handle(rtn.content().to_vec()),
+                    None => None, 
+                };
 
+                // Respond to pack (or not)
+                match out {
+                    Some(mut out) => connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(out.to_bin(), None))),
+                    None => {},    
+                }
+
+            }
+            
             if client_disconnected {
                 println!("Client Disconnects");
                 entities

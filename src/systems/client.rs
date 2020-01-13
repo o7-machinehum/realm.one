@@ -49,8 +49,6 @@ impl<'a> System<'a> for ClientSystem {
                     // info!("{:?}", Pack::from_bin(recv));
                 }
             
-                info!("{:?}", reader.0);
-                
                 // if !str.is_empty() {
                 //     let mut pkout = handle(str);
                 //     if pkout.cmd != network::Cmd::Nothing{ 
