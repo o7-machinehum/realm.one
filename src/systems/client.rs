@@ -7,6 +7,7 @@ use amethyst::{
 use log::info;
 use crate::network;
 use crate::network::Pack;
+use crate::network::client;
 use crate::resources::ClientStatus;
 
 /// A simple system that sends a ton of messages to all connections.
@@ -24,6 +25,11 @@ impl<'a> System<'a> for ClientSystem {
 
     fn run(&mut self, (mut status, mut connections, mut readers, entities): Self::SystemData) {
         for (e, connection) in (&entities, &mut connections).join() {
+            let reader = readers
+                .entry(e)
+                .expect("Cannot get reader")
+                .or_insert_with(|| network::Reader(connection.register_reader()));
+            
             if !status.connected {
                  info!("Authenticating");
                  let mut packet = Pack::connect("pubkey or some shit".to_string());  
@@ -32,29 +38,34 @@ impl<'a> System<'a> for ClientSystem {
             }
             
             else {
-                let reader = readers
-                    .entry(e)
-                    .expect("Cannot get reader")
-                    .or_insert_with(|| network::Reader(connection.register_reader()));
-
-                let mut recv = Vec::<u8>::new();
-                
+                let mut recv = Vec::<Pack>::new();
                 for ev in connection.received_events(&mut reader.0) {
-                    match ev {
-                        NetEvent::Packet(packet) => {}, //recv.append(packet.content_mut()),
-                        NetEvent::Connected(addr) => info!("Client Connected! {}", addr), 
-                        NetEvent::Disconnected(_addr) => {}
-                        _ => {}
+                    // Get Pack 
+                    let rtn = match ev {
+                        NetEvent::Packet(packet) => Some(packet),
+                        NetEvent::Connected(addr) => None,
+                        NetEvent::Disconnected(_addr) => None,
+                        _ => None
+                    };
+                    
+                    // Process Pack
+                    let out = match rtn {
+                        Some(rtn) => client::handle(rtn.content().to_vec()),
+                        None => None, 
+                    };
+
+                    // Add to vector of responces 
+                    match out {
+                        Some(mut out) => recv.push(out), 
+                        None => {},    
                     }
-                    // info!("{:?}", Pack::from_bin(recv));
                 }
-            
-                // if !str.is_empty() {
-                //     let mut pkout = handle(str);
-                //     if pkout.cmd != network::Cmd::Nothing{ 
-                //         connection.queue(NetEvent::Packet(NetPacket::unreliable(pkout.to_string())));
-                //     } 
-                // }
+                
+                // Respond
+                // TODO: There's this member that can be used for vectors. Should use that.
+                for mut resp in recv {
+                    connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(resp.to_bin(), None)));
+                }
             }
         }
     }
