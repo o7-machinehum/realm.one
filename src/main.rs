@@ -23,6 +23,7 @@ mod constants;
 mod mech;
 mod network;
 mod resources;
+mod events;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -30,8 +31,6 @@ fn main() -> amethyst::Result<()> {
     let mut rtn : amethyst::Result<()> = Ok(()); 
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
-    
-    
     if args[1] == "client" {
         info!("Starting the client");
         rtn = client(resources, args[2].clone());
@@ -82,7 +81,6 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
 }
 
 fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
-     
     let game_data = GameDataBuilder::default()
         .with_bundle(NetworkBundle::<Vec<u8>>::new(
             "127.0.0.1:3456".parse().unwrap(),

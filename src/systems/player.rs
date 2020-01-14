@@ -3,17 +3,29 @@ use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Join, Read, Entities, System, SystemData, World, WriteStorage};
 use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
+use amethyst::shrev::{EventChannel, ReaderId};
+use amethyst::network;
 
 use std::time::Instant;
 
 use crate::components::{PlayerComponent, Orientation};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::{Room, Adj};
+use crate::events::{Events};
 
 use crate::constants;
 
 #[derive(SystemDesc)]
-pub struct PlayerSystem;
+pub struct PlayerSystem ;
+// {
+//     reader: Option<ReaderId<Events>>,
+// }
+
+// impl PlayerSystem {
+//     pub fn new(reader: ReaderId<Events>) -> Self {
+//         PlayerSystem{ reader }
+//     }
+// }
 
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
@@ -21,12 +33,22 @@ impl<'s> System<'s> for PlayerSystem{
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Room>,
+        Read<'s, EventChannel<Events>>,
         Entities<'s>,
         Read<'s, InputHandler<MovementBindingTypes>>,
     );
 
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut rooms, entities, input): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut rooms, mut events, entities, input): Self::SystemData) {
+        // for event in events.read(reader) {
+        //     println!("Received an event: {:?}", event);
+        // }
+        
         for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
+            // let reader = readers
+            //     .entry(e)
+            //     .expect("Cannot get reader")
+            //     .or_insert_with(|| network::Reader(connection.register_reader()));
+            
             let now = Instant::now();
 
             if now.duration_since(player.last_movement_instant).as_millis() >= constants::MOVEMENT_DELAY_MS {

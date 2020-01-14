@@ -17,7 +17,8 @@ fn welcome() -> Option<Pack> {
     let mut file = File::open(&fname.to_string()).expect("Unable to open map file"); 
     let mut contents = String::new();
     file.read_to_string(&mut contents);
-    Some(Pack::send_tmx("map1".to_string(), "hi".to_string()))
+    // Some(Pack::send_tmx("map1".to_string(), "hi".to_string()))
+    Some(Pack::send_tmx(fname.to_string(), contents.to_string()))
 }
 
 pub fn handle(bin: Vec<u8>) -> Option<Pack> {
