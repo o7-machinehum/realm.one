@@ -24,17 +24,17 @@ impl SimpleState for GamePlayState {
         world.register::<PlayerComponent>();
         world.register::<map::Room>();
         
-        let mut room = map::Room::new("resources/sprites/townCompress.tmx".to_string());
+        let mut room = map::Room::new("resources/maps/townCompress.tmx".to_string());
         let status = ClientStatus::new();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
 
         room.load_sprites(world);   // Load in all the sprites
-        room.draw_room(world);      // Paint the initial room
         
-        let player1 = PlayerComponent::new( 8.0, 8.0, (159, 147, 123, 135), &room.sprites);
+        let player1 = PlayerComponent::new( 8.0, 8.0, (318, 306, 282, 294), &room.sprites);
         player1.insert(world);
+        room.draw_room(world);      // Paint the initial room
 
         let mut mapEvents = EventChannel::<Events>::new();
         mapEvents.register_reader();

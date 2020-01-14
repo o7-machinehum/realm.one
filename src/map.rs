@@ -49,12 +49,7 @@ impl Room {
     pub fn new(file_name: String) -> Self {
         let file = File::open(&Path::new(&file_name)).unwrap();
     	let reader = BufReader::new(file);
-        // let map =  tiled::parse(reader).unwrap();
-        
-        let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/basictiles.tsx")).unwrap();
-
-        // info!("{:?}", map.layers[0].tiles);
-        // info!("Width/Height: {}, {}, ", map.width, map.height);
+        let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
 
         Self {
             len_width: Room::count_tiles(&map), 
@@ -112,82 +107,74 @@ impl Room {
         self.draw_layer(world, Layers::L1);
     }
     
-    fn draw_layer_ent(&mut self, ent: Entities, layer: Layers) {
-        let mut x;
-        let mut y = 0.0;
-        for row in self.current.layers[layer as usize].tiles.iter().rev() {
-            x = 0.0;
-            y += constants::TILE_SIZE;
-
-            for col in row.iter() {
-                x += constants::TILE_SIZE; 
-
-                let mut transform = Transform::default();
-                transform.set_translation_xyz(x, y, 0.);
-                
-                if col.gid != 0 {
-                    
-                ent
-                    .build_entity()
-                    .with(self.sprites[col.gid as usize - 1].clone())
-                    .with(transform)
-                    .build();
-                }
-            }
-        }
-    }
-     
-    pub fn draw_room_ent(&mut self, ent: Entities) {
-        self.draw_layer(ent, Layers::L6);
-        // self.draw_layer(world, Layers::L5);
-        // self.draw_layer(world, Layers::L4);
-        // self.draw_layer(world, Layers::L3);
-        // self.draw_layer(world, Layers::L2);
-        // self.draw_layer(world, Layers::L1);
-    }
+//    fn draw_layer_ent(&mut self, ent: Entities, layer: Layers) {
+//        let mut x;
+//        let mut y = 0.0;
+//        for row in self.current.layers[layer as usize].tiles.iter().rev() {
+//            x = 0.0;
+//            y += constants::TILE_SIZE;
+//
+//            for col in row.iter() {
+//                x += constants::TILE_SIZE; 
+//
+//                let mut transform = Transform::default();
+//                transform.set_translation_xyz(x, y, 0.);
+//                
+//                if col.gid != 0 {
+//                    
+//                ent
+//                    .build_entity()
+//                    .with(self.sprites[col.gid as usize - 1].clone())
+//                    .with(transform)
+//                    .build();
+//                }
+//            }
+//        }
+//    }
+//     
+//    pub fn draw_room_ent(&mut self, ent: Entities) {
+//        self.draw_layer(ent, Layers::L6);
+//        // self.draw_layer(world, Layers::L5);
+//        // self.draw_layer(world, Layers::L4);
+//        // self.draw_layer(world, Layers::L3);
+//        // self.draw_layer(world, Layers::L2);
+//        // self.draw_layer(world, Layers::L1);
+//    }
 
     pub fn load_sprites(&mut self, world: &mut World) {
-        let mut ii = 0;
+        let texture_handle = {
+            let loader = world.read_resource::<Loader>();
+            let texture_storage = world.read_resource::<AssetStorage<Texture>>();
+            
+            loader.load(
+                //format!("sprites/{}.png", sets.name), 
+                "sprites/master16.png",
+                ImageFormat::default(),
+                (),
+                &texture_storage,
+            )
+        };
 
-        for sets in &self.current.tilesets {
-            // Load the texture for our sprites. We'll later need to
-            // add a handle to this texture to our `SpriteRender`s, so
-            // we need to keep a reference to it.
-            let texture_handle = {
-                let loader = world.read_resource::<Loader>();
-                let texture_storage = world.read_resource::<AssetStorage<Texture>>();
+        // Load the spritesheet definition file, which contains metadata on our
+        // spritesheet texture.
+        let sheet_handle = {
+            let loader = world.read_resource::<Loader>();
+            let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
 
-                loader.load(
-                    // "sprites/basictiles.png",
-                    format!("sprites/{}.png", sets.name), 
-                    ImageFormat::default(),
-                    (),
-                    &texture_storage,
-                )
-            };
-
-            // Load the spritesheet definition file, which contains metadata on our
-            // spritesheet texture.
-            let sheet_handle = {
-                let loader = world.read_resource::<Loader>();
-                let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
-
-                loader.load(
-                    // "sprites/basictiles.ron",
-                    format!("sprites/{}.ron", sets.name), 
-                    SpriteSheetFormat(texture_handle),
-                    (),
-                    &sheet_storage,
-                )
-            };
+            loader.load(
+                "sprites/master16.ron",
+                // format!("sprites/{}.ron", sets.name), 
+                SpriteSheetFormat(texture_handle),
+                (),
+                &sheet_storage,
+            )
+        };
  
-            for i in 0..self.len_width[ii] { 
-                self.sprites.push(SpriteRender {
-                    sprite_sheet: sheet_handle.clone(),
-                    sprite_number: i as usize,
-                });
-            };
-            ii += 1;
+        for i in 0..self.len_width[0] { 
+            self.sprites.push(SpriteRender {
+                sprite_sheet: sheet_handle.clone(),
+                sprite_number: i as usize,
+            });
         };
     }
 
