@@ -10,6 +10,8 @@ log = { version = "0.4.8", features = ["serde"] }
 tiled = { git = "https://github.com/mattyhall/rs-tiled" }
 serde = { version = "1", features = ["derive"] }
 bincode = "1.2.1"
+stringreader = "0.1.1"
+
 
 [features]
 default = ["vulkan"]

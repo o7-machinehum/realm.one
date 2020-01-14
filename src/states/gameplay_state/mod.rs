@@ -5,12 +5,14 @@ use amethyst::{
     window::ScreenDimensions,
     network::NetConnection,
     ecs::World,
+    shrev::EventChannel
 };
 
 use log::info;
 use crate::map;
 use crate::components::PlayerComponent;
 use crate::resources::ClientStatus;
+use crate::events::{Events};
 
 pub struct GamePlayState {
     pub ip: String, // IP of server to connect to
@@ -21,8 +23,8 @@ impl SimpleState for GamePlayState {
         let world = data.world;
         world.register::<PlayerComponent>();
         world.register::<map::Room>();
-
-        let mut room = map::Room::new("resources/sprites/town.tmx".to_string());
+        
+        let mut room = map::Room::new("resources/sprites/townCompress.tmx".to_string());
         let status = ClientStatus::new();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
@@ -33,9 +35,12 @@ impl SimpleState for GamePlayState {
         
         let player1 = PlayerComponent::new( 8.0, 8.0, (159, 147, 123, 135), &room.sprites);
         player1.insert(world);
-        info!("Hello");
+
+        let mut mapEvents = EventChannel::<Events>::new();
+        mapEvents.register_reader();
 
         world.insert(status);
+        world.insert(mapEvents);
         world
             .create_entity()
             .with(room)

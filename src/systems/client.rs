@@ -3,12 +3,15 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Entities, Join, System, SystemData, World, Write, WriteStorage},
     network::*,
+    shrev::EventChannel
 };
 use log::info;
 use crate::network;
 use crate::network::Pack;
 use crate::network::client;
 use crate::resources::ClientStatus;
+use crate::map::{Room, Adj};
+use crate::events::{Events};
 
 /// A simple system that sends a ton of messages to all connections.
 /// In this case, only the server is connected.
@@ -18,13 +21,15 @@ pub struct ClientSystem;
 impl<'a> System<'a> for ClientSystem {
     type SystemData = (
         Write<'a, ClientStatus>, 
+        Write<'a, EventChannel<Events>>,
         WriteStorage<'a, NetConnection<Vec::<u8>>>,
         WriteStorage<'a, network::Reader>,
+        WriteStorage<'a, Room>,
         Entities<'a>,
     );
 
-    fn run(&mut self, (mut status, mut connections, mut readers, entities): Self::SystemData) {
-        for (e, connection) in (&entities, &mut connections).join() {
+    fn run(&mut self, (mut status, mut events, mut connections, mut readers, mut rooms, entities): Self::SystemData) {
+        for (e, connection, room) in (&entities, &mut connections, &mut rooms).join() {
             let reader = readers
                 .entry(e)
                 .expect("Cannot get reader")
@@ -50,14 +55,25 @@ impl<'a> System<'a> for ClientSystem {
                     
                     // Process Pack
                     let out = match rtn {
-                        Some(rtn) => client::handle(rtn.content().to_vec()),
-                        None => None, 
+                        Some(rtn) => client::handle(rtn.content().to_vec(), &entities),
+                        None => (None, None), 
                     };
 
-                    // Add to vector of responces 
-                    match out {
-                        Some(mut out) => recv.push(out), 
-                        None => {},    
+                    // Add to vector of udp responces 
+                    match out.0 {
+                        Some(mut out) => recv.push(out),
+                        None => {},
+                    }
+                    
+                    // Then write the event to the event channel
+                    match out.1 {
+                        Some(out) => {
+                            match out {
+                                Events::NewMap(map) => room.change(map), 
+                            }
+                        // events.single_write(out);
+                        },
+                        None => {},
                     }
                 }
                 

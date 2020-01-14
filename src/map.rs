@@ -3,7 +3,7 @@ use amethyst::{
     core::transform::Transform,
     prelude::*,
     renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    ecs::{Component, DenseVecStorage, FlaggedStorage},
+    ecs::{Entities, Component, DenseVecStorage, FlaggedStorage},
 };
 
 extern crate tiled;
@@ -49,7 +49,9 @@ impl Room {
     pub fn new(file_name: String) -> Self {
         let file = File::open(&Path::new(&file_name)).unwrap();
     	let reader = BufReader::new(file);
-        let map =  tiled::parse(reader).unwrap();
+        // let map =  tiled::parse(reader).unwrap();
+        
+        let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/basictiles.tsx")).unwrap();
 
         // info!("{:?}", map.layers[0].tiles);
         // info!("Width/Height: {}, {}, ", map.width, map.height);
@@ -60,7 +62,12 @@ impl Room {
             sprites: Vec::new(), 
         }
     }
-   
+
+    pub fn change(&mut self, newMap: tiled::Map) {
+        self.len_width = Room::count_tiles(&newMap); 
+        self.current = newMap;
+    }
+
     fn count_tiles(map: &tiled::Map) -> Vec<i32> {
         let mut v: Vec<i32> = Vec::new();
         for sets in &map.tilesets {
@@ -94,6 +101,49 @@ impl Room {
                 }
             }
         }
+    }
+    
+    pub fn draw_room(&mut self, world: &mut World) {
+        // self.draw_layer(world, Layers::L6);
+        self.draw_layer(world, Layers::L5);
+        self.draw_layer(world, Layers::L4);
+        self.draw_layer(world, Layers::L3);
+        self.draw_layer(world, Layers::L2);
+        self.draw_layer(world, Layers::L1);
+    }
+    
+    fn draw_layer_ent(&mut self, ent: Entities, layer: Layers) {
+        let mut x;
+        let mut y = 0.0;
+        for row in self.current.layers[layer as usize].tiles.iter().rev() {
+            x = 0.0;
+            y += constants::TILE_SIZE;
+
+            for col in row.iter() {
+                x += constants::TILE_SIZE; 
+
+                let mut transform = Transform::default();
+                transform.set_translation_xyz(x, y, 0.);
+                
+                if col.gid != 0 {
+                    
+                ent
+                    .build_entity()
+                    .with(self.sprites[col.gid as usize - 1].clone())
+                    .with(transform)
+                    .build();
+                }
+            }
+        }
+    }
+     
+    pub fn draw_room_ent(&mut self, ent: Entities) {
+        self.draw_layer(ent, Layers::L6);
+        // self.draw_layer(world, Layers::L5);
+        // self.draw_layer(world, Layers::L4);
+        // self.draw_layer(world, Layers::L3);
+        // self.draw_layer(world, Layers::L2);
+        // self.draw_layer(world, Layers::L1);
     }
 
     pub fn load_sprites(&mut self, world: &mut World) {
@@ -141,15 +191,6 @@ impl Room {
         };
     }
 
-    pub fn draw_room(&mut self, world: &mut World) {
-        // self.draw_layer(world, Layers::L6);
-        self.draw_layer(world, Layers::L5);
-        self.draw_layer(world, Layers::L4);
-        self.draw_layer(world, Layers::L3);
-        self.draw_layer(world, Layers::L2);
-        self.draw_layer(world, Layers::L1);
-    }
-    
     // Convert world coordinates to tiled coordinates
     fn world_2_tiled(&mut self, (x, y): (i32, i32)) -> (i32, i32){
         (x, (self.current.height as i32 - 1) - y)
