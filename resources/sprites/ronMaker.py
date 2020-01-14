@@ -1,4 +1,5 @@
-#eg: python3 ronMaker.py <out_fname.ron> <texture_width> <texture_height> <width> <height>
+#eg: python3 ronMaker.py <fname.ron> <img_width> <img_height> <texture_width> <texture_height>
+#eg: python3 ronMaker.py master16.ron 192 496 16 16
 
 import sys
 
@@ -7,13 +8,8 @@ texture_width      = int(sys.argv[2])
 texture_height     = int(sys.argv[3])
 width              = int(sys.argv[4])
 height             = int(sys.argv[5])
-cols               = int(width / texture_width)
-rows               = int(height / texture_height)
-
-print("Output File Name: %s" %(fname));
-print("Texture Width/Height (px): %d/%d" %(texture_width, texture_height));
-print("Image Width/Height (px): %d/%d" %(width, height));
-print("Sprites cols/rows: %d/%d" %(cols, rows));
+cols               = int(texture_width   / width)
+rows               = int(texture_height  / height)
 
 f = open(fname, "w+")
 
