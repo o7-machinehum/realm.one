@@ -10,7 +10,7 @@ use crate::network;
 use crate::network::Pack;
 use crate::network::client;
 use crate::resources::ClientStatus;
-use crate::map::{Room, Adj};
+use crate::map::Room;
 use crate::events::{Events};
 
 /// A simple system that sends a ton of messages to all connections.

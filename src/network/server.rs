@@ -4,8 +4,6 @@ use log::info;
 
 use std::{
     fs::File,
-    io::BufReader,
-    path::Path,
 };
 
 use std::io::Read;
