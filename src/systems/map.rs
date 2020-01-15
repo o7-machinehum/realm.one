@@ -1,20 +1,10 @@
 use amethyst::core::{Transform, SystemDesc};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Join, Read, Entities, System, SystemData, World, WriteStorage};
-use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
-use amethyst::shrev::{EventChannel, ReaderId};
-use amethyst::network;
 
-use std::time::Instant;
-
-use crate::components::{PlayerComponent, Orientation};
-use crate::key_bindings::{MovementBindingTypes, AxisBinding};
-use crate::map::{Room, Adj, TilePosition, SpritesContainer};
-use crate::events::{Events};
+use crate::map::{Room, TilePosition, SpritesContainer};
 use log::info;
-
-use crate::constants;
 
 #[derive(SystemDesc)]
 pub struct MapSystem ;
@@ -33,11 +23,18 @@ impl<'s> System<'s> for MapSystem{
     /// Resource room should be updated with the newest room
     fn run(&mut self, (mut transforms, mut sprite_renders, mut tiles_pos, mut room, mut container, entities): Self::SystemData) {
         for (sprite_render, transform, pos) in (&mut sprite_renders, &mut transforms, &mut tiles_pos).join() { 
-            match (room.update_gid(pos)) {
+            match room.diff_gid(pos) {
                 Some(gid) => {
-                    pos.gid = gid;                                  // Change the gid in the position 
-                    *sprite_render = container.sprites[gid - 1].clone(); // Change the sprite
-                }, 
+                    pos.gid = gid;                                           // Change the gid in the position 
+                    if gid == 0 {
+                        //TODO: This is just inserting a blank sprites into the spriterender
+                        // I don't know if this is the best way to do this.
+                        *sprite_render = container.sprites[49].clone();      
+                    }
+                    else {
+                        *sprite_render = container.sprites[gid - 1].clone(); // Change the sprite
+                    }
+                },
                 None => {},
             }
         }

@@ -2,8 +2,6 @@ use amethyst::{
     prelude::*,
 };
 
-use crate::map;
-
 pub struct ServerState;
 
 impl SimpleState for ServerState {

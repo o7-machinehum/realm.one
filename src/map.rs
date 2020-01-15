@@ -3,7 +3,7 @@ use amethyst::{
     core::transform::Transform,
     prelude::*,
     renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    ecs::{Entities, Component, DenseVecStorage, FlaggedStorage},
+    ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 
 extern crate tiled;
@@ -15,8 +15,8 @@ use std::{
 
 use log::info;
 use crate::constants;
-use crate::mech::colision;
 
+#[derive(Clone, Debug)]
 enum Layers {
     L1 = 0,
     L2,
@@ -25,8 +25,6 @@ enum Layers {
     L5,
     L6,
 }
-
-
 
 #[derive(Default)]
 pub struct SpritesContainer {
@@ -76,6 +74,7 @@ impl SpritesContainer {
 
 pub struct Room {
     map: tiled::Map,
+    xsize: usize,
 }
 
 impl Default for Room {
@@ -84,7 +83,10 @@ impl Default for Room {
         let reader = BufReader::new(file);
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
         
-        Self { map }
+        Self { 
+            xsize: map.layers[0].tiles[0].len() - 1,
+            map,
+        }
     }
 }
 
@@ -95,6 +97,7 @@ impl Room {
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
 
         Self {
+            xsize: map.layers[0].tiles[0].len() - 1,
             map, 
         }
     }
@@ -105,27 +108,27 @@ impl Room {
     }
 
     fn get_gid(&self, loc: &TilePosition) -> u32 {
-        self.map.layers[loc.z].tiles[loc.x][loc.y].gid
+        self.map.layers[loc.z].tiles[self.xsize - loc.x][loc.y].gid
     }
     
     /// Compares the gid of the tile in a current location to that of a room
     /// If the tile isn't the same, it returns Some(usize) of the proper tile
-    pub fn update_gid(&self, loc: &TilePosition) -> Option<usize> {
+    pub fn diff_gid(&self, loc: &TilePosition) -> Option<usize> {
         let gid =  self.get_gid(loc);
-
-        if (loc.gid as u32 != gid) && (gid != 0) {
-           return Some(self.get_gid(loc) as usize);
+            
+        if loc.gid as u32 != gid {
+           return Some(gid as usize);
         }
         None 
     }
 
     fn draw_layer(&mut self, world: &mut World, layer: Layers, sprites: &SpritesContainer) {
-        for (x, row) in self.map.layers[layer as usize].tiles.iter().rev().enumerate().rev(){
+        for (x, row) in self.map.layers[layer.clone() as usize].tiles.iter().rev().enumerate() {
             for (y, col) in row.iter().enumerate() {
                 if col.gid != 0 {
-                    let mut loc = TilePosition::new(x, y, 0, col.gid as usize - 1);
+                    let mut loc = TilePosition::new(x, y, layer.clone() as usize, col.gid as usize - 1);
                     let mut transform = loc.to_trans(); 
-                
+                    
                     world
                         .create_entity()
                         .with(sprites.sprites[loc.gid].clone()) 
@@ -138,11 +141,10 @@ impl Room {
     }
     
     pub fn draw_room(&mut self, world: &mut World, sprites: &SpritesContainer) {
-        // self.draw_layer(world, Layers::L6);
-        // self.draw_layer(world, Layers::L5);
-        // self.draw_layer(world, Layers::L4);
-        // self.draw_layer(world, Layers::L3);
-        // self.draw_layer(world, Layers::L2);
+        self.draw_layer(world, Layers::L5, sprites);
+        self.draw_layer(world, Layers::L4, sprites);
+        self.draw_layer(world, Layers::L3, sprites);
+        self.draw_layer(world, Layers::L2, sprites);
         self.draw_layer(world, Layers::L1, sprites);
     }
 }
@@ -154,10 +156,6 @@ pub struct Adj {
     pub s: Option<tiled::Properties>,
     pub w: Option<tiled::Properties>,
 }
-
-// impl Component for Room{
-//     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
-// }
 
 impl Component for TilePosition{
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
@@ -184,13 +182,16 @@ impl TilePosition {
         }
     }
     
-    pub fn to_spr_num(&mut self) -> usize {
-        (self.x * self.y)
-    }
+    // pub fn to_spr_num(&mut self) -> usize {
+    //     (self.x * self.y)
+    // }
 
     pub fn to_trans(&mut self) -> Transform {
         let mut transform = Transform::default();
-        transform.set_translation_xyz((self.x as f32 * constants::TILE_SIZE) as f32, (self.y as f32 * constants::TILE_SIZE) as f32, 0.);
+        transform.set_translation_xyz((self.x as f32 * constants::TILE_SIZE) as f32, 
+                                      (self.y as f32 * constants::TILE_SIZE) as f32, 
+                                      (self.z as f32)
+                                     );
         transform
     }
 }
