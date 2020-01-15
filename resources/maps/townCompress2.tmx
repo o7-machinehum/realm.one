@@ -3,7 +3,7 @@
  <tileset firstgid="1" source="../sprites/master16.tsx"/>
  <layer id="1" name="L1" width="96" height="96">
   <data encoding="base64" compression="zlib">
-   eAHt12FqwkAUhVHX0O5/rzU/BkJAaqaj95qegqhgeM9vjra93fwkC3zfh7tlGmznrn2ugf659pt7/fX/z99//PPPf9aA/vqnDPj+z9rTX//UZ79hLv/8NzhM7cA//yl7DXP557/BYWoH/vlP2WuYyz//DQ5TO/DPf8pew1z++W9wmNqBf/5T9hrm8s9/g8PUDvzzn7LXMJd//hscpnbgn/+UvYa5/PPf4DC1A//8p+w1zOWf/waHqR345z9lr2Eu//w3OEztwD//KXsNc/nnv8Fhagf++U/Za5jLP/8NDlM78M9/yl7DXP75b3CY2oF//lP2Gubyz3+Dw9QO/POfstcwl3/+GxymduCf/5S9hrn889/gMLXDWf9f9wu2W2rfq8092397//qv8zfT/2oGk+9H/3WWZ85Rf/1n3FzlGv75v4rlmffB/2f597f/2vM643//v69zWHMOz/Y/tp/pP3PNzHfqJ11ztr+Ga9wPI8/0H/a1X9t+O4Pf+o/m436cm/s1Z/Go/978eKz5mub7js/037/e47VncOw/rI97vdf2PvZ81P/4Os9fcw7H/jq/pvOjrvq/t/fxHPTv6r/93j2ekeeva7LCvzObP58V/X0+/tb/B26Mnc4=
+   eAHt3TEKgDAMQNEcQXow738cLYXSoQ6FOAReQVFBkJ+3OLVFRHNowAADDDDAAAMMMMAAAwwwwAADDDDAAAMMMMAAAwwwwAADDDDAAAMMMMAAAwwwwAADDDDAAAMMMMAAAwwwwAADDDDAAAMMMMAAAwwwwAADDDDAAAMMMMAAAwwwwAADDDDAAAMMMMAAAwwwwAADDDDAAAMMMMAAAwwwwAADDDDAAAMMMMAAAwwwwAADDDBQ3MBd/PvtMWqfVQYYYIABBhhggAEGcg28vwhzaZvbdtdzxv642L3jWd5c1uzXctMb96X1vw1G5bOzmeTP5GQC+uf311RTBhhggAEGGKhk4AENLYV3
   </data>
  </layer>
  <layer id="2" name="L2" width="96" height="96" visible="0">

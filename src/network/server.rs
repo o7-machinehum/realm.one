@@ -13,7 +13,7 @@ use std::io::Read;
 /// Send the map to the client
 fn welcome() -> Option<Pack> {
     info!("Player Connected, sending map!");
-    let fname = "resources/sprites/townCompress.tmx";
+    let fname = "resources/maps/townCompress2.tmx";
     let mut file = File::open(&fname.to_string()).expect("Unable to open map file"); 
     let mut contents = String::new();
     file.read_to_string(&mut contents);
