@@ -3,7 +3,7 @@ use amethyst::{
     core::transform::Transform,
     prelude::*,
     renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    ecs::{Component, DenseVecStorage, FlaggedStorage},
+    ecs::{Component, DenseVecStorage, FlaggedStorage, Entity, Entities},
 };
 
 extern crate tiled;
@@ -73,8 +73,10 @@ impl SpritesContainer {
 }
 
 pub struct Room {
-    map: tiled::Map,
-    xsize: usize,
+    pub map: tiled::Map,
+    pub xsize: usize,
+    pub tile_ent: Vec<Entity>,
+    pub update: bool,
 }
 
 impl Default for Room {
@@ -86,6 +88,8 @@ impl Default for Room {
         Self { 
             xsize: map.layers[0].tiles[0].len() - 1,
             map,
+            tile_ent: Vec::new(),
+            update: true,
         }
     }
 }
@@ -99,12 +103,15 @@ impl Room {
         Self {
             xsize: map.layers[0].tiles[0].len() - 1,
             map, 
+            tile_ent: Vec::new(),
+            update: true,
         }
     }
 
     pub fn change(&mut self, map: tiled::Map) {
         info!("Inserting New Map");
         self.map = map;
+        self.update = true;
     }
 
     fn get_gid(&self, loc: &TilePosition) -> u32 {
@@ -121,32 +128,6 @@ impl Room {
         }
         None 
     }
-
-    fn draw_layer(&mut self, world: &mut World, layer: Layers, sprites: &SpritesContainer) {
-        for (x, row) in self.map.layers[layer.clone() as usize].tiles.iter().rev().enumerate() {
-            for (y, col) in row.iter().enumerate() {
-                if col.gid != 0 {
-                    let mut loc = TilePosition::new(x, y, layer.clone() as usize, col.gid as usize - 1);
-                    let mut transform = loc.to_trans(); 
-                    
-                    world
-                        .create_entity()
-                        .with(sprites.sprites[loc.gid].clone()) 
-                        .with(transform)
-                        .with(loc) 
-                        .build();
-                }
-            }
-        }
-    }
-    
-    pub fn draw_room(&mut self, world: &mut World, sprites: &SpritesContainer) {
-        self.draw_layer(world, Layers::L5, sprites);
-        self.draw_layer(world, Layers::L4, sprites);
-        self.draw_layer(world, Layers::L3, sprites);
-        self.draw_layer(world, Layers::L2, sprites);
-        self.draw_layer(world, Layers::L1, sprites);
-    }
 }
 
 pub struct Adj {
@@ -158,10 +139,6 @@ pub struct Adj {
 }
 
 impl Component for TilePosition{
-    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
-}
-
-impl Component for SpritesContainer{
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }
 
