@@ -24,12 +24,12 @@ impl<'a> System<'a> for ClientSystem {
         Write<'a, EventChannel<Events>>,
         WriteStorage<'a, NetConnection<Vec::<u8>>>,
         WriteStorage<'a, network::Reader>,
-        WriteStorage<'a, Room>,
+        Write<'a, Room>,
         Entities<'a>,
     );
 
-    fn run(&mut self, (mut status, mut events, mut connections, mut readers, mut rooms, entities): Self::SystemData) {
-        for (e, connection, room) in (&entities, &mut connections, &mut rooms).join() {
+    fn run(&mut self, (mut status, mut events, mut connections, mut readers, mut room, entities): Self::SystemData) {
+        for (e, connection) in (&entities, &mut connections).join() {
             let reader = readers
                 .entry(e)
                 .expect("Cannot get reader")

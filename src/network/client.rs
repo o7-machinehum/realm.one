@@ -27,7 +27,7 @@ fn load_map(mut pk: Pack, entities: &Entities) -> (Option<Pack>, Option<Events>)
     let string = pk.strings.pop().unwrap();        // Get the string
     let mut streader = StringReader::new(&string); // Make a buffer
     let reader = BufReader::new(streader);
-    let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/basictiles.tsx")).unwrap();
+    let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
     
     (None, Some(Events::NewMap(map)))
 }

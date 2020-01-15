@@ -66,8 +66,9 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
         .with_bundle(NetworkBundle::<Vec<u8>>::new(
             "127.0.0.1:3455".parse().unwrap(),
         ))?
-        .with(systems::PlayerSystem, "player_system", &["input_system"])
-        .with(systems::ClientSystem, "client_system", &[]);
+        // .with(systems::PlayerSystem, "player_system", &["input_system"])
+        .with(systems::ClientSystem, "client_system", &[])
+        .with(systems::MapSystem,    "map_system", &[]);
 
 
     let mut game = Application::new(
