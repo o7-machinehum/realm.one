@@ -28,6 +28,7 @@ impl<'s> System<'s> for MapSystem{
                 entities.delete(*entity);
             }
             
+            // Add new tiles
             let mut entList: Vec<Entity> = Vec::new();
             for (z, layer) in room.map.layers.iter().enumerate() {
                 for (x, row) in layer.tiles.iter().rev().enumerate() {
