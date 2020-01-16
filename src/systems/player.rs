@@ -1,32 +1,34 @@
 use amethyst::core::{Transform, SystemDesc};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Join, Read, Entities, System, SystemData, World, WriteStorage};
+use amethyst::ecs::{Join, Read, Write, Entities, System, SystemData, World, WriteStorage};
 use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
+use amethyst::shrev::{EventChannel, ReaderId};
+use amethyst::network;
 
 use std::time::Instant;
-use log::info;
 
 use crate::components::{PlayerComponent, Orientation};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::{Room, Adj};
+use crate::events::{Events};
 
 use crate::constants;
 
 #[derive(SystemDesc)]
-pub struct PlayerSystem;
+pub struct PlayerSystem ;
 
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, SpriteRender>,
-        WriteStorage<'s, Room>,
+        Write<'s, Room>,
         Entities<'s>,
         Read<'s, InputHandler<MovementBindingTypes>>,
     );
 
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut rooms, entities, input): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut room, entities, input): Self::SystemData) {
         for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
             let now = Instant::now();
 
@@ -57,15 +59,12 @@ impl<'s> System<'s> for PlayerSystem{
                 
                 player.orientation = orientation.clone();
                 player.last_movement_instant = now.clone();
-
                 sprite_renders.insert(entity, player.get_orientated());
 
-                for room in (&mut rooms).join() {
-                    let adj: Adj = room.get_adj(transform);
-                    if room.allowed_move(transform, horizontal, vertical, adj){
-                        transform.move_up(vertical * constants::PLAYER_MOVE );
-                        transform.move_right(horizontal * constants::PLAYER_MOVE );
-                    }
+                let adj: Adj = room.get_adj(transform);
+                if room.allowed_move(transform, horizontal, vertical, adj){
+                    transform.move_up(vertical * constants::PLAYER_MOVE );
+                    transform.move_right(horizontal * constants::PLAYER_MOVE );
                 }
             }
         } 
