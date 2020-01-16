@@ -41,7 +41,7 @@ impl PlayerComponent {
     
     pub fn insert(self, world: &mut World) {
         let mut transform = Transform::default();
-        transform.set_translation_xyz(self.x, self.y, 0.0); 
+        transform.set_translation_xyz(self.x, self.y, 1.0); 
 
         // Create a player entity.
         world

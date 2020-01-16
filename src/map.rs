@@ -15,6 +15,7 @@ use std::{
 
 use log::info;
 use crate::constants;
+use crate::mech::{colision};
 
 #[derive(Clone, Debug)]
 enum Layers {
@@ -113,20 +114,72 @@ impl Room {
         self.map = map;
         self.update = true;
     }
+    
+    // Convert world coordinates to tiled coordinates
+    fn world_2_tiled(&self, (x, y): (i32, i32)) -> (i32, i32){
+        (x, (self.map.height as i32 - 1) - y)
+    }
 
-    fn get_gid(&self, loc: &TilePosition) -> u32 {
-        self.map.layers[loc.z].tiles[self.xsize - loc.x][loc.y].gid
+    pub fn get_pos(pos: &Transform) -> (i32, i32){
+         Room::px_2_world(pos.translation().data[0], pos.translation().data[1])
     }
     
-    /// Compares the gid of the tile in a current location to that of a room
-    /// If the tile isn't the same, it returns Some(usize) of the proper tile
-    pub fn diff_gid(&self, loc: &TilePosition) -> Option<usize> {
-        let gid =  self.get_gid(loc);
-            
-        if loc.gid as u32 != gid {
-           return Some(gid as usize);
+    // Convert from pixel coordinates 
+    pub fn px_2_world(x: f32, y:f32) -> (i32, i32){
+        ((((x - constants::TILE_SIZE) / constants::TILE_SIZE) as i32),
+         (((y - constants::TILE_SIZE) / constants::TILE_SIZE) as i32)
+        )
+    }
+
+    // Check to see if the resulting position is inside the map
+    pub fn allowed_move(&self, pos: &Transform, horizontal: f32, vertical: f32, adj: Adj) -> bool{
+        let (x, y) = Room::get_pos(pos);
+        let north = (vertical > 0.)
+            && ((y >= (self.map.height as i32 - constants::TILE_PER_PLAYER as i32))
+                || colision(&adj.n));
+        let east = (horizontal > 0.)
+            && ((x >= (self.map.width as i32 - constants::TILE_PER_PLAYER as i32))
+                || colision(&adj.e));
+        let south = (vertical < 0.) && ((y == 0) || colision(&adj.s));
+        let west = (horizontal < 0.) && ((x == 0) || colision(&adj.w));
+
+        !north && !east && !south && !west
+    }
+    
+    fn get_prop(&self, (x, y): (i32, i32), (xoff, yoff): (i32, i32)) -> Option<tiled::Properties> {
+        
+        // Bottom left
+        if (x == 0 && xoff <= -1) || (y == 0 && yoff <= -1) {
+            return None;  
         }
-        None 
+        
+        if x + xoff > (self.map.width as i32 - constants::TILE_PER_PLAYER as i32) {
+            return None;
+        }
+
+        if y + yoff > (self.map.height as i32 - constants::TILE_PER_PLAYER as i32) {
+            return None;
+        }
+        
+        let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
+        let tile = self.map.layers[Layers::L4 as usize].tiles[y1 as usize][x1 as usize];
+
+        match self.map.get_tileset_by_gid(tile.gid){
+            Some(thing) => Some(thing.tiles[tile.gid as usize].properties.clone()),
+            None => None,
+        }
+    }
+    
+    pub fn get_adj(&self, pos: &Transform) -> Adj {
+        let (x, y): (i32, i32) = Room::get_pos(pos);
+        
+        Adj{
+            cur: self.get_prop((x,y),(0,0)),
+            n:   self.get_prop((x,y),(0,constants::TILE_PER_PLAYER as i32)),
+            e:   self.get_prop((x,y),(constants::TILE_PER_PLAYER as i32,0)),
+            s:   self.get_prop((x,y),(0, -constants::TILE_PER_PLAYER as i32)),
+            w:   self.get_prop((x,y),(-constants::TILE_PER_PLAYER as i32,0)),
+        }
     }
 }
 
@@ -158,108 +211,13 @@ impl TilePosition {
             gid,
         }
     }
-    
-    // pub fn to_spr_num(&mut self) -> usize {
-    //     (self.x * self.y)
-    // }
 
     pub fn to_trans(&mut self) -> Transform {
         let mut transform = Transform::default();
-        transform.set_translation_xyz((self.x as f32 * constants::TILE_SIZE) as f32, 
-                                      (self.y as f32 * constants::TILE_SIZE) as f32, 
-                                      (self.z as f32)
+        transform.set_translation_xyz((self.x as f32 * constants::TILE_SIZE) as f32 + 8.0, 
+                                      (self.y as f32 * constants::TILE_SIZE) as f32 + 8.0, 
+                                      (self.z as f32 * 0.1)
                                      );
         transform
     }
 }
-
-// Comment
-// impl Room {
-//    pub fn change(&mut self, newMap: tiled::Map) {
-//        self.len_width = Room::count_tiles(&newMap); 
-//        self.current = newMap;
-//    }
-//
-//    fn count_tiles(map: &tiled::Map) -> Vec<i32> {
-//        let mut v: Vec<i32> = Vec::new();
-//        for sets in &map.tilesets {
-//            v.push((sets.images[0].width / sets.tile_width as i32) * (sets.images[0].height / sets.tile_height as i32)) 
-//        }
-//
-//        info!("Tiles in the images: {:?}", v);
-//
-//        v
-//    }
-//
-    
-//}
-//
-//    
-//
-//    // Convert world coordinates to tiled coordinates
-//    fn world_2_tiled(&mut self, (x, y): (i32, i32)) -> (i32, i32){
-//        (x, (self.current.height as i32 - 1) - y)
-//    }
-//
-//    pub fn get_pos(pos: &Transform) -> (i32, i32){
-//         Room::px_2_world(pos.translation().data[0], pos.translation().data[1])
-//    }
-//    
-//    // Convert from pixel coordinates 
-//    pub fn px_2_world(x: f32, y:f32) -> (i32, i32){
-//        ((((x - constants::TILE_SIZE) / constants::TILE_SIZE) as i32),
-//         (((y - constants::TILE_SIZE) / constants::TILE_SIZE) as i32)
-//        )
-//    }
-//
-//    // Check to see if the resulting position is inside the map
-//    pub fn allowed_move(&mut self, pos: &Transform, horizontal: f32, vertical: f32, adj: Adj) -> bool{
-//        let (x, y) = Room::get_pos(pos);
-//        let north = (vertical > 0.)
-//            && ((y >= (self.current.height as i32 - constants::TILE_PER_PLAYER as i32))
-//                || colision(&adj.n));
-//        let east = (horizontal > 0.)
-//            && ((x >= (self.current.width as i32 - constants::TILE_PER_PLAYER as i32))
-//                || colision(&adj.e));
-//        let south = (vertical < 0.) && ((y == 0) || colision(&adj.s));
-//        let west = (horizontal < 0.) && ((x == 0) || colision(&adj.w));
-//
-//        !north && !east && !south && !west
-//    }
-//    
-//    fn get_prop(&mut self, (x, y): (i32, i32), (xoff, yoff): (i32, i32)) -> Option<tiled::Properties> {
-//        
-//        // Bottom left
-//        if (x == 0 && xoff <= -1) || (y == 0 && yoff <= -1) {
-//            return None;  
-//        }
-//        
-//        if x + xoff > (self.current.width as i32 - constants::TILE_PER_PLAYER as i32) {
-//            return None;
-//        }
-//
-//        if y + yoff > (self.current.height as i32 - constants::TILE_PER_PLAYER as i32) {
-//            return None;
-//        }
-//        
-//        let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
-//        let tile = self.current.layers[Layers::L4 as usize].tiles[y1 as usize][x1 as usize];
-//
-//        match self.current.get_tileset_by_gid(tile.gid){
-//            Some(thing) => Some(thing.tiles[tile.gid as usize].properties.clone()),
-//            None => None,
-//        }
-//    }
-//    
-//    pub fn get_adj(&mut self, pos: &Transform) -> Adj {
-//        let (x, y): (i32, i32) = Room::get_pos(pos);
-//        
-//        Adj{
-//            cur: self.get_prop((x,y),(0,0)),
-//            n:   self.get_prop((x,y),(0,constants::TILE_PER_PLAYER as i32)),
-//            e:   self.get_prop((x,y),(constants::TILE_PER_PLAYER as i32,0)),
-//            s:   self.get_prop((x,y),(0, -constants::TILE_PER_PLAYER as i32)),
-//            w:   self.get_prop((x,y),(-constants::TILE_PER_PLAYER as i32,0)),
-//        }
-//    }
-//}
