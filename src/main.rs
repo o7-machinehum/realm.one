@@ -8,28 +8,50 @@ use amethyst::{
     },
     input::InputBundle,
     utils::application_root_dir,
+    network::NetworkBundle,
 };
+
+use std::env; 
+use log::info;
 
 mod map;
 mod key_bindings;
-
 mod states;
 mod components;
 mod systems;
 mod constants;
 mod mech;
+mod network;
+mod resources;
+mod events;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
-
+    let args: Vec<String> = env::args().collect();
+    let mut rtn : amethyst::Result<()> = Ok(()); 
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
+    if args[1] == "client" {
+        info!("Starting the client");
+        rtn = client(resources, args[2].clone());
+    }
+
+    else if args[1] == "server"{
+        info!("Starting the server!");
+        rtn = server(resources);
+    }
+    // else error out
+    
+    rtn
+}
+
+fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
     
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(key_bindings_config_path)?;
-
+    
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(
@@ -41,17 +63,37 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(input_bundle)? 
-        .with(systems::PlayerSystem, "player_system", &["input_system"]);
+        .with_bundle(NetworkBundle::<Vec<u8>>::new(
+            "127.0.0.1:3455".parse().unwrap(),
+        ))?
+        .with(systems::PlayerSystem, "player_system", &["input_system"])
+        .with(systems::ClientSystem, "client_system", &[])
+        .with(systems::MapSystem,    "map_system", &[]);
 
 
     let mut game = Application::new(
         resources, 
-        states::GamePlayState{},
+        states::GamePlayState{ip},
         game_data,
     )?;
 
     game.run();
-
     Ok(())
 }
 
+fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
+    let game_data = GameDataBuilder::default()
+        .with_bundle(NetworkBundle::<Vec<u8>>::new(
+            "127.0.0.1:3456".parse().unwrap(),
+        ))?
+        .with(systems::ServerSystem, "server_system", &[]);
+
+    let mut game = Application::new(
+        resources, 
+        states::ServerState{},
+        game_data,
+    )?;
+
+    game.run();
+    Ok(())
+}

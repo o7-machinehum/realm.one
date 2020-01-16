@@ -1,4 +1,5 @@
-#eg: python3 ronMaker.py <fname.ron> <texture_width> <texture_height> <width> <height>
+#eg: python3 ronMaker.py <fname.ron> <img_width> <img_height> <texture_width> <texture_height>
+#eg: python3 ronMaker.py master16.ron 192 496 16 16
 
 import sys
 

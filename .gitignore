@@ -7,3 +7,9 @@ thumbs.db
 *~
 *.rs.bk
 *.swp
+notes
+*.aux
+*.log
+*.out
+test
+
