@@ -39,15 +39,16 @@ pub struct Pack {
     ints: Vec<u32>,
     floats: Vec<f32>,
     strings: Vec<String>,
+    ser_struct: Vec<u8>,
 }
 
 impl Pack {
-    fn fill() -> (Vec<u32>, Vec<f32>, Vec<String>) {
-        (Vec::<u32>::new(), Vec::<f32>::new(), Vec::<String>::new())
+    fn fill() -> (Vec<u32>, Vec<f32>, Vec<String>, Vec<u8>) {
+        (Vec::<u32>::new(), Vec::<f32>::new(), Vec::<String>::new(), Vec::<u8>::new())
     }
 
     pub fn send_tmx(map_name: String, tmx: String) -> Self {
-        let (ints, floats, mut strings) =  Pack::fill();
+        let (ints, floats, mut strings, ser_struct) =  Pack::fill();
         strings.push(map_name);
         strings.push(tmx);
 
@@ -57,11 +58,12 @@ impl Pack {
             ints,
             floats,
             strings,
+            ser_struct,
         }
     }
 
     pub fn connect(proof: String) -> Self {
-        let (ints, floats, mut strings) =  Pack::fill();
+        let (ints, floats, mut strings, ser_struct) =  Pack::fill();
         strings.push(proof);
 
         Self {
@@ -70,16 +72,18 @@ impl Pack {
             ints,
             floats,
             strings,
+            ser_struct,
         }
     }
     
     pub fn nothing() -> Self {
-        let (ints, floats, strings) =  Pack::fill();
+        let (ints, floats, strings, ser_struct) =  Pack::fill();
 
         Self {
             cmd: Cmd::Connect,
             id: 0, 
             ints, floats, strings,
+            ser_struct,
         }
     }
 
