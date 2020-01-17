@@ -29,11 +29,13 @@ pub enum Cmd {
     Connect,
     TransferMap,
     CreateMonster,  // Create a monsters
+    CreatePlayer,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Pack {
     pub cmd: Cmd,
+    id: u32,
     ints: Vec<u32>,
     floats: Vec<f32>,
     strings: Vec<String>,
@@ -44,23 +46,6 @@ impl Pack {
         (Vec::<u32>::new(), Vec::<f32>::new(), Vec::<String>::new())
     }
 
-    pub fn pack_monster(mon_id: u32, xpos: f32, ypos: f32, hp: f32, tile: u32, name: String) -> Self {
-        let (mut ints, mut floats, mut strings) =  Pack::fill();
-        ints.push(tile);
-        floats.push(xpos);
-        floats.push(ypos);
-        floats.push(hp);
-        strings.push(name);
-        ints.push(mon_id);
-        
-        Self {
-            cmd: Cmd::CreateMonster,
-            ints,
-            floats,
-            strings,
-        }
-    }
-
     pub fn send_tmx(map_name: String, tmx: String) -> Self {
         let (ints, floats, mut strings) =  Pack::fill();
         strings.push(map_name);
@@ -68,6 +53,7 @@ impl Pack {
 
         Self {
             cmd: Cmd::TransferMap,
+            id: 0, 
             ints,
             floats,
             strings,
@@ -80,6 +66,7 @@ impl Pack {
 
         Self {
             cmd: Cmd::Connect,
+            id: 0, 
             ints,
             floats,
             strings,
@@ -91,17 +78,10 @@ impl Pack {
 
         Self {
             cmd: Cmd::Connect,
+            id: 0, 
             ints, floats, strings,
         }
     }
-
-    // pub fn from_string(str: String) -> Self {
-    //     from_str(&str).unwrap()
-    // }
-    //  
-    // pub fn to_string(&mut self) -> String {
-    //     to_string(&self).unwrap()
-    // }
 
     pub fn from_bin(bin: Vec<u8>) -> Self {
         bincode::deserialize(&bin[..]).unwrap() 

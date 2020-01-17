@@ -14,6 +14,17 @@ pub enum Orientation {
     North,
 }
 
+/// Server Size player components
+pub struct ServerPlayerComponent {
+    x: f32,
+    y: f32,
+    no: usize, 
+    ea: usize, 
+    so: usize,
+    we: usize, 
+}
+
+/// Client Side player component
 pub struct PlayerComponent {
     pub x: f32,
     pub y: f32,
@@ -26,8 +37,8 @@ pub struct PlayerComponent {
 }
 
 impl PlayerComponent {
-    pub fn new( x: f32, y: f32, (no, ea, so, we) : (usize, usize, usize, usize) , sprites: &Vec<SpriteRender>) -> PlayerComponent {
-        PlayerComponent {
+    pub fn new( x: f32, y: f32, (no, ea, so, we) : (usize, usize, usize, usize) , sprites: &Vec<SpriteRender>) -> Self {
+        Self {
             x,
             y,
             n: sprites[no].clone(), 

@@ -21,7 +21,7 @@ use std::io::Read;
 use crate::events::{Events};
 use stringreader::StringReader;
 
-fn load_map(mut pk: Pack, entities: &Entities) -> (Option<Pack>, Option<Events>) {
+fn load_map(mut pk: Pack) -> (Option<Pack>, Option<Events>) {
     info!("Loading the map!");
     
     let string = pk.strings.pop().unwrap();        // Get the string
@@ -38,8 +38,9 @@ pub fn handle(bin: Vec<u8>, entities: &Entities ) -> (Option<Pack>, Option<Event
 
     match pk.cmd {
         network::Cmd::Nothing       => (None, None),
-        network::Cmd::TransferMap   => load_map(pk, entities), 
+        network::Cmd::TransferMap   => load_map(pk), 
         network::Cmd::Connect       => (None, None),
         network::Cmd::CreateMonster => (None, None),
+        network::Cmd::CreatePlayer  => (None, None),
     }
 }
