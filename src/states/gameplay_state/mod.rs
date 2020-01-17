@@ -8,7 +8,6 @@ use amethyst::{
     shrev::EventChannel
 };
 
-use log::info;
 use crate::map;
 use crate::components::PlayerComponent;
 use crate::resources::ClientStatus;
@@ -24,8 +23,8 @@ impl SimpleState for GamePlayState {
         world.register::<PlayerComponent>();
         world.register::<map::TilePosition>();
         
-        let mut sprites = map::SpritesContainer::new(&world, 371);
-        let mut room = map::Room::new("resources/maps/townCompress.tmx".to_string());
+        let sprites = map::SpritesContainer::new(&world, 371);
+        let room = map::Room::new("resources/maps/townCompress.tmx".to_string());
 
         let status = ClientStatus::new();
 
@@ -35,11 +34,11 @@ impl SimpleState for GamePlayState {
         let player1 = PlayerComponent::new( 8.0, 8.0, (318, 306, 282, 294), &sprites.sprites);
         player1.insert(world);
 
-        let mut mapEvents = EventChannel::<Events>::new();
-        mapEvents.register_reader();
+        let mut map_events = EventChannel::<Events>::new();
+        map_events.register_reader();
 
         world.insert(status);
-        world.insert(mapEvents);
+        world.insert(map_events);
         world.insert(sprites);
         world.insert(room);
         

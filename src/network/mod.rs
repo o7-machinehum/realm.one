@@ -76,16 +76,16 @@ impl Pack {
         }
     }
     
-    pub fn nothing() -> Self {
-        let (ints, floats, strings, ser_struct) =  Pack::fill();
+    // pub fn nothing() -> Self {
+    //     let (ints, floats, strings, ser_struct) =  Pack::fill();
 
-        Self {
-            cmd: Cmd::Connect,
-            id: 0, 
-            ints, floats, strings,
-            ser_struct,
-        }
-    }
+    //     Self {
+    //         cmd: Cmd::Connect,
+    //         id: 0, 
+    //         ints, floats, strings,
+    //         ser_struct,
+    //     }
+    // }
 
     pub fn from_bin(bin: Vec<u8>) -> Self {
         bincode::deserialize(&bin[..]).unwrap() 

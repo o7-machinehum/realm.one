@@ -3,7 +3,7 @@ use amethyst::{
     core::transform::Transform,
     prelude::*,
     renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    ecs::{Component, DenseVecStorage, FlaggedStorage, Entity, Entities},
+    ecs::{Component, DenseVecStorage, FlaggedStorage, Entity},
 };
 
 extern crate tiled;
@@ -18,6 +18,7 @@ use crate::constants;
 use crate::mech::{colision};
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 enum Layers {
     L1 = 0,
     L2,
@@ -216,7 +217,7 @@ impl TilePosition {
         let mut transform = Transform::default();
         transform.set_translation_xyz((self.x as f32 * constants::TILE_SIZE) as f32 + 8.0, 
                                       (self.y as f32 * constants::TILE_SIZE) as f32 + 8.0, 
-                                      (self.z as f32 * 0.1)
+                                      self.z as f32 * 0.1
                                      );
         transform
     }

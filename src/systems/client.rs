@@ -3,7 +3,6 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Entities, Join, System, SystemData, World, Write, WriteStorage},
     network::*,
-    shrev::EventChannel
 };
 use log::info;
 use crate::network;
@@ -47,20 +46,20 @@ impl<'a> System<'a> for ClientSystem {
                     // Get Pack 
                     let rtn = match ev {
                         NetEvent::Packet(packet) => Some(packet),
-                        NetEvent::Connected(addr) => None,
+                        NetEvent::Connected(_addr) => None,
                         NetEvent::Disconnected(_addr) => None,
                         _ => None
                     };
                     
                     // Process Pack
                     let out = match rtn {
-                        Some(rtn) => client::handle(rtn.content().to_vec(), &entities),
+                        Some(rtn) => client::handle(rtn.content().to_vec()),
                         None => (None, None), 
                     };
 
                     // Add to vector of udp responces 
                     match out.0 {
-                        Some(mut out) => recv.push(out),
+                        Some(out) => recv.push(out),
                         None => {},
                     }
                     

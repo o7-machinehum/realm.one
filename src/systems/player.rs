@@ -3,15 +3,12 @@ use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Join, Read, Write, Entities, System, SystemData, World, WriteStorage};
 use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
-use amethyst::shrev::{EventChannel, ReaderId};
-use amethyst::network;
 
 use std::time::Instant;
 
 use crate::components::{PlayerComponent, Orientation};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::{Room, Adj};
-use crate::events::{Events};
 
 use crate::constants;
 
@@ -28,7 +25,7 @@ impl<'s> System<'s> for PlayerSystem{
         Read<'s, InputHandler<MovementBindingTypes>>,
     );
 
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut room, entities, input): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, room, entities, input): Self::SystemData) {
         for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
             let now = Instant::now();
 
@@ -59,7 +56,7 @@ impl<'s> System<'s> for PlayerSystem{
                 
                 player.orientation = orientation.clone();
                 player.last_movement_instant = now.clone();
-                sprite_renders.insert(entity, player.get_orientated());
+                sprite_renders.insert(entity, player.get_orientated()).expect("Failed to insert orientated player!");
 
                 let adj: Adj = room.get_adj(transform);
                 if room.allowed_move(transform, horizontal, vertical, adj){
