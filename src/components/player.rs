@@ -15,14 +15,14 @@ pub enum Orientation {
 }
 
 /// Server Size player components
-pub struct ServerPlayerComponent {
-    x: f32,
-    y: f32,
-    no: usize, 
-    ea: usize, 
-    so: usize,
-    we: usize, 
-}
+// pub struct ServerPlayerComponent {
+//     x: f32,
+//     y: f32,
+//     no: usize, 
+//     ea: usize, 
+//     so: usize,
+//     we: usize, 
+// }
 
 /// Client Side player component
 pub struct PlayerComponent {

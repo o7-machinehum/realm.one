@@ -4,7 +4,6 @@ use amethyst::{
     ecs::{Entities, Join, System, SystemData, World, WriteStorage},
     network::*,
 };
-use log::info;
 use crate::network;
 use crate::network::Pack;
 use crate::network::server;
@@ -32,7 +31,7 @@ impl<'a> System<'a> for ServerSystem {
                 // Get Pack 
                 let rtn = match ev {
                     NetEvent::Packet(packet) => Some(packet),
-                    NetEvent::Connected(addr) => None,
+                    NetEvent::Connected(_addr) => None,
                     NetEvent::Disconnected(_addr) => None,
                     _ => None
                 };
@@ -45,7 +44,7 @@ impl<'a> System<'a> for ServerSystem {
 
                 // Add to vector of responces 
                 match out {
-                    Some(mut out) => recv.push(out), 
+                    Some(out) => recv.push(out), 
                     None => {},    
                 }
             }
