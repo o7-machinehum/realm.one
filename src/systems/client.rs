@@ -21,14 +21,13 @@ pub struct ClientSystem;
 impl<'a> System<'a> for ClientSystem {
     type SystemData = (
         Write<'a, ClientStatus>, 
-        Write<'a, EventChannel<Events>>,
         WriteStorage<'a, NetConnection<Vec::<u8>>>,
         WriteStorage<'a, network::Reader>,
         Write<'a, Room>,
         Entities<'a>,
     );
 
-    fn run(&mut self, (mut status, mut events, mut connections, mut readers, mut room, entities): Self::SystemData) {
+    fn run(&mut self, (mut status, mut connections, mut readers, mut room, entities): Self::SystemData) {
         for (e, connection) in (&entities, &mut connections).join() {
             let reader = readers
                 .entry(e)
