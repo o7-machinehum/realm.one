@@ -1,5 +1,4 @@
-use crate::network;
-use crate::network::Pack;
+use crate::network::{Pack, Cmd};
 use log::info;
 
 use std::{
@@ -9,12 +8,19 @@ use std::{
 
 use crate::events::{Events};
 use stringreader::StringReader;
+use crate::components::PlayerInfo;
 
-fn load_map(mut pk: Pack) -> (Option<Pack>, Option<Events>) {
+fn create_player(mut pk: Pack) -> (Option<Pack>, Option<Events>) {
+    // let player: PlayerInfo = pk.get_struct();
+
+    //(None, Some(Events::CreatePlayer(player)))
+    (None, None)
+}
+
+fn load_map(map_name: String, map_data: String) -> (Option<Pack>, Option<Events>) {
     info!("Loading the map!");
     
-    let string = pk.strings.pop().unwrap();        // Get the string
-    let streader = StringReader::new(&string); // Make a buffer
+    let streader = StringReader::new(&map_data);     // Make a buffer
     let reader = BufReader::new(streader);
     let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
     
@@ -22,14 +28,13 @@ fn load_map(mut pk: Pack) -> (Option<Pack>, Option<Events>) {
 }
 
 pub fn handle(bin: Vec<u8> ) -> (Option<Pack>, Option<Events>) {
-    let pk = network::Pack::from_bin(bin);
+    let pk = Pack::from_bin(bin);
     info!("{:?}", pk);
 
     match pk.cmd {
-        network::Cmd::Nothing       => (None, None),
-        network::Cmd::TransferMap   => load_map(pk), 
-        network::Cmd::Connect       => (None, None),
-        network::Cmd::CreateMonster => (None, None),
-        network::Cmd::CreatePlayer  => (None, None),
+        Cmd::Nothing                   => (None, None),
+        Cmd::TransferMap(name, data)   => load_map(name, data), 
+        Cmd::Connect(proof)            => (None, None),
+        Cmd::CreatePlayer              => create_player(pk),
     }
 }

@@ -6,11 +6,12 @@ use amethyst::{
 };
 use log::info;
 use crate::network;
-use crate::network::Pack;
+use crate::network::{Pack, Cmd};
 use crate::network::client;
 use crate::resources::ClientStatus;
 use crate::map::Room;
 use crate::events::{Events};
+use crate::components::PlayerList;
 
 /// A simple system that sends a ton of messages to all connections.
 /// In this case, only the server is connected.
@@ -23,10 +24,11 @@ impl<'a> System<'a> for ClientSystem {
         WriteStorage<'a, NetConnection<Vec::<u8>>>,
         WriteStorage<'a, network::Reader>,
         Write<'a, Room>,
+        Write<'a, PlayerList>,
         Entities<'a>,
     );
 
-    fn run(&mut self, (mut status, mut connections, mut readers, mut room, entities): Self::SystemData) {
+    fn run(&mut self, (mut status, mut connections, mut readers, mut room, mut p_list, entities): Self::SystemData) {
         for (e, connection) in (&entities, &mut connections).join() {
             let reader = readers
                 .entry(e)
@@ -35,7 +37,7 @@ impl<'a> System<'a> for ClientSystem {
             
             if !status.connected {
                  info!("Authenticating");
-                 let mut packet = Pack::connect("pubkey or some shit".to_string());  
+                 let mut packet = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0);  
                  connection.queue(NetEvent::Packet(NetPacket::unreliable(packet.to_bin())));
                  status.connected = true;
             }
@@ -68,6 +70,7 @@ impl<'a> System<'a> for ClientSystem {
                         Some(out) => {
                             match out {
                                 Events::NewMap(map) => room.change(map), 
+                                Events::CreatePlayer(player1) => p_list.list.push(player1), 
                             }
                         // events.single_write(out);
                         },
