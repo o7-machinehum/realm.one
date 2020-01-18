@@ -72,7 +72,6 @@ impl<'a> System<'a> for ClientSystem {
                                 Events::NewMap(map) => room.change(map), 
                                 Events::CreatePlayer(player1) => p_list.list.push(player1), 
                             }
-                        // events.single_write(out);
                         },
                         None => {},
                     }

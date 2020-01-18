@@ -41,8 +41,8 @@ impl Default for PlayerList {
 pub struct PlayerInfo {
     pub id: u32,            
     pub act: PlayerAction,  
-    pub name: String,    
-    pub room: String,    
+    pub name: String,
+    pub room: String,
     pub x: f32,          
     pub y: f32, 
     pub no: usize,      
@@ -59,7 +59,7 @@ pub struct PlayerComponent {
     pub s: SpriteRender,
     pub w: SpriteRender,
     pub last_movement_instant: Instant,
-    trans: Transform,
+    pub trans: Transform,
     p: PlayerInfo,
 }
 
@@ -90,7 +90,7 @@ impl PlayerComponent {
             .build();
     }
 
-    pub fn get_orientated(&self) -> SpriteRender{
+    pub fn get_orientated(&self) -> SpriteRender {
         match self.orientation {
             Orientation::North=> return self.n.clone(),
             Orientation::South=> return self.s.clone(),
