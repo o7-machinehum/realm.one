@@ -13,7 +13,7 @@ use crate::components::PlayerInfo;
 fn create_player(id: u32, player: PlayerInfo) -> (Option<Pack>, Option<Events>) {
     info!("Insering Player id: {}, name: {} into the world", id, player.name);  
     // Add PlayerInfo to the big vector! 
-    (None, None)
+    (None, Some(Events::CreatePlayer(player)))
 }
 
 fn load_map(map_name: String, map_data: String) -> (Option<Pack>, Option<Events>) {

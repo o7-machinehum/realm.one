@@ -6,9 +6,9 @@ use amethyst::renderer::SpriteRender;
 
 use std::time::Instant;
 
-use crate::components::{PlayerComponent, Orientation};
+use crate::components::{PlayerComponent, Orientation, PlayerList};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
-use crate::map::{Room, Adj};
+use crate::map::{Room, Adj, SpritesContainer};
 
 use crate::constants;
 
@@ -23,9 +23,24 @@ impl<'s> System<'s> for PlayerSystem{
         Write<'s, Room>,
         Entities<'s>,
         Read<'s, InputHandler<MovementBindingTypes>>,
+        Write<'s, PlayerList>,
+        Read<'s, SpritesContainer>,
     );
 
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, room, entities, input): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, room, entities, input, mut p, s): Self::SystemData) {
+        match p.list.pop() {
+            Some(pl) => {
+                let player = PlayerComponent::new(pl, &s.sprites);
+                entities
+                    .build_entity()
+                    .with(player.trans.clone(), &mut transforms)
+                    .with(player.get_orientated().clone(), &mut sprite_renders)
+                    .with(player, &mut players) 
+                    .build();
+            }
+            None => {},
+        }
+        
         for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
             let now = Instant::now();
 
