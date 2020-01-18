@@ -10,15 +10,14 @@ use crate::events::{Events};
 use stringreader::StringReader;
 use crate::components::PlayerInfo;
 
-fn create_player(mut pk: Pack) -> (Option<Pack>, Option<Events>) {
-    // let player: PlayerInfo = pk.get_struct();
-
-    //(None, Some(Events::CreatePlayer(player)))
+fn create_player(id: u32, player: PlayerInfo) -> (Option<Pack>, Option<Events>) {
+    info!("Insering Player id: {}, name: {} into the world", id, player.name);  
+    // Add PlayerInfo to the big vector! 
     (None, None)
 }
 
 fn load_map(map_name: String, map_data: String) -> (Option<Pack>, Option<Events>) {
-    info!("Loading the map!");
+    info!("Loading the map: {}!", map_name);
     
     let streader = StringReader::new(&map_data);     // Make a buffer
     let reader = BufReader::new(streader);
@@ -29,12 +28,13 @@ fn load_map(map_name: String, map_data: String) -> (Option<Pack>, Option<Events>
 
 pub fn handle(bin: Vec<u8> ) -> (Option<Pack>, Option<Events>) {
     let pk = Pack::from_bin(bin);
+    let id = pk.id;
     info!("{:?}", pk);
 
     match pk.cmd {
         Cmd::Nothing                   => (None, None),
         Cmd::TransferMap(name, data)   => load_map(name, data), 
-        Cmd::Connect(proof)            => (None, None),
-        Cmd::CreatePlayer              => create_player(pk),
+        Cmd::Connect(..)               => (None, None),
+        Cmd::CreatePlayer(pl)          => create_player(id, pl),
     }
 }

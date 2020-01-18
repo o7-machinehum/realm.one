@@ -9,6 +9,8 @@ use amethyst::{
 use serde::{Serialize, Deserialize};
 use bincode;
 
+use crate::components::PlayerInfo;
+
 // eg:
 // let mut k = network::pack::new(10);
 // let p = k.to_string();
@@ -22,13 +24,12 @@ impl Component for Reader {
     type Storage = VecStorage<Self>;
 }
 
-#[derive(PartialEq)]
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Cmd {
     Nothing,
     Connect(String),
     TransferMap(String, String),
-    CreatePlayer,
+    CreatePlayer(PlayerInfo),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
