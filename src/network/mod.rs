@@ -26,9 +26,8 @@ impl Component for Reader {
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Cmd {
     Nothing,
-    Connect,
-    TransferMap,
-    CreateMonster,  // Create a monsters
+    Connect(String),
+    TransferMap(String, String),
     CreatePlayer,
 }
 
@@ -36,56 +35,15 @@ pub enum Cmd {
 pub struct Pack {
     pub cmd: Cmd,
     id: u32,
-    ints: Vec<u32>,
-    floats: Vec<f32>,
-    strings: Vec<String>,
-    ser_struct: Vec<u8>,
 }
 
 impl Pack {
-    fn fill() -> (Vec<u32>, Vec<f32>, Vec<String>, Vec<u8>) {
-        (Vec::<u32>::new(), Vec::<f32>::new(), Vec::<String>::new(), Vec::<u8>::new())
-    }
-
-    pub fn send_tmx(map_name: String, tmx: String) -> Self {
-        let (ints, floats, mut strings, ser_struct) =  Pack::fill();
-        strings.push(map_name);
-        strings.push(tmx);
-
+    pub fn new(cmd: Cmd, id: u32) -> Self {
         Self {
-            cmd: Cmd::TransferMap,
-            id: 0, 
-            ints,
-            floats,
-            strings,
-            ser_struct,
+            cmd,
+            id, 
         }
     }
-
-    pub fn connect(proof: String) -> Self {
-        let (ints, floats, mut strings, ser_struct) =  Pack::fill();
-        strings.push(proof);
-
-        Self {
-            cmd: Cmd::Connect,
-            id: 0, 
-            ints,
-            floats,
-            strings,
-            ser_struct,
-        }
-    }
-    
-    // pub fn nothing() -> Self {
-    //     let (ints, floats, strings, ser_struct) =  Pack::fill();
-
-    //     Self {
-    //         cmd: Cmd::Connect,
-    //         id: 0, 
-    //         ints, floats, strings,
-    //         ser_struct,
-    //     }
-    // }
 
     pub fn from_bin(bin: Vec<u8>) -> Self {
         bincode::deserialize(&bin[..]).unwrap() 

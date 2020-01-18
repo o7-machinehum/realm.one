@@ -9,9 +9,8 @@ use amethyst::{
 };
 
 use crate::map;
-use crate::components::PlayerComponent;
+use crate::components::{PlayerComponent, PlayerInfo, PlayerAction, PlayerList};
 use crate::resources::ClientStatus;
-use crate::events::{Events};
 
 pub struct GamePlayState {
     pub ip: String, // IP of server to connect to
@@ -25,23 +24,34 @@ impl SimpleState for GamePlayState {
         
         let sprites = map::SpritesContainer::new(&world, 371);
         let room = map::Room::new("resources/maps/townCompress.tmx".to_string());
+        let player_list = PlayerList{ list: Vec::new() };
 
         let status = ClientStatus::new();
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
-
-        let player1 = PlayerComponent::new( 8.0, 8.0, (318, 306, 282, 294), &sprites.sprites);
+        
+        // id 0 is always yourself
+        let player1Info = PlayerInfo {
+            id: 0,
+            act: PlayerAction::Nothing,
+            name: "Turnip".to_string(),
+            room: "Room1".to_string(), 
+            x: 8.0,        
+            y: 8.0, 
+            no: 318,        
+            ea: 306, 
+            so: 282,
+            we: 294, 
+        };
+        
+        let player1 = PlayerComponent::new(player1Info, &sprites.sprites);
         player1.insert(world);
 
-        let mut map_events = EventChannel::<Events>::new();
-        map_events.register_reader();
-
         world.insert(status);
-        world.insert(map_events);
         world.insert(sprites);
         world.insert(room);
-        
+        world.insert(player_list);
         world
             .create_entity()
             .with(NetConnection::<Vec<u8>>::new(
