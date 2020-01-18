@@ -9,7 +9,7 @@ use std::io::Read;
 
 /// Send the map to the client
 fn welcome(proof: String) -> Option<Pack> {
-    info!("Player Connected, sending map!");
+    info!("Player Connected proof: {}, sending map!", proof);
     let fname = "resources/maps/townCompress2.tmx";
     let mut file = File::open(&fname.to_string()).expect("Unable to open map file"); 
     let mut contents = String::new();
@@ -23,9 +23,9 @@ pub fn handle(bin: Vec<u8>) -> Option<Pack> {
 
     match pk.cmd {
         Cmd::Nothing              => None,
-        Cmd::TransferMap(i, ii)   => None, 
+        Cmd::TransferMap(..)      => None, 
         Cmd::Connect(proof)       => welcome(proof),
-        Cmd::CreatePlayer         => None,
+        Cmd::CreatePlayer(..)     => None,
     }
     // None
 }

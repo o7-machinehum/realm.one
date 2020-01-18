@@ -5,7 +5,6 @@ use amethyst::{
     window::ScreenDimensions,
     network::NetConnection,
     ecs::World,
-    shrev::EventChannel
 };
 
 use crate::map;
@@ -32,7 +31,7 @@ impl SimpleState for GamePlayState {
         init_camera(world, &dimensions);
         
         // id 0 is always yourself
-        let player1Info = PlayerInfo {
+        let player1_info = PlayerInfo {
             id: 0,
             act: PlayerAction::Nothing,
             name: "Turnip".to_string(),
@@ -45,7 +44,7 @@ impl SimpleState for GamePlayState {
             we: 294, 
         };
         
-        let player1 = PlayerComponent::new(player1Info, &sprites.sprites);
+        let player1 = PlayerComponent::new(player1_info, &sprites.sprites);
         player1.insert(world);
 
         world.insert(status);
