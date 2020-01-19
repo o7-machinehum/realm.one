@@ -10,9 +10,8 @@ use crate::events::{Events};
 use stringreader::StringReader;
 use crate::components::PlayerInfo;
 
-fn create_player(id: u32, player: PlayerInfo) -> (Option<Pack>, Option<Events>) {
-    info!("Insering Player id: {}, name: {} into the world", id, player.name);  
-    // Add PlayerInfo to the big vector! 
+fn create_player(id: u32, player: Vec<PlayerInfo>) -> (Option<Pack>, Option<Events>) {
+    info!("Insering Player id: {}, name: {:?} into the world", id, player);  
     (None, Some(Events::CreatePlayer(player)))
 }
 
@@ -23,7 +22,7 @@ fn load_map(map_name: String, map_data: String) -> (Option<Pack>, Option<Events>
     let reader = BufReader::new(streader);
     let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
     
-    (None, Some(Events::NewMap(map)))
+    (Some(Pack::new(Cmd::RecivedMap, 0)), Some(Events::NewMap(map)))
 }
 
 pub fn handle(bin: Vec<u8> ) -> (Option<Pack>, Option<Events>) {
@@ -34,6 +33,7 @@ pub fn handle(bin: Vec<u8> ) -> (Option<Pack>, Option<Events>) {
     match pk.cmd {
         Cmd::Nothing                   => (None, None),
         Cmd::TransferMap(name, data)   => load_map(name, data), 
+        Cmd::RecivedMap                => (None, None),
         Cmd::Connect(..)               => (None, None),
         Cmd::CreatePlayer(pl)          => create_player(id, pl),
     }

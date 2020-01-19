@@ -11,6 +11,8 @@ use amethyst::{
     network::NetworkBundle,
 };
 
+use crate::network::{Pack};
+
 use std::env; 
 use log::info;
 
@@ -86,7 +88,7 @@ fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
         .with_bundle(NetworkBundle::<Vec<u8>>::new(
             "127.0.0.1:3456".parse().unwrap(),
         ))?
-        .with(systems::ServerSystem, "server_system", &[]);
+        .with(systems::ServerSystem{new_players: Vec::<Pack>::new()}, "server_system", &[]);
 
     let mut game = Application::new(
         resources, 

@@ -29,24 +29,6 @@ impl SimpleState for GamePlayState {
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
-        
-        // id 0 is always yourself
-        let player1_info = PlayerInfo {
-            id: 0,
-            modified: true,
-            act: PlayerAction::Nothing,
-            name: "Turnip".to_string(),
-            room: "Room1".to_string(), 
-            x: 8.0,        
-            y: 8.0, 
-            no: 318,        
-            ea: 306, 
-            so: 282,
-            we: 294, 
-        };
-        
-        let player1 = PlayerComponent::new(player1_info, &sprites.sprites);
-        player1.insert(world);
 
         world.insert(status);
         world.insert(sprites);

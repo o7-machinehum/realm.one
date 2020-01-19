@@ -66,6 +66,9 @@ pub struct PlayerComponent {
 
 impl PlayerComponent {
     pub fn new(p: PlayerInfo, sprites: &Vec<SpriteRender>) -> Self {
+        let mut tr = Transform::default();
+        tr.set_translation_xyz(p.x, p.y, 1.0);
+
         Self {
             n: sprites[p.no].clone(), 
             e: sprites[p.ea].clone(), 
@@ -73,24 +76,11 @@ impl PlayerComponent {
             w: sprites[p.we].clone(),
             orientation: Orientation::South,
             last_movement_instant: Instant::now(),
-            trans: Transform::default(),
+            trans: tr,
             p,
         }
     }
-    
-    pub fn insert(self, world: &mut World) {
-        let mut transform = Transform::default();
-        transform.set_translation_xyz(self.p.x, self.p.y, 1.0); 
-
-        // Create a player entity.
-        world
-            .create_entity()
-            .with(self.n.clone()) 
-            .with(self)
-            .with(transform)
-            .build();
-    }
-
+   
     pub fn get_orientated(&self) -> SpriteRender {
         match self.orientation {
             Orientation::North=> return self.n.clone(),

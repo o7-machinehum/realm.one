@@ -6,6 +6,7 @@ use std::{
 };
 
 use std::io::Read;
+use crate::components::PlayerInfo;
 
 /// Send the map to the client
 fn welcome(proof: String) -> Option<Pack> {
@@ -17,6 +18,11 @@ fn welcome(proof: String) -> Option<Pack> {
     Some(Pack::new(Cmd::TransferMap(fname.to_string(), contents.to_string()), 0))
 }
 
+fn send_player() -> Option<Pack> {
+    info!("Client has recived the map, inserting players!");
+    Some(Pack::new(Cmd::CreatePlayer(Vec::<PlayerInfo>::new()), 0))
+}
+
 pub fn handle(bin: Vec<u8>) -> Option<Pack> {
     let pk = Pack::from_bin(bin);
     info!("{:?}", pk);
@@ -24,8 +30,8 @@ pub fn handle(bin: Vec<u8>) -> Option<Pack> {
     match pk.cmd {
         Cmd::Nothing              => None,
         Cmd::TransferMap(..)      => None, 
+        Cmd::RecivedMap           => send_player(),
         Cmd::Connect(proof)       => welcome(proof),
         Cmd::CreatePlayer(..)     => None,
     }
-    // None
 }
