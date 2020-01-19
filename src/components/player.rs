@@ -5,6 +5,7 @@ use amethyst::{
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 use std::time::Instant;
+use serde::{Serialize, Deserialize};
 
 #[derive(Clone)]
 pub enum Orientation {
@@ -14,45 +15,73 @@ pub enum Orientation {
     North,
 }
 
+#[warn(dead_code)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum PlayerAction {
+    Nothing = 0,
+    MoveN,
+    MoveE,
+    MoveS,
+    MoveW,
+}
+
+pub struct PlayerList {
+    pub list: Vec<PlayerInfo>,
+}
+
+impl Default for PlayerList {
+    fn default() -> Self {
+    Self{ list: Vec::new(), } 
+    }
+}
+
+/// Server Size player components
+#[warn(dead_code)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PlayerInfo {
+    pub id: u32,
+    pub modified: bool, 
+    pub act: PlayerAction,
+    pub name: String,
+    pub room: String,
+    pub x: f32,          
+    pub y: f32, 
+    pub no: usize,      
+    pub ea: usize, 
+    pub so: usize,
+    pub we: usize, 
+}
+
+/// Client Side player component
 pub struct PlayerComponent {
-    pub x: f32,
-    pub y: f32,
     pub orientation: Orientation,
     pub n: SpriteRender,
     pub e: SpriteRender,
     pub s: SpriteRender,
     pub w: SpriteRender,
     pub last_movement_instant: Instant,
+    pub trans: Transform,
+    p: PlayerInfo,
 }
 
 impl PlayerComponent {
-    pub fn new( x: f32, y: f32, (no, ea, so, we) : (usize, usize, usize, usize) , sprites: &Vec<SpriteRender>) -> PlayerComponent {
-        PlayerComponent {
-            x,
-            y,
-            n: sprites[no].clone(), 
-            e: sprites[ea].clone(), 
-            s: sprites[so].clone(), 
-            w: sprites[we].clone(),
+    pub fn new(p: PlayerInfo, sprites: &Vec<SpriteRender>) -> Self {
+        let mut tr = Transform::default();
+        tr.set_translation_xyz(p.x, p.y, 1.0);
+
+        Self {
+            n: sprites[p.no].clone(), 
+            e: sprites[p.ea].clone(), 
+            s: sprites[p.so].clone(), 
+            w: sprites[p.we].clone(),
             orientation: Orientation::South,
             last_movement_instant: Instant::now(),
+            trans: tr,
+            p,
         }
     }
-    
-    pub fn insert(self, world: &mut World) {
-        let mut transform = Transform::default();
-        transform.set_translation_xyz(self.x, self.y, 1.0); 
-
-        // Create a player entity.
-        world
-            .create_entity()
-            .with(self.n.clone()) 
-            .with(self)
-            .with(transform)
-            .build();
-    }
-
-    pub fn get_orientated(&self) -> SpriteRender{
+   
+    pub fn get_orientated(&self) -> SpriteRender {
         match self.orientation {
             Orientation::North=> return self.n.clone(),
             Orientation::South=> return self.s.clone(),
