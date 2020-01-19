@@ -24,7 +24,7 @@ impl Component for Reader {
     type Storage = VecStorage<Self>;
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Cmd {
     Nothing,
     Connect(String),
@@ -32,7 +32,7 @@ pub enum Cmd {
     CreatePlayer(PlayerInfo),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Pack {
     pub cmd: Cmd,
     id: u32,

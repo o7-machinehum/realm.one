@@ -16,7 +16,7 @@ pub enum Orientation {
 }
 
 #[warn(dead_code)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum PlayerAction {
     Nothing = 0,
     MoveN,
@@ -37,10 +37,11 @@ impl Default for PlayerList {
 
 /// Server Size player components
 #[warn(dead_code)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerInfo {
-    pub id: u32,            
-    pub act: PlayerAction,  
+    pub id: u32,
+    pub modified: bool, 
+    pub act: PlayerAction,
     pub name: String,
     pub room: String,
     pub x: f32,          
