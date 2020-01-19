@@ -5,6 +5,7 @@ use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
 
 use std::time::Instant;
+use log::info;
 
 use crate::components::{PlayerComponent, Orientation, PlayerList};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
@@ -30,6 +31,7 @@ impl<'s> System<'s> for PlayerSystem{
     fn run(&mut self, (mut transforms, mut players, mut sprite_renders, room, entities, input, mut p, s): Self::SystemData) {
         match p.list.pop() {
             Some(pl) => {
+                info!("Inserting Player"); 
                 let player = PlayerComponent::new(pl, &s.sprites);
                 entities
                     .build_entity()

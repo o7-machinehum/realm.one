@@ -29,7 +29,8 @@ pub enum Cmd {
     Nothing,
     Connect(String),
     TransferMap(String, String),
-    CreatePlayer(PlayerInfo),
+    RecivedMap,
+    CreatePlayer(Vec<PlayerInfo>),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

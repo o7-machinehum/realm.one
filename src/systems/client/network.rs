@@ -70,7 +70,7 @@ impl<'a> System<'a> for ClientSystem {
                         Some(out) => {
                             match out {
                                 Events::NewMap(map) => room.change(map), 
-                                Events::CreatePlayer(player1) => p_list.list.push(player1), 
+                                Events::CreatePlayer(mut player1) => p_list.list.append(&mut player1), 
                             }
                         },
                         None => {},
