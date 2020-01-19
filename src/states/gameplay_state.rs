@@ -33,6 +33,7 @@ impl SimpleState for GamePlayState {
         // id 0 is always yourself
         let player1_info = PlayerInfo {
             id: 0,
+            modified: true,
             act: PlayerAction::Nothing,
             name: "Turnip".to_string(),
             room: "Room1".to_string(), 
