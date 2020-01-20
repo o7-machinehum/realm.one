@@ -25,7 +25,22 @@ impl SimpleState for ServerState {
             we: 294, 
         };
 
+        let player2_info = PlayerInfo {
+            id: 0,
+            modified: true,
+            act: PlayerAction::Nothing,
+            name: "Turnip".to_string(),
+            room: "Room1".to_string(), 
+            x: 5.0*8.0,        
+            y: 5.0*8.0, 
+            no: 318,        
+            ea: 306, 
+            so: 282,
+            we: 294, 
+        };
+
         player_list.list.push(player1_info);
+        player_list.list.push(player2_info);
         world.insert(player_list);
     }
 }
