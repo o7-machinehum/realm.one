@@ -42,13 +42,17 @@ impl<'a> System<'a> for ServerSystem {
             let mut pk_out = Vec::<Pack>::new();
             // pk_out.append(&mut self.new_players.clone()); 
 
-            // Command / Responce below
+            // Command / Responce below  
+            let mut client_disconnected = false;
             for ev in connection.received_events(&mut reader.0) {
                 // Get Pack 
                 let rtn = match ev {
                     NetEvent::Packet(packet) => Some(packet),
                     NetEvent::Connected(_addr) => None,
-                    NetEvent::Disconnected(_addr) => None,
+                    NetEvent::Disconnected(_addr) => {
+                        client_disconnected = true;
+                        None 
+                    },
                     _ => None
                 };
                 
@@ -67,8 +71,15 @@ impl<'a> System<'a> for ServerSystem {
                         }
                         pk_out.push(out);
                     },
-                    None => {},    
+                    None => {},
                 }
+            }
+            
+            if client_disconnected {
+                info!("Client Disconnects");
+                entities
+                    .delete(e)
+                    .expect("Cannot delete connection from world!");
             }
             
             // Respond
