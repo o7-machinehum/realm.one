@@ -7,7 +7,7 @@ use serde::{Serialize, Deserialize};
 use bincode;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
-use crate::components::{PlayerInfo, PlayerAction};
+use crate::components::{PlayerInfo, Action};
 
 pub struct Reader(pub ReaderId<NetEvent<Vec<u8>>>);
 
@@ -21,8 +21,8 @@ pub enum Cmd {
     Connect(String),
     TransferMap(String, String),
     RecivedMap,
-    InsertPlayer(PlayerInfo),
-    Action(PlayerAction),
+    InsertPlayer(PlayerInfo), 
+    Action(Action),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

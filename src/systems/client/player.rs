@@ -7,10 +7,10 @@ use amethyst::renderer::SpriteRender;
 use std::time::Instant;
 use log::info;
 
-use crate::components::{PlayerComponent, Orientation, PlayerList};
+use crate::components::{PlayerComponent, Orientation, PlayerList, Action};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::{Room, Adj, SpritesContainer};
-use crate::network::{IO, Cmd};
+use crate::network::{IO, Cmd, Pack};
 use crate::constants;
 
 
@@ -75,6 +75,7 @@ impl<'s> System<'s> for PlayerSystem{
                     if room.allowed_move(tr, horizontal, vertical, adj){
                         player.walk(&horizontal, &vertical);
                         tr.set_translation_xyz(player.x(), player.y(), player.z()); 
+                        // io.O.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                     }
                 }
             },

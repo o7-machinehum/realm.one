@@ -13,7 +13,7 @@ use std::io::Read;
 use crate::network;
 use log::info;
 use crate::network::{Pack, Cmd, IO};
-use crate::components::{PlayerList, PlayerAction, PlayerInfo, Action};
+use crate::components::{PlayerList, PlayerInfo, Action};
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 /// A simple system that receives a ton of network events.
@@ -40,7 +40,6 @@ fn ready_player_one(ip: Option<SocketAddr>) -> Pack {
     let player1_info = PlayerInfo {
         id: 0,
         modified: true,
-        act: PlayerAction::new(0, Action::Nothing),
         name: "Turnip".to_string(),
         room: "Room1".to_string(),
         x: 8.0,

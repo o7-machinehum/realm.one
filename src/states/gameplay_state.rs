@@ -8,7 +8,7 @@ use amethyst::{
 };
 
 use crate::map;
-use crate::components::{PlayerComponent, PlayerInfo, PlayerAction, PlayerList};
+use crate::components::{PlayerComponent, PlayerInfo, PlayerList};
 use crate::resources::ClientStatus;
 use crate::network::IO;
 
