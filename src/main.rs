@@ -25,7 +25,6 @@ mod constants;
 mod mech;
 mod network;
 mod resources;
-mod events;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -88,7 +87,9 @@ fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
         .with_bundle(NetworkBundle::<Vec<u8>>::new(
             "127.0.0.1:3456".parse().unwrap(),
         ))?
-        .with(systems::ServerSystem{new_players: Vec::<Pack>::new()}, "server_system", &[]);
+        .with(systems::ServerSystem, "server_system", &[])
+        .with(systems::AuthSystem, "auth_system", &[])
+        .with(systems::PlayerManSystem{new_players: Vec::<Pack>::new()}, "playerman_system", &[]);
 
     let mut game = Application::new(
         resources, 

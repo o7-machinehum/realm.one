@@ -16,6 +16,7 @@ use std::{
 use log::info;
 use crate::constants;
 use crate::mech::{colision};
+use stringreader::StringReader;
 
 #[derive(Clone, Debug)]
 #[allow(dead_code)]
@@ -110,8 +111,12 @@ impl Room {
         }
     }
 
-    pub fn change(&mut self, map: tiled::Map) {
-        info!("Inserting New Map");
+    pub fn change(&mut self, map_name: String, map_data: String) {
+        info!("Loading the map: {}!", map_name);
+        let streader = StringReader::new(&map_data);     // Make a buffer
+        let reader = BufReader::new(streader);
+        let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
+        
         self.map = map;
         self.update = true;
     }

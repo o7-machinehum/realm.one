@@ -10,6 +10,7 @@ use log::info;
 use crate::components::{PlayerComponent, Orientation, PlayerList};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::{Room, Adj, SpritesContainer};
+use crate::network::{IO, Cmd};
 
 use crate::constants;
 
@@ -21,26 +22,28 @@ impl<'s> System<'s> for PlayerSystem{
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, SpriteRender>,
+        Write<'s, IO>,
         Write<'s, Room>,
         Entities<'s>,
         Read<'s, InputHandler<MovementBindingTypes>>,
-        Write<'s, PlayerList>,
         Read<'s, SpritesContainer>,
     );
-
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, room, entities, input, mut p, s): Self::SystemData) {
-        match p.list.pop() {
-            Some(pl) => {
-                info!("Inserting Player"); 
-                let player = PlayerComponent::new(pl, &s.sprites);
-                entities
-                    .build_entity()
-                    .with(player.trans.clone(), &mut transforms)
-                    .with(player.get_orientated().clone(), &mut sprite_renders)
-                    .with(player, &mut players) 
-                    .build();
+ 
+    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
+        for element in io.I.pop() {
+            match &element.cmd {
+                Cmd::InsertPlayer(p1) =>  {
+                    info!("Inserting Player"); 
+                    let player = PlayerComponent::new(p1.clone(), &s.sprites);
+                    entities
+                        .build_entity()
+                        .with(player.trans.clone(), &mut transforms)
+                        .with(player.get_orientated().clone(), &mut sprite_renders)
+                        .with(player, &mut players) 
+                        .build();
+                    },
+                _ => io.I.push(element), 
             }
-            None => {},
         }
         
         for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
@@ -81,6 +84,6 @@ impl<'s> System<'s> for PlayerSystem{
                     transform.move_right(horizontal * constants::PLAYER_MOVE );
                 }
             }
-        } 
+        }
     }
 }

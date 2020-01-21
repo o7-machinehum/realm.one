@@ -6,11 +6,9 @@ use amethyst::{
 };
 use log::info;
 use crate::network;
-use crate::network::{Pack, Cmd};
-use crate::network::client;
+use crate::network::{Pack, Cmd, IO};
 use crate::resources::ClientStatus;
 use crate::map::Room;
-use crate::events::{Events};
 use crate::components::PlayerList;
 
 /// A simple system that sends a ton of messages to all connections.
@@ -25,10 +23,11 @@ impl<'a> System<'a> for ClientSystem {
         WriteStorage<'a, network::Reader>,
         Write<'a, Room>,
         Write<'a, PlayerList>,
+        Write <'a, IO>,
         Entities<'a>,
     );
 
-    fn run(&mut self, (mut status, mut connections, mut readers, mut room, mut p_list, entities): Self::SystemData) {
+    fn run(&mut self, (mut status, mut connections, mut readers, mut room, mut p_list, mut io, entities): Self::SystemData) {
         for (e, connection) in (&entities, &mut connections).join() {
             let reader = readers
                 .entry(e)
@@ -36,50 +35,35 @@ impl<'a> System<'a> for ClientSystem {
                 .or_insert_with(|| network::Reader(connection.register_reader()));
             
             if !status.connected {
-                 info!("Authenticating");
-                 let mut packet = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0);  
-                 connection.queue(NetEvent::Packet(NetPacket::unreliable(packet.to_bin())));
-                 status.connected = true;
+                let mut packet = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0);  
+                status.connected = true;
+                io.O.push(packet); 
             }
             
             else {
-                let mut recv = Vec::<Pack>::new();
                 for ev in connection.received_events(&mut reader.0) {
                     // Get Pack 
-                    let rtn = match ev {
+                    let pack = match ev {
                         NetEvent::Packet(packet) => Some(packet),
                         NetEvent::Connected(_addr) => None,
                         NetEvent::Disconnected(_addr) => None,
                         _ => None
                     };
                     
-                    // Process Pack
-                    let out = match rtn {
-                        Some(rtn) => client::handle(rtn.content().to_vec()),
-                        None => (None, None), 
-                    };
-
-                    // Add to vector of udp responces 
-                    match out.0 {
-                        Some(out) => recv.push(out),
-                        None => {},
-                    }
-                    
-                    // Then write the event to the event channel
-                    match out.1 {
-                        Some(out) => {
-                            match out {
-                                Events::NewMap(map) => room.change(map), 
-                                Events::CreatePlayer(mut player1) => p_list.list.append(&mut player1), 
-                            }
+                    match pack {
+                        Some(pack) => {
+                            // info!("{:?}", pack.content()); 
+                            info!("Adding Something"); 
+                            io.I.push(Pack::from_bin(pack.content().to_vec())); // Add the pack to the IO vector
                         },
-                        None => {},
+                        None => (),
                     }
                 }
-                
+
                 // Respond
                 // TODO: There's this member that can be used for vectors. Should use that.
-                for mut resp in recv {
+                for mut resp in io.O.pop() {
+                    info!("Sending"); 
                     connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(resp.to_bin(), None)));
                 }
             }
