@@ -39,7 +39,7 @@ impl<'s> System<'s> for PlayerSystem{
                     let player = PlayerComponent::new(p1.clone(), &s.sprites);
                     self.p1 = Some(entities
                         .build_entity()
-                        .with(player.trans.clone(), &mut transforms)
+                        .with(player.trans(), &mut transforms)
                         .with(player.get_orientated().clone(), &mut sprite_renders)
                         .with(player, &mut players) 
                         .build());
@@ -48,7 +48,6 @@ impl<'s> System<'s> for PlayerSystem{
             }
         }
         
-        // for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
         match self.p1 {
             Some(p1) => {
                 let now = Instant::now();
@@ -75,8 +74,7 @@ impl<'s> System<'s> for PlayerSystem{
                     let adj: Adj = room.get_adj(tr);
                     if room.allowed_move(tr, horizontal, vertical, adj){
                         player.walk(&horizontal, &vertical);
-                        tr.move_up(vertical * constants::PLAYER_MOVE);
-                        tr.move_right(horizontal * constants::PLAYER_MOVE);
+                        tr.set_translation_xyz(player.x(), player.y(), player.z()); 
                     }
                 }
             },

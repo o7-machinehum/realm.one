@@ -42,13 +42,13 @@ fn ready_player_one(ip: Option<SocketAddr>) -> Pack {
         modified: true,
         act: PlayerAction::new(0, Action::Nothing),
         name: "Turnip".to_string(),
-        room: "Room1".to_string(), 
-        x: 8.0,        
-        y: 8.0, 
-        no: 318,        
-        ea: 306, 
+        room: "Room1".to_string(),
+        x: 8.0,
+        y: 8.0,
+        no: 318,
+        ea: 306,
         so: 282,
-        we: 294, 
+        we: 294,
     };
 
     Pack::new(Cmd::InsertPlayer(player1_info), 0, ip)
