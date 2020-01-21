@@ -9,6 +9,7 @@ use amethyst::{
     input::InputBundle,
     utils::application_root_dir,
     network::NetworkBundle,
+    ecs::Entity,
 };
 
 use crate::network::{Pack};
@@ -67,7 +68,7 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
         .with_bundle(NetworkBundle::<Vec<u8>>::new(
             "127.0.0.1:3455".parse().unwrap(),
         ))?
-        .with(systems::PlayerSystem, "player_system", &["input_system"])
+        .with(systems::PlayerSystem{p1: None}, "player_system", &["input_system"])
         .with(systems::ClientSystem, "client_system", &[])
         .with(systems::MapSystem,    "map_system", &[]);
 

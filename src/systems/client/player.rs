@@ -1,6 +1,6 @@
 use amethyst::core::{Transform, SystemDesc};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Join, Read, Write, Entities, System, SystemData, World, WriteStorage};
+use amethyst::ecs::{Join, Read, Write, Entities, Entity, System, SystemData, World, WriteStorage};
 use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
 
@@ -11,11 +11,13 @@ use crate::components::{PlayerComponent, Orientation, PlayerList};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::{Room, Adj, SpritesContainer};
 use crate::network::{IO, Cmd};
-
 use crate::constants;
 
+
 #[derive(SystemDesc)]
-pub struct PlayerSystem ;
+pub struct PlayerSystem{ 
+    pub p1: Option<Entity>,
+}
 
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
@@ -35,55 +37,50 @@ impl<'s> System<'s> for PlayerSystem{
                 Cmd::InsertPlayer(p1) =>  {
                     info!("Inserting Player"); 
                     let player = PlayerComponent::new(p1.clone(), &s.sprites);
-                    entities
+                    self.p1 = Some(entities
                         .build_entity()
                         .with(player.trans.clone(), &mut transforms)
                         .with(player.get_orientated().clone(), &mut sprite_renders)
                         .with(player, &mut players) 
-                        .build();
+                        .build());
                     },
                 _ => io.I.push(element), 
             }
         }
         
-        for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
-            let now = Instant::now();
+        // for (entity, player, transform) in (&*entities, &mut players, &mut transforms).join() {  
+        match self.p1 {
+            Some(p1) => {
+                let now = Instant::now();
+                let mut player = players.get_mut(p1).unwrap();
 
-            if now.duration_since(player.last_movement_instant).as_millis() >= constants::MOVEMENT_DELAY_MS {
-                let horizontal = input
-                    .axis_value(&AxisBinding::Horizontal)
-                    .unwrap_or(0.0);
-                let vertical = input
-                    .axis_value(&AxisBinding::Vertical)
-                    .unwrap_or(0.0);
-                
-                if horizontal == 0. && vertical == 0. {
-                    return;
-                }
-                
-                let orientation : Orientation;
-                if horizontal > 0. {
-                    orientation = Orientation::East;
-                } else if horizontal < 0. {
-                    orientation = Orientation::West;
-                } else if vertical > 0. {
-                    orientation = Orientation::North;
-                } else if vertical < 0. {
-                    orientation = Orientation::South;
-                } else {
-                    orientation = player.orientation.clone()
-                }
-                
-                player.orientation = orientation.clone();
-                player.last_movement_instant = now.clone();
-                sprite_renders.insert(entity, player.get_orientated()).expect("Failed to insert orientated player!");
+                if now.duration_since(player.last_movement_instant).as_millis() >= constants::MOVEMENT_DELAY_MS {
+                    let horizontal = input
+                        .axis_value(&AxisBinding::Horizontal)
+                        .unwrap_or(0.0);
+                    let vertical = input
+                        .axis_value(&AxisBinding::Vertical)
+                        .unwrap_or(0.0);
+                    
+                    if horizontal == 0. && vertical == 0. {
+                        return;
+                    }
+                    
+                    let mut tr = transforms.get_mut(p1).unwrap(); 
 
-                let adj: Adj = room.get_adj(transform);
-                if room.allowed_move(transform, horizontal, vertical, adj){
-                    transform.move_up(vertical * constants::PLAYER_MOVE );
-                    transform.move_right(horizontal * constants::PLAYER_MOVE );
+                    player.update_orientation(&horizontal, &vertical);
+                    player.last_movement_instant = now.clone();
+                    sprite_renders.insert(p1, player.get_orientated()).expect("Failed to insert orientated player!");
+
+                    let adj: Adj = room.get_adj(tr);
+                    if room.allowed_move(tr, horizontal, vertical, adj){
+                        player.walk(&horizontal, &vertical);
+                        tr.move_up(vertical * constants::PLAYER_MOVE);
+                        tr.move_right(horizontal * constants::PLAYER_MOVE);
+                    }
                 }
-            }
+            },
+            None => ()
         }
     }
 }

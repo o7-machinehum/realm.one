@@ -7,6 +7,7 @@ use amethyst::{
 use std::time::Instant;
 use serde::{Serialize, Deserialize};
 use crate::components::PlayerAction;
+use crate::constants;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Orientation {
@@ -79,6 +80,26 @@ impl PlayerComponent {
         }
     }
 
+    pub fn update_orientation(&mut self, x: &f32, y: &f32) {
+        let x = *x;
+        let y = *y;
+
+        if x > 0. {
+            self.orientation = Orientation::East;
+        } else if x < 0. {
+            self.orientation = Orientation::West;
+        } else if y > 0. {
+            self.orientation = Orientation::North;
+        } else if y < 0. {
+            self.orientation = Orientation::South;
+        }
+    }
+    
+    pub fn walk(&mut self, x: &f32, y: &f32) {
+        self.trans.move_up(*x * constants::PLAYER_MOVE);
+        self.trans.move_right(*y * constants::PLAYER_MOVE);
+    }
+    
     pub fn get_orientated(&self) -> SpriteRender {
         match self.orientation {
             Orientation::North=> return self.n.clone(),
