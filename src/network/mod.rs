@@ -1,6 +1,3 @@
-pub mod server;
-pub mod client;
-
 use amethyst::{
     ecs::{Component, VecStorage},
     network::*,
@@ -9,7 +6,7 @@ use amethyst::{
 use serde::{Serialize, Deserialize};
 use bincode;
 
-use crate::components::PlayerInfo;
+use crate::components::{PlayerInfo, PlayerAction};
 
 // eg:
 // let mut k = network::pack::new(10);
@@ -30,13 +27,15 @@ pub enum Cmd {
     Connect(String),
     TransferMap(String, String),
     RecivedMap,
-    CreatePlayer(Vec<PlayerInfo>),
+    InsertPlayer(PlayerInfo),
+    Action(PlayerAction),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Pack {
     pub cmd: Cmd,
     id: u32,
+    // ip field needed
 }
 
 impl Pack {
@@ -56,4 +55,28 @@ impl Pack {
     }
 }
 
+
+/// IO resource, buff for inputs and outputs
+pub struct IO {
+    pub I: Vec<Pack>,
+    pub O: Vec<Pack>,
+}
+
+impl IO {
+    pub fn new() -> Self {
+        Self {
+            I: Vec::<Pack>::new(),
+            O: Vec::<Pack>::new(),
+        }
+    }
+}
+
+impl Default for IO {
+    fn default() -> Self {
+        Self {
+            I: Vec::<Pack>::new(),
+            O: Vec::<Pack>::new(),
+        }
+    }
+}
 // id: 0 - do nothing

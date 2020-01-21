@@ -6,23 +6,14 @@ use amethyst::{
 };
 use std::time::Instant;
 use serde::{Serialize, Deserialize};
+use crate::components::PlayerAction;
 
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Orientation {
     South,
     West,
     East,
     North,
-}
-
-#[warn(dead_code)]
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum PlayerAction {
-    Nothing = 0,
-    MoveN,
-    MoveE,
-    MoveS,
-    MoveW,
 }
 
 pub struct PlayerList {
@@ -39,7 +30,7 @@ impl Default for PlayerList {
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerInfo {
-    pub id: u32,
+    pub id: u32,       // Change this to idNum
     pub modified: bool, 
     pub act: PlayerAction,
     pub name: String,
@@ -55,10 +46,10 @@ pub struct PlayerInfo {
 /// Client Side player component
 pub struct PlayerComponent {
     pub orientation: Orientation,
-    pub n: SpriteRender,
-    pub e: SpriteRender,
-    pub s: SpriteRender,
-    pub w: SpriteRender,
+    n: SpriteRender,
+    e: SpriteRender,
+    s: SpriteRender,
+    w: SpriteRender,
     pub last_movement_instant: Instant,
     pub trans: Transform,
     p: PlayerInfo,
@@ -80,7 +71,14 @@ impl PlayerComponent {
             p,
         }
     }
-   
+    
+    pub fn action(&self, action: PlayerAction) {
+        match action {
+            Move => (),
+            _    => (),
+        }
+    }
+
     pub fn get_orientated(&self) -> SpriteRender {
         match self.orientation {
             Orientation::North=> return self.n.clone(),

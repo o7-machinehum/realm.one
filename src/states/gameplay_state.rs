@@ -10,6 +10,7 @@ use amethyst::{
 use crate::map;
 use crate::components::{PlayerComponent, PlayerInfo, PlayerAction, PlayerList};
 use crate::resources::ClientStatus;
+use crate::network::IO;
 
 pub struct GamePlayState {
     pub ip: String, // IP of server to connect to
@@ -18,6 +19,7 @@ pub struct GamePlayState {
 impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
+        let io = IO::new();
         world.register::<PlayerComponent>();
         world.register::<map::TilePosition>();
         
@@ -34,6 +36,7 @@ impl SimpleState for GamePlayState {
         world.insert(sprites);
         world.insert(room);
         world.insert(player_list);
+        world.insert(io);
         world
             .create_entity()
             .with(NetConnection::<Vec<u8>>::new(
