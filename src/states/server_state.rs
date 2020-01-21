@@ -2,7 +2,6 @@ use amethyst::{
     prelude::*,
 };
 
-use crate::components::{PlayerList, PlayerAction, PlayerInfo, Action};
 use crate::network::{IO};
 
 pub struct ServerState;

@@ -9,4 +9,3 @@ pub use self::player::Orientation;
 
 mod player_action;
 pub use self::player_action::Action;
-pub use self::player_action::PlayerAction;

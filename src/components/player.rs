@@ -6,7 +6,6 @@ use amethyst::{
 };
 use std::time::Instant;
 use serde::{Serialize, Deserialize};
-use crate::components::PlayerAction;
 use crate::constants;
 use log::info;
 
@@ -34,7 +33,6 @@ impl Default for PlayerList {
 pub struct PlayerInfo {
     pub id: u32,       // Change this to idNum
     pub modified: bool, 
-    pub act: PlayerAction,
     pub name: String,
     pub room: String,
     pub x: f32,          
@@ -70,12 +68,12 @@ impl PlayerComponent {
         }
     }
     
-    pub fn action(&self, action: PlayerAction) {
-        match action {
-            Move => (),
-            _    => (),
-        }
-    }
+    // pub fn action(&self, action: PlayerAction) {
+    //     match action {
+    //         Move => (),
+    //         _    => (),
+    //     }
+    // }
 
     pub fn update_orientation(&mut self, x: &f32, y: &f32) {
         let x = *x;
