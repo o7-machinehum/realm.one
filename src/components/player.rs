@@ -8,6 +8,7 @@ use std::time::Instant;
 use serde::{Serialize, Deserialize};
 use crate::components::PlayerAction;
 use crate::constants;
+use log::info;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Orientation {
@@ -52,15 +53,12 @@ pub struct PlayerComponent {
     s: SpriteRender,
     w: SpriteRender,
     pub last_movement_instant: Instant,
-    pub trans: Transform,
     p: PlayerInfo,
 }
 
 impl PlayerComponent {
     pub fn new(p: PlayerInfo, sprites: &Vec<SpriteRender>) -> Self {
-        let mut tr = Transform::default();
-        tr.set_translation_xyz(p.x, p.y, 1.0);
-
+        
         Self {
             n: sprites[p.no].clone(), 
             e: sprites[p.ea].clone(), 
@@ -68,7 +66,6 @@ impl PlayerComponent {
             w: sprites[p.we].clone(),
             orientation: Orientation::South,
             last_movement_instant: Instant::now(),
-            trans: tr,
             p,
         }
     }
@@ -96,8 +93,26 @@ impl PlayerComponent {
     }
     
     pub fn walk(&mut self, x: &f32, y: &f32) {
-        self.trans.move_up(*x * constants::PLAYER_MOVE);
-        self.trans.move_right(*y * constants::PLAYER_MOVE);
+        self.p.x += *x * constants::PLAYER_MOVE;
+        self.p.y += *y * constants::PLAYER_MOVE;
+    }
+
+    pub fn x(&self) -> f32 {
+        self.p.x
+    }
+
+    pub fn y(&self) -> f32 {
+        self.p.y
+    }
+
+    pub fn z(&self) -> f32 {
+        1.0 
+    }
+
+    pub fn trans(&self) -> Transform {
+        let mut tr = Transform::default();
+        tr.set_translation_xyz(self.x(), self.y(), self.z()); 
+        tr
     }
     
     pub fn get_orientated(&self) -> SpriteRender {
