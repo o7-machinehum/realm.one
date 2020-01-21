@@ -5,15 +5,9 @@ use amethyst::{
 };
 use serde::{Serialize, Deserialize};
 use bincode;
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use crate::components::{PlayerInfo, PlayerAction};
-
-// eg:
-// let mut k = network::pack::new(10);
-// let p = k.to_string();
-// info!("{}", p);
-// let t = network::pack::from_string(p);
-// info!("{:?}", t);
 
 pub struct Reader(pub ReaderId<NetEvent<Vec<u8>>>);
 
@@ -35,22 +29,36 @@ pub enum Cmd {
 pub struct Pack {
     pub cmd: Cmd,
     id: u32,
-    // ip field needed
+    addr: Option<SocketAddr>,
 }
 
 impl Pack {
-    pub fn new(cmd: Cmd, id: u32) -> Self {
+    pub fn new(cmd: Cmd, id: u32, ip: Option<SocketAddr>) -> Self {
+        let ipNew = match ip {
+            Some(ip) => ip,
+            None => SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3456),
+        };
+
         Self {
             cmd,
-            id, 
+            id,
+            addr: Some(ipNew), 
         }
+    }
+    
+    pub fn ip(&self) -> Option<SocketAddr> {
+        self.addr
+    }
+
+    pub fn update_ip(&mut self, ip: SocketAddr) {
+        self.addr = Some(ip);
     }
 
     pub fn from_bin(bin: Vec<u8>) -> Self {
         bincode::deserialize(&bin[..]).unwrap() 
     }
      
-    pub fn to_bin(&mut self) -> Vec<u8> {
+    pub fn to_bin(&self) -> Vec<u8> {
         bincode::serialize(self).unwrap()
     }
 }

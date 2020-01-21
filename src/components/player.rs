@@ -23,7 +23,7 @@ pub struct PlayerList {
 
 impl Default for PlayerList {
     fn default() -> Self {
-    Self{ list: Vec::new(), } 
+        Self{ list: Vec::new(), } 
     }
 }
 

@@ -35,7 +35,7 @@ impl<'a> System<'a> for ClientSystem {
                 .or_insert_with(|| network::Reader(connection.register_reader()));
             
             if !status.connected {
-                let mut packet = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0);  
+                let mut packet = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0, None);  
                 status.connected = true;
                 io.O.push(packet); 
             }

@@ -17,7 +17,7 @@ use crate::components::PlayerList;
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
-pub struct PlayerManSystem{
+pub struct PlayerManSystem {
     pub new_players: Vec<Pack>, 
 }
 

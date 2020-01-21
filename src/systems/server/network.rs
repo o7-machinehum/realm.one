@@ -16,13 +16,12 @@ pub struct ServerSystem;
 impl<'a> System<'a> for ServerSystem {
     type SystemData = (
         WriteStorage<'a, NetConnection<Vec<u8>>>,
-        WriteStorage<'a, NetIdentity>,
         WriteStorage<'a, network::Reader>,
         Write <'a, IO>,
         Entities<'a>,
     );
 
-    fn run(&mut self, (mut connections, mut ids, mut readers, mut io, entities): Self::SystemData) {
+    fn run(&mut self, (mut connections, mut readers, mut io, entities): Self::SystemData) {
         for (e, connection) in (&entities, &mut connections).join() {
             let reader = readers
                 .entry(e)
@@ -44,9 +43,13 @@ impl<'a> System<'a> for ServerSystem {
                     },
                     _ => None
                 };
-                           
+                
                 match pack {
-                    Some(pack) => io.I.push(Pack::from_bin(pack.content().to_vec())), // Add the pack to the IO vector
+                    Some(pack) => {
+                        let mut pk = Pack::from_bin(pack.content().to_vec());
+                        pk.update_ip(connection.target_addr); // RTS
+                        io.I.push(pk);    
+                    } 
                     None => (),
                 }
             }
@@ -58,10 +61,19 @@ impl<'a> System<'a> for ServerSystem {
                     .expect("Cannot delete connection from world!");
             }
             
-            // TODO: There's this member that can be used for vectors. Should use that.
-            for mut resp in io.O.pop() {
-                info!("Sending a thing"); 
-                connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(resp.to_bin(), None)));
+            // If there is a ip in the ip field send the message to that clinet, if not
+            // sent to all of the client
+            let target = connection.target_addr;
+            for element in io.O.pop() {
+                match &element.ip() {
+                    Some(ip) => {
+                        match(ip) {
+                            target => connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(element.to_bin(), None))),
+                            _ => io.O.push(element),
+                        }
+                    },
+                    None => connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(element.to_bin(), None))),
+                }
             }
         }
     }
