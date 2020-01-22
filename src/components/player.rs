@@ -1,13 +1,12 @@
 use amethyst::{
     renderer::SpriteRender,
     core::transform::Transform,
-    prelude::*,
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 use std::time::Instant;
 use serde::{Serialize, Deserialize};
 use crate::constants;
-use log::info;
+
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Orientation {

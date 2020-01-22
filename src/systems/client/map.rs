@@ -4,7 +4,7 @@ use amethyst::ecs::{Read, Write, Entities, System, SystemData, World, WriteStora
 use amethyst::renderer::SpriteRender;
 
 use crate::map::{Room, TilePosition, SpritesContainer};
-use log::info;
+
 use crate::network::{IO, Cmd};
 
 #[derive(SystemDesc)]
@@ -24,10 +24,10 @@ impl<'s> System<'s> for MapSystem{
     /// Should ONLY be called in a re-draw event of the map
     /// Resource room should be updated with the newest room
     fn run(&mut self, (mut transforms, mut sprite_renders, mut tiles_pos, mut room, mut io, container, entities): Self::SystemData) {
-        for element in io.I.pop() {
+        for element in io.i.pop() {
             match &element.cmd {
                 Cmd::TransferMap(name, data) => room.change(name.to_string(), data.to_string()),
-                _ => io.I.push(element), 
+                _ => io.i.push(element), 
             }
         }
         

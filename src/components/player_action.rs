@@ -1,9 +1,7 @@
-use amethyst::{
-    ecs::{Component, DenseVecStorage, FlaggedStorage},
-};
-use std::time::Instant;
+
+
 use serde::{Serialize, Deserialize};
-use crate::components::{IdNum, Orientation};
+use crate::components::{Orientation};
 
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
