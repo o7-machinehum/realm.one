@@ -18,6 +18,7 @@ impl Component for Reader {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Cmd {
     Nothing,
+    Ping,
     Connect(String),
     TransferMap(String, String),
     RecivedMap,
@@ -34,7 +35,7 @@ pub struct Pack {
 
 impl Pack {
     pub fn new(cmd: Cmd, id: u32, ip: Option<SocketAddr>) -> Self {
-        let ipNew = match ip {
+        let ip_new = match ip {
             Some(ip) => ip,
             None => SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3456),
         };
@@ -42,7 +43,7 @@ impl Pack {
         Self {
             cmd,
             id,
-            addr: Some(ipNew), 
+            addr: Some(ip_new), 
         }
     }
     
@@ -66,15 +67,15 @@ impl Pack {
 
 /// IO resource, buff for inputs and outputs
 pub struct IO {
-    pub I: Vec<Pack>,
-    pub O: Vec<Pack>,
+    pub i: Vec<Pack>,
+    pub o: Vec<Pack>,
 }
 
 impl IO {
     pub fn new() -> Self {
         Self {
-            I: Vec::<Pack>::new(),
-            O: Vec::<Pack>::new(),
+            i: Vec::<Pack>::new(),
+            o: Vec::<Pack>::new(),
         }
     }
 }
@@ -82,8 +83,8 @@ impl IO {
 impl Default for IO {
     fn default() -> Self {
         Self {
-            I: Vec::<Pack>::new(),
-            O: Vec::<Pack>::new(),
+            i: Vec::<Pack>::new(),
+            o: Vec::<Pack>::new(),
         }
     }
 }

@@ -11,7 +11,7 @@ tiled = { git = "https://github.com/mattyhall/rs-tiled" }
 serde = { version = "1", features = ["derive"] }
 bincode = "1.2.1"
 stringreader = "0.1.1"
-
+laminar = "0.2.3"
 
 [features]
 default = ["vulkan"]

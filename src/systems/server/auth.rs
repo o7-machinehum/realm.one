@@ -1,8 +1,7 @@
 use amethyst::{
     core::{SystemDesc},
     derive::SystemDesc,
-    ecs::{Entities, Join, Write, System, SystemData, World, WriteStorage},
-    network::*,
+    ecs::{Write, System, SystemData, World},
 };
 
 use std::{
@@ -10,11 +9,10 @@ use std::{
 };
 use std::io::Read;
 
-use crate::network;
 use log::info;
 use crate::network::{Pack, Cmd, IO};
-use crate::components::{PlayerList, PlayerInfo, Action};
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use crate::components::{PlayerInfo};
+use std::net::{SocketAddr};
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
@@ -58,14 +56,14 @@ impl<'a> System<'a> for AuthSystem {
         Write <'a, IO>,
     );
 
-    fn run(&mut self, (mut io): Self::SystemData) {
-        for element in io.0.I.pop() {
+    fn run(&mut self, mut io: Self::SystemData) {
+        for element in io.0.i.pop() {
             match &element.cmd {
                 Cmd::Connect(packet) => {
-                    io.0.O.push(insert_map(packet.to_string(), element.ip())); 
-                    io.0.O.push(ready_player_one(element.ip()));
+                    io.0.o.push(insert_map(packet.to_string(), element.ip())); 
+                    io.0.o.push(ready_player_one(element.ip()));
                 },
-                _ => (io.0.I.push(element)), 
+                _ => (io.0.i.push(element)), 
             }
         }
     }

@@ -1,16 +1,16 @@
 use amethyst::core::{Transform, SystemDesc};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Join, Read, Write, Entities, Entity, System, SystemData, World, WriteStorage};
+use amethyst::ecs::{Read, Write, Entities, Entity, System, SystemData, World, WriteStorage};
 use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
 
 use std::time::Instant;
 use log::info;
 
-use crate::components::{PlayerComponent, Orientation, PlayerList, Action};
+use crate::components::{PlayerComponent, Action};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
 use crate::map::{Room, Adj, SpritesContainer};
-use crate::network::{IO, Cmd, Pack};
+use crate::network::{Pack, IO, Cmd};
 use crate::constants;
 
 
@@ -32,7 +32,7 @@ impl<'s> System<'s> for PlayerSystem{
     );
  
     fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
-        for element in io.I.pop() {
+        for element in io.i.pop() {
             match &element.cmd {
                 Cmd::InsertPlayer(p1) =>  {
                     info!("Inserting Player"); 
@@ -44,7 +44,7 @@ impl<'s> System<'s> for PlayerSystem{
                         .with(player, &mut players) 
                         .build());
                     },
-                _ => io.I.push(element), 
+                _ => io.i.push(element), 
             }
         }
         
@@ -65,7 +65,7 @@ impl<'s> System<'s> for PlayerSystem{
                         return;
                     }
                     
-                    let mut tr = transforms.get_mut(p1).unwrap(); 
+                    let tr = transforms.get_mut(p1).unwrap(); 
 
                     player.update_orientation(&horizontal, &vertical);
                     player.last_movement_instant = now.clone();
@@ -75,7 +75,7 @@ impl<'s> System<'s> for PlayerSystem{
                     if room.allowed_move(tr, horizontal, vertical, adj){
                         player.walk(&horizontal, &vertical);
                         tr.set_translation_xyz(player.x(), player.y(), player.z()); 
-                        // io.O.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
+                        io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                     }
                 }
             },

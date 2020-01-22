@@ -27,7 +27,7 @@ impl<'a> System<'a> for ClientSystem {
         Entities<'a>,
     );
 
-    fn run(&mut self, (mut status, mut connections, mut readers, mut room, mut p_list, mut io, entities): Self::SystemData) {
+    fn run(&mut self, (mut status, mut connections, mut readers, _room, _p_list, mut io, entities): Self::SystemData) {
         for (e, connection) in (&entities, &mut connections).join() {
             let reader = readers
                 .entry(e)
@@ -35,26 +35,35 @@ impl<'a> System<'a> for ClientSystem {
                 .or_insert_with(|| network::Reader(connection.register_reader()));
             
             if !status.connected {
-                let mut packet = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0, None);  
+                let packet2 = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0, None);  
+                connection.queue(NetEvent::Packet(NetPacket::unreliable(packet2.to_bin())));
                 status.connected = true;
-                io.O.push(packet); 
             }
             
             else {
                 for ev in connection.received_events(&mut reader.0) {
+                    info!("{:?}", connection.state);
                     // Get Pack 
                     let pack = match ev {
                         NetEvent::Packet(packet) => Some(packet),
-                        NetEvent::Connected(_addr) => None,
-                        NetEvent::Disconnected(_addr) => None,
+                        NetEvent::Connected(addr) => {
+                            info!("Server Connected: {}", addr);
+                            None 
+                        },
+                        NetEvent::Disconnected(addr) => {
+                            info!("Server Disconnected: {}", addr);
+                            None
+                        }
                         _ => None
                     };
+                
+                    info!("{:?}", pack);
                     
                     match pack {
                         Some(pack) => {
                             // info!("{:?}", pack.content()); 
                             info!("Adding Something"); 
-                            io.I.push(Pack::from_bin(pack.content().to_vec())); // Add the pack to the IO vector
+                            io.i.push(Pack::from_bin(pack.content().to_vec())); // Add the pack to the IO vector
                         },
                         None => (),
                     }
@@ -62,9 +71,10 @@ impl<'a> System<'a> for ClientSystem {
 
                 // Respond
                 // TODO: There's this member that can be used for vectors. Should use that.
-                for mut resp in io.O.pop() {
-                    info!("Sending"); 
-                    connection.queue(NetEvent::Packet(NetPacket::reliable_ordered(resp.to_bin(), None)));
+                for resp in io.o.pop() {
+                    info!("{:?}", resp); 
+                    connection.queue(NetEvent::Packet(NetPacket::reliable_sequenced(resp.to_bin(), None)));
+                    info!("sent..."); 
                 }
             }
         }
