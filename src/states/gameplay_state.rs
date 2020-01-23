@@ -3,7 +3,6 @@ use amethyst::{
     prelude::*,
     renderer::{Camera},
     window::ScreenDimensions,
-    network::NetConnection,
     ecs::World,
 };
 
@@ -37,12 +36,12 @@ impl SimpleState for GamePlayState {
         world.insert(room);
         world.insert(player_list);
         world.insert(io);
-        world
-            .create_entity()
-            .with(NetConnection::<Vec<u8>>::new(
-                self.ip.parse().unwrap(),
-            ))
-            .build();
+        // world
+        //     .create_entity()
+        //     .with(NetConnection::<Vec<u8>>::new(
+        //         self.ip.parse().unwrap(),
+        //     ))
+        //     .build();
     }
 }
 

@@ -1,6 +1,5 @@
 use amethyst::{
     ecs::{Component, VecStorage},
-    network::*,
     shrev::ReaderId,
 };
 use serde::{Serialize, Deserialize};
@@ -9,11 +8,11 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use crate::components::{PlayerInfo, Action};
 
-pub struct Reader(pub ReaderId<NetEvent<Vec<u8>>>);
+// pub struct Reader(pub ReaderId<NetEvent<Vec<u8>>>);
 
-impl Component for Reader {
-    type Storage = VecStorage<Self>;
-}
+// impl Component for Reader {
+//     type Storage = VecStorage<Self>;
+// }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Cmd {
