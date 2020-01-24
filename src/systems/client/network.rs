@@ -4,7 +4,7 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Entities, Read, Join, System, SystemData, World, Write, WriteStorage, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
-    network::simulation::{udp::UdpNetworkBundle, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
+    network::simulation::{DeliveryRequirement, UrgencyRequirement, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
     Result, 
 };
 use log::{info, error};
@@ -24,9 +24,7 @@ impl<'a, 'b> SystemBundle<'a, 'b> for ClientSystemBundle {
         builder.add(
             ClientSystemDesc::default().build(world),
             "client_system",
-            &[],
-        );
-        Ok(())
+            &[],); Ok(())
     }
 }
 
@@ -82,7 +80,7 @@ impl<'a> System<'a> for ClientSystem {
             }
             else {
                 for resp in io.o.pop() {
-                    net.send(server_addr, &resp.to_bin());
+                    net.send_with_requirements(server_addr, &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
                 }
             }
         }
@@ -91,9 +89,7 @@ impl<'a> System<'a> for ClientSystem {
         for event in channel.read(&mut self.reader) {
             match event {
                 NetworkSimulationEvent::Message(addr, payload) => {
-                    info!("{}: {:?}", addr, payload);
                     io.i.push(Pack::from_bin(payload.to_vec())); // Add the pack to the IO vector
-                    info!("Made it.");
                 }
                 NetworkSimulationEvent::Connect(addr) => info!("New client connection: {}", addr),
                 NetworkSimulationEvent::Disconnect(addr) => {
@@ -104,6 +100,6 @@ impl<'a> System<'a> for ClientSystem {
                 }
                 _ => {}
             }
-        } 
+        }
     }
 }

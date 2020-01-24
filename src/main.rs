@@ -9,7 +9,7 @@ use amethyst::{
     input::InputBundle,
     utils::application_root_dir,
     // network::simulation::{udp::UdpNetworkBundle, NetworkSimulationEvent, TransportResource},
-    network::simulation::{laminar::{LaminarNetworkBundle, LaminarSocket}, NetworkSimulationEvent, TransportResource, },
+    network::simulation::{laminar::{LaminarNetworkBundle, LaminarSocket, LaminarConfig}, NetworkSimulationEvent, TransportResource},
 };
 
 use crate::network::{Pack};
@@ -51,33 +51,27 @@ fn main() -> amethyst::Result<()> {
     rtn
 }
 
-// fn get_server_config(udp_socket_addr: SocketAddr) -> ServerConfig {
-//     let laminar_config = laminar::Config {
-//         // blocking_mode: false,
-//         idle_connection_timeout: Duration::from_millis(1000),
-//         // heartbeat_interval: None,
-//         max_packet_size: 16384,
-//         max_fragments: 18,
-//         fragment_size: 1450,
-//         fragment_reassembly_buffer_size: 1450,
-//         receive_buffer_max_size: 1450,
-//         rtt_smoothing_factor: 0.5,
-//         rtt_max_value: 500,
-//         socket_event_buffer_size: 1024,
-//         socket_polling_timeout: Some(Duration::from_millis(100)),
-//         // max_packets_in_flight: 10,
-//     };
-//     
-//     ServerConfig {
-//         udp_socket_addr,
-//         max_throughput: 5000,
-//         create_net_connection_on_connect: true,
-//         laminar_config,
-//     }
-// }
+fn get_server_config() -> LaminarConfig {
+    LaminarConfig {
+        blocking_mode: false,
+        idle_connection_timeout: Duration::from_millis(1000),
+        heartbeat_interval: Some(Duration::from_millis(100)),
+        max_packet_size: 16384,
+        max_fragments: 18,
+        fragment_size: 4098,
+        fragment_reassembly_buffer_size: 1450,
+        receive_buffer_max_size: 4098,
+        rtt_smoothing_factor: 0.5,
+        rtt_max_value: 500,
+        socket_event_buffer_size: 4098,
+        socket_polling_timeout: Some(Duration::from_millis(100)),
+        max_packets_in_flight: 10,
+    }
+}
 
 fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
-    let socket = LaminarSocket::bind("0.0.0.0:3455")?;
+    // let socket = LaminarSocket::bind("0.0.0.0:3455")?;
+    let socket = LaminarSocket::bind_with_config("0.0.0.0:3455", get_server_config())?;
     
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
@@ -113,7 +107,8 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
 }
 
 fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
-    let socket = LaminarSocket::bind("0.0.0.0:3456")?;
+    // let socket = LaminarSocket::bind("0.0.0.0:3456")?;
+    let socket = LaminarSocket::bind_with_config("0.0.0.0:3456", get_server_config())?;
         
     let game_data = GameDataBuilder::default()
         .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 

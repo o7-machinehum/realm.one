@@ -8,7 +8,7 @@ use serde::{Serialize, Deserialize};
 use crate::constants;
 
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Orientation {
     South,
     West,
@@ -28,7 +28,7 @@ impl Default for PlayerList {
 
 /// Server Size player components
 #[warn(dead_code)]
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct PlayerInfo {
     pub id: u32,       // Change this to idNum
     pub modified: bool, 
