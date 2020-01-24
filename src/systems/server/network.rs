@@ -3,7 +3,7 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Entities, Join, Read, Write, System, SystemData, World, WriteStorage, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
-    network::simulation::{udp::UdpNetworkBundle, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
+    network::simulation::{DeliveryRequirement, UrgencyRequirement, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
     Result,
 };
 use crate::network;
@@ -60,18 +60,17 @@ impl ServerSystem {
 impl<'a> System<'a> for ServerSystem {
     type SystemData = (
         Write<'a, TransportResource>,
+        Read<'a, NetworkSimulationTime>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
         Write <'a, IO>,
     );
 
-    fn run(&mut self, (mut net, channel, mut io): Self::SystemData) {
+    fn run(&mut self, (mut net, sim_time, channel, mut io): Self::SystemData) {
         for event in channel.read(&mut self.reader) {
             match event {
                 NetworkSimulationEvent::Message(addr, payload) => {
-                    info!("{}: {:?}", addr, payload);
                     let mut pk = Pack::from_bin(payload.to_vec());
                     pk.addr = Some(addr.clone());  // Update the client addr
-                    // pk.addr = None;  // Update the client addr
                     io.i.push(pk);
                 }
                 NetworkSimulationEvent::Connect(addr) => {
@@ -90,18 +89,18 @@ impl<'a> System<'a> for ServerSystem {
         }
         
         // Send responces
-        for resp in io.o.pop() {
-            info!("{:?}", resp);
-            match resp.addr {
-                Some(addr) => {
-                    info!("Sending to: {}", addr);
-                    net.send(addr, &resp.to_bin());
-                },
-                // Broadcast message
-                None => {
-                    for addr in self.clients.clone() {
-                        info!("Sending to: {}", addr);
-                        net.send(addr, &resp.to_bin());
+        for frame in sim_time.sim_frames_to_run() {
+            for resp in io.o.pop() {
+                match resp.addr {
+                    // Just send to one address 
+                    Some(addr) => {
+                        net.send_with_requirements(addr, &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
+                    },
+                    // Broadcast message
+                    None => {
+                        for addr in self.clients.clone() {
+                            net.send_with_requirements(addr, &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
+                        }
                     }
                 }
             }

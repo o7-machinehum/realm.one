@@ -8,13 +8,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use crate::components::{PlayerInfo, Action};
 
-// pub struct Reader(pub ReaderId<NetEvent<Vec<u8>>>);
-
-// impl Component for Reader {
-//     type Storage = VecStorage<Self>;
-// }
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Cmd {
     Nothing,
     Ping,
