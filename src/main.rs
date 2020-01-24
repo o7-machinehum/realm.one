@@ -8,7 +8,8 @@ use amethyst::{
     },
     input::InputBundle,
     utils::application_root_dir,
-    network::simulation::{udp::UdpNetworkBundle, NetworkSimulationEvent, TransportResource},
+    // network::simulation::{udp::UdpNetworkBundle, NetworkSimulationEvent, TransportResource},
+    network::simulation::{laminar::{LaminarNetworkBundle, LaminarSocket}, NetworkSimulationEvent, TransportResource, },
 };
 
 use crate::network::{Pack};
@@ -76,8 +77,7 @@ fn main() -> amethyst::Result<()> {
 // }
 
 fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
-    let socket = UdpSocket::bind("0.0.0.0:3455")?;
-    socket.set_nonblocking(true)?;
+    let socket = LaminarSocket::bind("0.0.0.0:3455")?;
     
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
@@ -96,10 +96,9 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(input_bundle)? 
-        .with_bundle(UdpNetworkBundle::new(Some(socket), 8000))? 
-        .with(systems::PlayerSystem{p1: None}, "player_system", &["input_system"])
+        .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
         .with_bundle(systems::ClientSystemBundle)? 
-        // .with(systems::ClientSystem, "client_system", &[])
+        .with(systems::PlayerSystem{p1: None}, "player_system", &["input_system"])
         .with(systems::MapSystem,    "map_system", &[]);
 
 
@@ -114,12 +113,10 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
 }
 
 fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
-    let socket = UdpSocket::bind("0.0.0.0:3456")?;
-    socket.set_nonblocking(true)?;
+    let socket = LaminarSocket::bind("0.0.0.0:3456")?;
         
     let game_data = GameDataBuilder::default()
-        .with_bundle(UdpNetworkBundle::new(Some(socket), 8000))? 
-        // .with(systems::ServerSystem, "server_system", &[])
+        .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
         .with_bundle(systems::ServerSystemBundle)? 
         .with(systems::AuthSystem, "auth_system", &[])
         .with(systems::PlayerManSystem{new_players: Vec::<Pack>::new()}, "playerman_system", &[]);

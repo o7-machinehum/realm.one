@@ -61,7 +61,12 @@ impl<'a> System<'a> for AuthSystem {
             match &element.cmd {
                 Cmd::Connect(packet) => {
                     io.0.o.push(insert_map(packet.to_string(), element.ip())); 
-                    io.0.o.push(ready_player_one(element.ip()));
+                    // io.0.o.push(ready_player_one(element.ip()));
+                    // This also needs to insert ALL the other players
+                    // Not just player1
+                    // For player in playerlist
+                    // Insert players
+                    // And monsters?
                 },
                 _ => (io.0.i.push(element)), 
             }

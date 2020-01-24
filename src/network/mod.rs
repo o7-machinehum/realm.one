@@ -29,7 +29,7 @@ pub enum Cmd {
 pub struct Pack {
     pub cmd: Cmd,
     id: u32,
-    addr: Option<SocketAddr>,
+    pub addr: Option<SocketAddr>,
 }
 
 impl Pack {
