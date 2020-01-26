@@ -9,6 +9,7 @@ use amethyst::{
 };
 use log::{info, error};
 use crate::network;
+use crate::constants;
 use crate::network::{Pack, Cmd, IO};
 use crate::resources::ClientStatus;
 use crate::map::Room;
@@ -70,7 +71,7 @@ impl<'a> System<'a> for ClientSystem {
         // message this frame. If, for example, the ECS frame rate is slower than the simulation
         // frame rate, this code block will run until it catches up with the expected simulation
         // frame number.
-        let server_addr = "127.0.0.1:3456".parse().unwrap();
+        let server_addr = constants::SERVER_IP.parse().unwrap();
         
         for frame in sim_time.sim_frames_to_run() {
             if !status.connected {
