@@ -11,9 +11,7 @@ use crate::components::{PlayerComponent, PlayerList};
 use crate::resources::ClientStatus;
 use crate::network::IO;
 
-pub struct GamePlayState {
-    pub ip: String, // IP of server to connect to
-}
+pub struct GamePlayState; 
 
 impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {

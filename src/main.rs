@@ -37,14 +37,14 @@ fn main() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
 
-    if args[1] == "client" {
-        info!("Starting the client");
-        rtn = client(resources, args[2].clone());
-    }
-
-    else if args[1] == "server"{
+    if args[1].starts_with("s") {
         info!("Starting the server!");
         rtn = server(resources);
+    }
+
+    else {
+        info!("Starting the client");
+        rtn = client(resources);
     }
     // else error out
     
@@ -55,7 +55,7 @@ fn get_server_config() -> LaminarConfig {
     LaminarConfig {
         blocking_mode: false,
         idle_connection_timeout: Duration::from_millis(1000),
-        heartbeat_interval: Some(Duration::from_millis(100)),
+        heartbeat_interval: Some(Duration::from_millis(10)),
         max_packet_size: 16384,
         max_fragments: 18,
         fragment_size: 4098,
@@ -69,9 +69,27 @@ fn get_server_config() -> LaminarConfig {
     }
 }
 
-fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
+fn get_client_config() -> LaminarConfig {
+    LaminarConfig {
+        blocking_mode: false,
+        idle_connection_timeout: Duration::from_millis(1000),
+        heartbeat_interval: Some(Duration::from_millis(10)),
+        max_packet_size: 16384,
+        max_fragments: 18,
+        fragment_size: 4098,
+        fragment_reassembly_buffer_size: 1450,
+        receive_buffer_max_size: 4098,
+        rtt_smoothing_factor: 0.5,
+        rtt_max_value: 500,
+        socket_event_buffer_size: 4098,
+        socket_polling_timeout: Some(Duration::from_millis(100)),
+        max_packets_in_flight: 10,
+    }
+}
+
+fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
     // let socket = LaminarSocket::bind("0.0.0.0:3455")?;
-    let socket = LaminarSocket::bind_with_config("0.0.0.0:3455", get_server_config())?;
+    let socket = LaminarSocket::bind_with_config(constants::CLIENT_IP, get_client_config())?;
     
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
@@ -98,7 +116,7 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
 
     let mut game = Application::new(
         resources, 
-        states::GamePlayState{ip},
+        states::GamePlayState,
         game_data,
     )?;
 
@@ -108,7 +126,7 @@ fn client(resources: std::path::PathBuf, ip: String) -> amethyst::Result<()> {
 
 fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
     // let socket = LaminarSocket::bind("0.0.0.0:3456")?;
-    let socket = LaminarSocket::bind_with_config("0.0.0.0:3456", get_server_config())?;
+    let socket = LaminarSocket::bind_with_config(constants::SERVER_IP, get_server_config())?;
         
     let game_data = GameDataBuilder::default()
         .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
