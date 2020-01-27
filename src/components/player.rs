@@ -6,7 +6,7 @@ use amethyst::{
 use std::time::Instant;
 use serde::{Serialize, Deserialize};
 use crate::constants;
-
+use std::net::{SocketAddr};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Orientation {
@@ -31,6 +31,7 @@ impl Default for PlayerList {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct PlayerComponent {
     pub id: u32,       // Change this to idNum
+    pub ip: SocketAddr, 
     pub modified: bool, 
     pub name: String,
     pub room: String,
