@@ -17,7 +17,7 @@ pub enum Orientation {
 }
 
 pub struct PlayerList {
-    pub list: Vec<PlayerInfo>,
+    pub list: Vec<PlayerComponent>,
 }
 
 impl Default for PlayerList {
@@ -26,54 +26,28 @@ impl Default for PlayerList {
     }
 }
 
-/// Server Size player components
+/// Client Side player component
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct PlayerInfo {
+pub struct PlayerComponent {
     pub id: u32,       // Change this to idNum
     pub modified: bool, 
     pub name: String,
     pub room: String,
     pub x: f32,          
     pub y: f32, 
-    pub no: usize,      
-    pub ea: usize, 
-    pub so: usize,
-    pub we: usize, 
-}
-
-/// Client Side player component
-pub struct PlayerComponent {
+    pub north: usize,      
+    pub east: usize, 
+    pub south: usize,
+    pub west: usize, 
     pub orientation: Orientation,
-    n: SpriteRender,
-    e: SpriteRender,
-    s: SpriteRender,
-    w: SpriteRender,
-    pub last_movement_instant: Instant,
-    p: PlayerInfo,
 }
 
 impl PlayerComponent {
-    pub fn new(p: PlayerInfo, sprites: &Vec<SpriteRender>) -> Self {
-        
-        Self {
-            n: sprites[p.no].clone(), 
-            e: sprites[p.ea].clone(), 
-            s: sprites[p.so].clone(), 
-            w: sprites[p.we].clone(),
-            orientation: Orientation::South,
-            last_movement_instant: Instant::now(),
-            p,
-        }
+    pub fn new(p: PlayerComponent) -> Self {
+        p 
     }
     
-    // pub fn action(&self, action: PlayerAction) {
-    //     match action {
-    //         Move => (),
-    //         _    => (),
-    //     }
-    // }
-
     pub fn update_orientation(&mut self, x: &f32, y: &f32) {
         let x = *x;
         let y = *y;
@@ -90,16 +64,16 @@ impl PlayerComponent {
     }
     
     pub fn walk(&mut self, x: &f32, y: &f32) {
-        self.p.x += *x * constants::PLAYER_MOVE;
-        self.p.y += *y * constants::PLAYER_MOVE;
+        self.x += *x * constants::PLAYER_MOVE;
+        self.y += *y * constants::PLAYER_MOVE;
     }
 
     pub fn x(&self) -> f32 {
-        self.p.x
+        self.x
     }
 
     pub fn y(&self) -> f32 {
-        self.p.y
+        self.y
     }
 
     pub fn z(&self) -> f32 {
@@ -112,12 +86,12 @@ impl PlayerComponent {
         tr
     }
     
-    pub fn get_orientated(&self) -> SpriteRender {
+    pub fn get_orientated(&self, sprites: &Vec<SpriteRender>) -> SpriteRender {
         match self.orientation {
-            Orientation::North=> return self.n.clone(),
-            Orientation::South=> return self.s.clone(),
-            Orientation::East => return self.e.clone(),
-            Orientation::West => return self.w.clone(),
+            Orientation::North=> return sprites[self.north].clone(),
+            Orientation::South=> return sprites[self.south].clone(),
+            Orientation::East => return sprites[self.east].clone(),
+            Orientation::West => return sprites[self.west].clone(),
         }
     }
 }

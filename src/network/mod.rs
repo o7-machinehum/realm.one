@@ -6,7 +6,7 @@ use serde::{Serialize, Deserialize};
 use bincode;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
-use crate::components::{PlayerInfo, Action};
+use crate::components::{PlayerComponent, Action};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Cmd {
@@ -15,7 +15,7 @@ pub enum Cmd {
     Connect(String),
     TransferMap(String, String),
     RecivedMap,
-    InsertPlayer(PlayerInfo), 
+    InsertPlayer(PlayerComponent), 
     Action(Action),
 }
 
