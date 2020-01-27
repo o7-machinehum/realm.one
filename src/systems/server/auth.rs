@@ -11,16 +11,12 @@ use std::io::Read;
 
 use log::info;
 use crate::network::{Pack, Cmd, IO};
-use crate::components::{PlayerInfo};
+use crate::components::{PlayerComponent, Orientation};
 use std::net::{SocketAddr};
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
 pub struct AuthSystem;
-
-// fn generate_id(proof: String) -> Pack {
-// 
-// }
 
 fn insert_map(proof: String, ip: Option<SocketAddr>) -> Pack {
     info!("Player Connected proof: {}, sending map!", proof);
@@ -35,17 +31,18 @@ fn ready_player_one(ip: Option<SocketAddr>) -> Pack {
     info!("Inserting player 1");
    
     // This should be loaded in the future
-    let player1_info = PlayerInfo {
+    let player1_info = PlayerComponent {
         id: 0,
         modified: true,
         name: "Turnip".to_string(),
         room: "Room1".to_string(),
         x: 8.0,
         y: 8.0,
-        no: 318,
-        ea: 306,
-        so: 282,
-        we: 294,
+        north: 318,
+        east: 306,
+        south: 282,
+        west: 294,
+        orientation: Orientation::North,
     };
 
     Pack::new(Cmd::InsertPlayer(player1_info), 0, ip)

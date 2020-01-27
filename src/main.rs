@@ -110,7 +110,7 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
         .with_bundle(input_bundle)? 
         .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
         .with_bundle(systems::ClientSystemBundle)? 
-        .with(systems::PlayerSystem{p1: None}, "player_system", &["input_system"])
+        .with(systems::PlayerSystem{p1: None, timer: None}, "player_system", &["input_system"])
         .with(systems::MapSystem,    "map_system", &[]);
     
     let mut game = Application::build(resources, states::GamePlayState)?
