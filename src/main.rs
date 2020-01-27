@@ -1,5 +1,5 @@
 use amethyst::{
-    core::transform::TransformBundle,
+    core::{frame_limiter::FrameRateLimitStrategy, Time, transform::TransformBundle},
     prelude::*,
     renderer::{
         plugins::{RenderFlat2D, RenderToWindow},
@@ -54,17 +54,17 @@ fn main() -> amethyst::Result<()> {
 fn get_server_config() -> LaminarConfig {
     LaminarConfig {
         blocking_mode: false,
-        idle_connection_timeout: Duration::from_millis(1000),
-        heartbeat_interval: Some(Duration::from_millis(10)),
+        idle_connection_timeout: Duration::from_millis(10000),
+        heartbeat_interval: Some(Duration::from_millis(1000)),
         max_packet_size: 16384,
         max_fragments: 18,
         fragment_size: 4098,
         fragment_reassembly_buffer_size: 1450,
         receive_buffer_max_size: 4098,
-        rtt_smoothing_factor: 0.5,
-        rtt_max_value: 500,
+        rtt_smoothing_factor: 0.1,
+        rtt_max_value: 1000,
         socket_event_buffer_size: 4098,
-        socket_polling_timeout: Some(Duration::from_millis(100)),
+        socket_polling_timeout: Some(Duration::from_millis(1)),
         max_packets_in_flight: 10,
     }
 }
@@ -72,17 +72,17 @@ fn get_server_config() -> LaminarConfig {
 fn get_client_config() -> LaminarConfig {
     LaminarConfig {
         blocking_mode: false,
-        idle_connection_timeout: Duration::from_millis(1000),
-        heartbeat_interval: Some(Duration::from_millis(10)),
+        idle_connection_timeout: Duration::from_millis(10000),
+        heartbeat_interval: Some(Duration::from_millis(100)),
         max_packet_size: 16384,
         max_fragments: 18,
         fragment_size: 4098,
         fragment_reassembly_buffer_size: 1450,
         receive_buffer_max_size: 4098,
-        rtt_smoothing_factor: 0.5,
-        rtt_max_value: 500,
+        rtt_smoothing_factor: 0.1,
+        rtt_max_value: 1000,
         socket_event_buffer_size: 4098,
-        socket_polling_timeout: Some(Duration::from_millis(100)),
+        socket_polling_timeout: Some(Duration::from_millis(1)),
         max_packets_in_flight: 10,
     }
 }
@@ -112,13 +112,19 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
         .with_bundle(systems::ClientSystemBundle)? 
         .with(systems::PlayerSystem{p1: None}, "player_system", &["input_system"])
         .with(systems::MapSystem,    "map_system", &[]);
-
-
-    let mut game = Application::new(
-        resources, 
-        states::GamePlayState,
-        game_data,
-    )?;
+    
+    let mut game = Application::build(resources, states::GamePlayState)?
+        .with_frame_limit(
+            FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
+            144,
+        )
+        .build(game_data)?;
+    
+    // let mut game = Application::new(
+    //     resources, 
+    //     states::GamePlayState,
+    //     game_data,
+    // )?;
 
     game.run();
     Ok(())
@@ -134,11 +140,18 @@ fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
         .with(systems::AuthSystem, "auth_system", &[])
         .with(systems::PlayerManSystem{new_players: Vec::<Pack>::new()}, "playerman_system", &[]);
 
-    let mut game = Application::new(
-        resources, 
-        states::ServerState{},
-        game_data,
-    )?;
+    let mut game = Application::build(resources, states::ServerState)?
+        .with_frame_limit(
+            FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
+            144,
+        )
+        .build(game_data)?;
+    
+    // let mut game = Application::new(
+    //     resources, 
+    //     states::ServerState{},
+    //     game_data,
+    // )?;
 
     game.run();
     Ok(())

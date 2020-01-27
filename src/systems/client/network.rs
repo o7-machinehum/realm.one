@@ -13,7 +13,7 @@ use crate::constants;
 use crate::network::{Pack, Cmd, IO};
 use crate::resources::ClientStatus;
 use crate::map::Room;
-use crate::components::PlayerList;
+use crate::components::{PlayerList, Action};
 
 /// A simple system that sends a ton of messages to all connections.
 /// In this case, only the server is connected.
@@ -73,11 +73,13 @@ impl<'a> System<'a> for ClientSystem {
         // frame number.
         let server_addr = constants::SERVER_IP.parse().unwrap();
         
-        for frame in sim_time.sim_frames_to_run() {
+        // for frame in sim_time.sim_frames_to_run() {
+        if sim_time.should_send_message_now() {
             if !status.connected {
+                info!("We are not connected ready player 1");
                 let packet2 = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0, None);  
                 status.connected = true;
-                net.send(server_addr, &packet2.to_bin());
+                net.send_with_requirements(server_addr, &packet2.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
             }
             else {
                 for resp in io.o.pop() {
@@ -85,12 +87,14 @@ impl<'a> System<'a> for ClientSystem {
                 }
             }
         }
-        
+
         // Incoming packets
         for event in channel.read(&mut self.reader) {
             match event {
                 NetworkSimulationEvent::Message(addr, payload) => {
-                    io.i.push(Pack::from_bin(payload.to_vec())); // Add the pack to the IO vector
+                    if *payload != b"ok".to_vec() {
+                        io.i.push(Pack::from_bin(payload.to_vec())); // Add the pack to the IO vector
+                    }
                 }
                 NetworkSimulationEvent::Connect(addr) => info!("New client connection: {}", addr),
                 NetworkSimulationEvent::Disconnect(addr) => {
