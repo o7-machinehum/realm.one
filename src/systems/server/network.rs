@@ -71,6 +71,8 @@ impl<'a> System<'a> for ServerSystem {
                 NetworkSimulationEvent::Message(addr, payload) => {
                     let mut pk = Pack::from_bin(payload.to_vec());
                     pk.addr = Some(addr.clone());  // Update the client addr
+                    info!("Package: {:?}", pk);
+                    net.send(*addr, b"ok");        // Respond
                     io.i.push(pk);
                 }
                 NetworkSimulationEvent::Connect(addr) => {
