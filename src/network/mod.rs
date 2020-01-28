@@ -10,11 +10,9 @@ use crate::components::{PlayerComponent, Action};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Cmd {
-    Nothing,
     Ping,
     Connect(String),
     TransferMap(String, String),
-    RecivedMap,
     InsertPlayer(PlayerComponent), 
     Action(Action),
 }

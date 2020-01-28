@@ -5,7 +5,7 @@ use amethyst::{
 };
 use std::time::Instant;
 use serde::{Serialize, Deserialize};
-use crate::constants;
+use crate::{constants, components::Action};
 use std::net::{SocketAddr};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -48,6 +48,13 @@ impl PlayerComponent {
     pub fn new(p: PlayerComponent) -> Self {
         p 
     }
+
+    pub fn action(&mut self, act: Action) {
+        match act {
+            Action::Move(dir) => self.walk(),
+            _=> (),
+        }
+    }
     
     pub fn update_orientation(&mut self, x: &f32, y: &f32) {
         let x = *x;
@@ -64,9 +71,13 @@ impl PlayerComponent {
         }
     }
     
-    pub fn walk(&mut self, x: &f32, y: &f32) {
-        self.x += *x * constants::PLAYER_MOVE;
-        self.y += *y * constants::PLAYER_MOVE;
+    pub fn walk(&mut self) {
+        match self.orientation {
+            Orientation::North => self.y += constants::PLAYER_MOVE,
+            Orientation::South => self.y -= constants::PLAYER_MOVE,
+            Orientation::East  => self.x += constants::PLAYER_MOVE,
+            Orientation::West  => self.x -= constants::PLAYER_MOVE,
+        }
     }
 
     pub fn x(&self) -> f32 {
