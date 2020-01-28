@@ -1,11 +1,12 @@
 use amethyst::{
     core::{SystemDesc},
     derive::SystemDesc,
-    ecs::{Write, System, SystemData, World},
+    ecs::{Write, Read, System, SystemData, World},
 };
 
 use crate::network::{Pack, IO, Cmd};
 use crate::components::{PlayerList, Action};
+use crate::map::{MapList, Room};
 use log::info;
 
 /// A simple system that receives a ton of network events.
@@ -16,9 +17,10 @@ impl<'a> System<'a> for PlayerManSystem {
     type SystemData = (
         Write <'a, IO>,
         Write<'a, PlayerList>,
+        Read <'a, MapList>,
     );
 
-    fn run(&mut self, (mut io, mut players): Self::SystemData) {
+    fn run(&mut self, (mut io, mut players, maps): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::Action(act) => {

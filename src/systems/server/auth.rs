@@ -1,15 +1,13 @@
 use amethyst::{
     core::{SystemDesc},
     derive::SystemDesc,
-    ecs::{Write, System, SystemData, World},
+    ecs::{Write, Read, System, SystemData, World},
     ecs,
 };
 
 use std::{
     fs::File,
 };
-
-use std::io::Read;
 
 use log::info;
 use crate::network::{Pack, Cmd, IO};
@@ -71,7 +69,7 @@ impl<'a> System<'a> for AuthSystem {
     type SystemData = (
         Write <'a, IO>,
         Write <'a, PlayerList>,
-        ecs::Read <'a, MapList>,
+        Read <'a, MapList>,
     );
 
     fn run(&mut self, (mut io, mut pl, maps): Self::SystemData) {

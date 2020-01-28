@@ -16,6 +16,7 @@ use std::{
 
 use log::info;
 use crate::constants;
+use crate::components::Orientation;
 use crate::mech::{colision};
 use stringreader::StringReader;
 
@@ -163,16 +164,21 @@ impl Room {
     }
 
     // Check to see if the resulting position is inside the map
-    pub fn allowed_move(&self, pos: &Transform, horizontal: f32, vertical: f32, adj: Adj) -> bool {
+    pub fn allowed_move(&self, pos: &Transform, facing: &Orientation) -> bool {
+        let adj: Adj = self.get_adj(pos);
         let (x, y) = Room::get_pos(pos);
-        let north = (vertical > 0.)
+
+        let north = (*facing == Orientation::North)
             && ((y >= (self.map.height as i32 - constants::TILE_PER_PLAYER as i32))
                 || colision(&adj.n));
-        let east = (horizontal > 0.)
+        
+        let east = (*facing == Orientation::East)
             && ((x >= (self.map.width as i32 - constants::TILE_PER_PLAYER as i32))
                 || colision(&adj.e));
-        let south = (vertical < 0.) && ((y == 0) || colision(&adj.s));
-        let west = (horizontal < 0.) && ((x == 0) || colision(&adj.w));
+        
+        let south = (*facing == Orientation::South) && ((y == 0) || colision(&adj.s));
+        
+        let west = (*facing == Orientation::West) && ((x == 0) || colision(&adj.w));
 
         !north && !east && !south && !west
     }
