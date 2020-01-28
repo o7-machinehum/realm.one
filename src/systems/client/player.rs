@@ -75,7 +75,7 @@ impl<'s> System<'s> for PlayerSystem{
 
                     let adj: Adj = room.get_adj(tr);
                     if room.allowed_move(tr, horizontal, vertical, adj) {
-                        player.walk(&horizontal, &vertical);
+                        player.walk(); // Walk one step in forward direction
                         tr.set_translation_xyz(player.x(), player.y(), player.z()); 
                         io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                     }

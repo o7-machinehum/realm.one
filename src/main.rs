@@ -88,7 +88,6 @@ fn get_client_config() -> LaminarConfig {
 }
 
 fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
-    // let socket = LaminarSocket::bind("0.0.0.0:3455")?;
     let socket = LaminarSocket::bind_with_config(constants::CLIENT_IP, get_client_config())?;
     
     let display_config = resources.join("display_config.ron");
@@ -111,7 +110,7 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
         .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
         .with_bundle(systems::ClientSystemBundle)? 
         .with(systems::PlayerSystem{p1: None, timer: None}, "player_system", &["input_system"])
-        .with(systems::MapSystem,    "map_system", &[]);
+        .with(systems::MapSystem, "map_system", &[]);
     
     let mut game = Application::build(resources, states::GamePlayState)?
         .with_frame_limit(
@@ -119,26 +118,19 @@ fn client(resources: std::path::PathBuf) -> amethyst::Result<()> {
             144,
         )
         .build(game_data)?;
-    
-    // let mut game = Application::new(
-    //     resources, 
-    //     states::GamePlayState,
-    //     game_data,
-    // )?;
 
     game.run();
     Ok(())
 }
 
 fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
-    // let socket = LaminarSocket::bind("0.0.0.0:3456")?;
     let socket = LaminarSocket::bind_with_config(constants::SERVER_IP, get_server_config())?;
         
     let game_data = GameDataBuilder::default()
         .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
         .with_bundle(systems::ServerSystemBundle)? 
         .with(systems::AuthSystem, "auth_system", &[])
-        .with(systems::PlayerManSystem{new_players: Vec::<Pack>::new()}, "playerman_system", &[]);
+        .with(systems::PlayerManSystem, "playerman_system", &[]);
 
     let mut game = Application::build(resources, states::ServerState)?
         .with_frame_limit(
@@ -146,12 +138,6 @@ fn server(resources: std::path::PathBuf) -> amethyst::Result<()> {
             144,
         )
         .build(game_data)?;
-    
-    // let mut game = Application::new(
-    //     resources, 
-    //     states::ServerState{},
-    //     game_data,
-    // )?;
 
     game.run();
     Ok(())

@@ -138,7 +138,7 @@ impl Room {
     }
 
     // Check to see if the resulting position is inside the map
-    pub fn allowed_move(&self, pos: &Transform, horizontal: f32, vertical: f32, adj: Adj) -> bool{
+    pub fn allowed_move(&self, pos: &Transform, horizontal: f32, vertical: f32, adj: Adj) -> bool {
         let (x, y) = Room::get_pos(pos);
         let north = (vertical > 0.)
             && ((y >= (self.map.height as i32 - constants::TILE_PER_PLAYER as i32))

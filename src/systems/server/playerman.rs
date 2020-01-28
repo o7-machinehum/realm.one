@@ -10,9 +10,7 @@ use log::info;
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
-pub struct PlayerManSystem {
-    pub new_players: Vec<Pack>, 
-}
+pub struct PlayerManSystem;
 
 impl<'a> System<'a> for PlayerManSystem {
     type SystemData = (
@@ -20,12 +18,16 @@ impl<'a> System<'a> for PlayerManSystem {
         Write<'a, PlayerList>,
     );
 
-    fn run(&mut self, (mut io, players): Self::SystemData) {
+    fn run(&mut self, (mut io, mut players): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::Action(act) => {
                     info!("Action from Address: {:?}, Action: {:?}", element.ip(), element.cmd);
-                    // io.o.push(insert_map(packet.to_string(), element.ip())); 
+                    for mut player in &mut players.list {
+                        if player.ip == element.ip().unwrap() {
+                            player.action(act.clone());     // Do the thing
+                        }
+                    }
                     // io.o.push(ready_player_one(element.ip()));
                 },
                 _ => (io.i.push(element)), 

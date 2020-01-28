@@ -76,8 +76,10 @@ impl<'a> System<'a> for ClientSystem {
         // for frame in sim_time.sim_frames_to_run() {
         if sim_time.should_send_message_now() {
             if !status.connected {
-                info!("We are not connected ready player 1");
-                let packet2 = Pack::new(Cmd::Connect("pubkey or some shit".to_string()), 0, None);  
+                info!("We are not connected, ready player 1");
+                // Proof pack
+                // PlayerName.<unixtime> <sign(PlayerName.<unixtime>)>
+                let packet2 = Pack::new(Cmd::Connect("Turnip 1580235330 SignatureHere".to_string()), 0, None);  
                 status.connected = true;
                 net.send_with_requirements(server_addr, &packet2.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
             }

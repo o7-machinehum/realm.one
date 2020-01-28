@@ -1,7 +1,5 @@
-
-
 use serde::{Serialize, Deserialize};
-use crate::components::{Orientation};
+use crate::components::{Orientation, PlayerComponent};
 
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -10,6 +8,11 @@ pub enum Action {
     Move(Orientation),
     Attack(u32),
     UseItem(u32),
+}
+
+pub fn verify(act: Action, mut player: &PlayerComponent) -> bool {
+
+    true 
 }
 
 // #[derive(Serialize, Deserialize, Debug, Clone)]
