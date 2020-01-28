@@ -9,8 +9,9 @@ use amethyst::{
 extern crate tiled;
 use std::{
     fs::File,
-    io::BufReader,
+    io::{BufReader, Read},
     path::Path,
+    fs,
 };
 
 use log::info;
@@ -75,16 +76,36 @@ impl SpritesContainer {
     }
 }
 
+// MapList for the server
+pub struct MapList {
+    pub list: Vec<Room>,
+}
+
+impl Default for MapList {
+    fn default() -> Self {
+        Self{ list: Vec::new(), } 
+    }
+}
+
+impl MapList {
+    pub fn add(&mut self, file_name: String) {
+        self.list.push(Room::new(file_name));
+    }
+}
+
 pub struct Room {
     pub map: tiled::Map,
     pub xsize: usize,
     pub tile_ent: Vec<Entity>,
     pub update: bool,
+    pub raw: String,
+    pub name: String,
 }
 
 impl Default for Room {
     fn default() -> Self { 
-        let file = File::open(&Path::new(&"resources/maps/first.tmx".to_string())).unwrap();
+        let file_name =  "resources/maps/first.tmx".to_string();
+        let mut file = File::open(&Path::new(&file_name)).unwrap();
         let reader = BufReader::new(file);
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
         
@@ -93,14 +114,16 @@ impl Default for Room {
             map,
             tile_ent: Vec::new(),
             update: true,
+            raw: fs::read_to_string(file_name.clone()).unwrap(),
+            name: file_name,
         }
     }
 }
 
 impl Room {
     pub fn new(file_name: String) -> Self {
-        let file = File::open(&Path::new(&file_name)).unwrap();
-    	let reader = BufReader::new(file);
+        let mut file = File::open(&Path::new(&file_name)).unwrap();
+        let reader = BufReader::new(file);
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
 
         Self {
@@ -108,6 +131,8 @@ impl Room {
             map, 
             tile_ent: Vec::new(),
             update: true,
+            raw: fs::read_to_string(file_name.clone()).unwrap(),
+            name: file_name,
         }
     }
 

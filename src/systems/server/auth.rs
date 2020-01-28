@@ -2,15 +2,18 @@ use amethyst::{
     core::{SystemDesc},
     derive::SystemDesc,
     ecs::{Write, System, SystemData, World},
+    ecs,
 };
 
 use std::{
     fs::File,
 };
+
 use std::io::Read;
 
 use log::info;
 use crate::network::{Pack, Cmd, IO};
+use crate::map::{MapList, Room};
 use crate::components::{PlayerComponent, Orientation, PlayerList};
 use std::net::{SocketAddr};
 
@@ -28,14 +31,20 @@ fn authenticate(proof: String) -> Option<String> {
     
     info!("Name: {}, time: {}, Signature: {}", v[2], v[1], v[0]); 
     // Verify player here
+    // |
+    // |
+    // Verify player here
     Some(v[2].to_string())
 }
 
-fn insert_map(ip: Option<SocketAddr>, room: String) -> Pack {
-    let mut file = File::open(&room).expect("Unable to open map file"); 
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("Failed to convert to string");
-    Pack::new(Cmd::TransferMap(room, contents.to_string()), 0, ip)
+fn insert_map(room: &String, maps: &Vec<Room>) -> String {
+    // Find the map in the map vector
+    for map in maps {
+        if map.name == *room {
+            return map.raw.clone();
+        }
+    }
+    "fuck".to_string()
 }
 
 fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
@@ -62,9 +71,10 @@ impl<'a> System<'a> for AuthSystem {
     type SystemData = (
         Write <'a, IO>,
         Write <'a, PlayerList>,
+        ecs::Read <'a, MapList>,
     );
 
-    fn run(&mut self, (mut io, mut pl): Self::SystemData) {
+    fn run(&mut self, (mut io, mut pl, maps): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::Connect(packet) => {
@@ -72,7 +82,9 @@ impl<'a> System<'a> for AuthSystem {
                         Some(s) => {
                             let player = ready_player_one(element.ip(), s);
                             let ip = player.ip;
-                            io.o.push(insert_map(Some(ip), player.room.clone())); 
+                            let map = insert_map(&player.room, &maps.list); 
+
+                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone(), map), 0, Some(ip))); 
                             io.o.push(Pack::new(Cmd::InsertPlayer(player), 0, Some(ip)));
                         },
                         None => (),
