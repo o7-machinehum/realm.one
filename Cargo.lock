@@ -2400,6 +2400,7 @@ dependencies = [
  "bincode 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "laminar 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nalgebra 0.19.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "ron 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.104 (registry+https://github.com/rust-lang/crates.io-index)",
  "stringreader 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",

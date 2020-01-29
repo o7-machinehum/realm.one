@@ -7,6 +7,7 @@ use std::time::Instant;
 use serde::{Serialize, Deserialize};
 use crate::{constants, components::Action};
 use std::net::{SocketAddr};
+use nalgebra::base::Vector3;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Orientation {
@@ -90,6 +91,10 @@ impl PlayerComponent {
 
     pub fn z(&self) -> f32 {
         1.0 
+    }
+
+    pub fn xyz(&self) -> Vector3<f32> {
+        Vector3::new(self.x, self.y, self.z()) 
     }
 
     pub fn trans(&self) -> Transform {

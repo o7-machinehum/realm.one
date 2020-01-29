@@ -33,7 +33,14 @@ impl<'s> System<'s> for PlayerManSystem{
                         if player.id == new.id {
                             info!("Updating Player: {:?}", player);
                             *player = new.clone();
-                            transform.set_translation_xyz(player.x(), player.y(), player.z()); 
+
+                            info!("{:?}", *transform.translation());
+                            info!("{:?}", new.xyz());
+
+                            if *transform.translation() != new.xyz() { 
+                                info!("Replacing Translation");
+                                transform.set_translation(player.xyz()); 
+                            }
                         }
                     }        
                 }, 
