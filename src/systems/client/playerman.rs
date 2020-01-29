@@ -30,7 +30,7 @@ impl<'s> System<'s> for PlayerManSystem{
             match element.cmd {
                 Cmd::UpdatePlayer(new) => {
                     for (mut transform, mut player, mut sprite_render) in (&mut transforms, &mut players, &mut sprite_renders).join() { 
-                        if player.id == new.id {
+                        if player.name == new.name {
                             info!("Updating Player: {:?}", player);
                             *player = new.clone();
 

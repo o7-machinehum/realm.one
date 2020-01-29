@@ -50,10 +50,9 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
    
     // Dig through database to find the correct player by name = name 
     PlayerComponent {
-        id: 0,
+        name,
         ip: ip.unwrap(),
         modified: true,
-        name,
         room: "resources/maps/townCompress2.tmx".to_string(),
         x: 8.0,
         y: 8.0,

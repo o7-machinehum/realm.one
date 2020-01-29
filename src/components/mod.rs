@@ -1,6 +1,3 @@
-mod id;
-pub use self::id::IdNum;
-
 mod player;
 pub use self::player::PlayerComponent;
 pub use self::player::PlayerList;
