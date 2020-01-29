@@ -73,8 +73,6 @@ impl<'s> System<'s> for PlayerSystem{
                     self.timer = Some(now.clone());
                     sprite_renders.insert(p1, player.get_orientated(&s.sprites)).expect("Failed to insert orientated player!");
 
-                    // let adj: Adj = room.get_adj(tr);
-                    //if room.allowed_move(tr, horizontal, vertical, adj) {
                     if room.allowed_move(tr, &player.orientation) {
                         player.walk(); // Walk one step in forward direction
                         tr.set_translation_xyz(player.x(), player.y(), player.z()); 

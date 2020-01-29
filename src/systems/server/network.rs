@@ -69,10 +69,10 @@ impl<'a> System<'a> for ServerSystem {
         for event in channel.read(&mut self.reader) {
             match event {
                 NetworkSimulationEvent::Message(addr, payload) => {
+                    info!("Package: {:?}", payload);
                     let mut pk = Pack::from_bin(payload.to_vec());
                     pk.addr = Some(addr.clone());  // Update the client addr
-                    info!("Package: {:?}", pk);
-                    net.send(*addr, b"ok");        // Respond
+                    // net.send(*addr, b"ok");        // Respond
                     io.i.push(pk);
                 }
                 NetworkSimulationEvent::Connect(addr) => {
@@ -100,7 +100,9 @@ impl<'a> System<'a> for ServerSystem {
                     },
                     // Broadcast message
                     None => {
+                        info!("Broadcasting pack: {:?}", resp);
                         for addr in self.clients.clone() {
+                            info!("Sending pack: {:?} to: {:?}", resp, addr);
                             net.send_with_requirements(addr, &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
                         }
                     }

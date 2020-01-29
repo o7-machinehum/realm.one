@@ -27,21 +27,42 @@ impl<'a> System<'a> for PlayerManSystem {
                     info!("Action from Address: {:?}, Action: {:?}", element.ip(), element.cmd);
                     for mut player in &mut players.list {
                         if player.ip == element.ip().unwrap() {
-                            player.action(act.clone());     // Do the thing
+                            // Get room the player is in
+                            let mut k : usize = 0;
+                            for x in 0..maps.list.len() {
+                                if maps.list[x].name == player.room {
+                                    k = x;
+                                    break
+                                }
+                            };
+
+                            let pk = match act {
+                                Action::Move(dir) => {
+                                    player.orientation = dir.clone();
+                                    info!("Checking to see if walk is allowed"); 
+                                    if maps.list[k].allowed_move(&player.trans(), &player.orientation) {
+                                        info!("Player Walking"); 
+                                        player.walk();
+                                        Some(Pack::new(Cmd::UpdatePlayer(player.clone()), 0, None))
+                                    }
+                                    else {
+                                        None
+                                    }
+                                },
+                                _ => None, 
+                            };
+
+                            info!("{:?}", pk);
+                            
+                            match pk {
+                                Some(pk) => io.o.push(pk),
+                                None => (),
+                            }
                         }
                     }
-                    // io.o.push(ready_player_one(element.ip()));
                 },
                 _ => (io.i.push(element)), 
             }
         }
-        
-        // for player in &mut players.list {     // For all the players in game
-        //     if player.modified {              // If one has been modified
-        //         self.new_players.push(Pack::new(Cmd::InsertPlayers(Vec::new()), 0)); // Send out the new pack
-        //         info!("Inserting Player {:?}", self.new_players); 
-        //         player.modified = false; 
-        //     }
-        // }
-    } 
+    }
 }

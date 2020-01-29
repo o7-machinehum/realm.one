@@ -15,6 +15,7 @@ pub enum Cmd {
     TransferMap(String, String),
     InsertPlayer(PlayerComponent), 
     Action(Action),
+    UpdatePlayer(PlayerComponent),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -26,15 +27,10 @@ pub struct Pack {
 
 impl Pack {
     pub fn new(cmd: Cmd, id: u32, ip: Option<SocketAddr>) -> Self {
-        let ip_new = match ip {
-            Some(ip) => ip,
-            None => SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 3456),
-        };
-
         Self {
             cmd,
             id,
-            addr: Some(ip_new), 
+            addr: ip, 
         }
     }
     

@@ -4,8 +4,11 @@ use amethyst::{
 
 use crate::network::{IO};
 use crate::map::{Room, MapList};
+use crate::appconfig::{AppConfig};
 
-pub struct ServerState;
+pub struct ServerState{
+    pub config: AppConfig,
+}
 
 impl SimpleState for ServerState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -17,6 +20,7 @@ impl SimpleState for ServerState {
         maps.add("resources/maps/townCompress.tmx".to_string());
         maps.add("resources/maps/townCompress2.tmx".to_string());
 
+        world.insert(self.config.clone());
         world.insert(io);
         world.insert(maps);
     }

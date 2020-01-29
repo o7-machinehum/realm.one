@@ -82,6 +82,7 @@ impl<'a> System<'a> for AuthSystem {
                             let ip = player.ip;
                             let map = insert_map(&player.room, &maps.list); 
 
+                            pl.list.push(player.clone()); 
                             io.o.push(Pack::new(Cmd::TransferMap(player.room.clone(), map), 0, Some(ip))); 
                             io.o.push(Pack::new(Cmd::InsertPlayer(player), 0, Some(ip)));
                         },
