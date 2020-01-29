@@ -1,0 +1,4 @@
+AppConfig(
+    server_ip: "127.0.0.2:3456",
+    client_ip: "127.0.3.1:3455",
+)

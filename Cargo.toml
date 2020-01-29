@@ -13,6 +13,7 @@ serde = { version = "1", features = ["derive"] }
 bincode = "1.2.1"
 stringreader = "0.1.1"
 laminar = "0.3.2"
+ron = "*"
 
 [features]
 default = ["vulkan"]

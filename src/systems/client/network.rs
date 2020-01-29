@@ -9,6 +9,7 @@ use amethyst::{
 };
 use log::{info, error};
 use crate::network;
+use crate::appconfig::{AppConfig};
 use crate::constants;
 use crate::network::{Pack, Cmd, IO};
 use crate::resources::ClientStatus;
@@ -64,14 +65,15 @@ impl<'a> System<'a> for ClientSystem {
         Write<'a, TransportResource>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
         Write <'a, IO>,
+        Read<'a, AppConfig>,
     );
 
-    fn run(&mut self, (mut status, sim_time, mut net, channel, mut io): Self::SystemData) {
+    fn run(&mut self, (mut status, sim_time, mut net, channel, mut io, conf): Self::SystemData) {
         // Use method `sim_time.sim_frames_to_run()` to determine if the system should send a
         // message this frame. If, for example, the ECS frame rate is slower than the simulation
         // frame rate, this code block will run until it catches up with the expected simulation
         // frame number.
-        let server_addr = constants::SERVER_IP.parse().unwrap();
+        // let server_addr = constants::SERVER_IP.parse().unwrap();
         
         // for frame in sim_time.sim_frames_to_run() {
         if sim_time.should_send_message_now() {
@@ -81,11 +83,11 @@ impl<'a> System<'a> for ClientSystem {
                 // PlayerName.<unixtime> <sign(PlayerName.<unixtime>)>
                 let packet2 = Pack::new(Cmd::Connect("Turnip 1580235330 SignatureHere".to_string()), 0, None);  
                 status.connected = true;
-                net.send_with_requirements(server_addr, &packet2.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
+                net.send_with_requirements(conf.server_ip.parse().unwrap(), &packet2.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
             }
             else {
                 for resp in io.o.pop() {
-                    net.send_with_requirements(server_addr, &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
+                    net.send_with_requirements(conf.server_ip.parse().unwrap(), &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
                 }
             }
         }
@@ -95,7 +97,9 @@ impl<'a> System<'a> for ClientSystem {
             match event {
                 NetworkSimulationEvent::Message(addr, payload) => {
                     if *payload != b"ok".to_vec() {
-                        io.i.push(Pack::from_bin(payload.to_vec())); // Add the pack to the IO vector
+                        let pl =  Pack::from_bin(payload.to_vec());
+                        info!("Payload: {:?}", pl);
+                        io.i.push(pl); // Add the pack to the IO vector
                     }
                 }
                 NetworkSimulationEvent::Connect(addr) => info!("New client connection: {}", addr),

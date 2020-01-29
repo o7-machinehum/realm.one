@@ -10,8 +10,11 @@ use crate::map;
 use crate::components::{PlayerComponent, PlayerList};
 use crate::resources::ClientStatus;
 use crate::network::IO;
+use crate::appconfig::{AppConfig};
 
-pub struct GamePlayState; 
+pub struct GamePlayState {
+    pub config: AppConfig,
+}
 
 impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -28,7 +31,8 @@ impl SimpleState for GamePlayState {
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
-
+        	
+        world.insert(self.config.clone());
         world.insert(status);
         world.insert(sprites);
         world.insert(room);
