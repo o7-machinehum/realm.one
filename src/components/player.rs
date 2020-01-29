@@ -31,10 +31,9 @@ impl Default for PlayerList {
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct PlayerComponent {
-    pub id: u32,       // Change this to idNum
+    pub name: String,
     pub ip: SocketAddr, 
     pub modified: bool, 
-    pub name: String,
     pub room: String,
     pub x: f32,          
     pub y: f32, 
