@@ -1,5 +1,5 @@
 use amethyst::{
-    core::{frame_limiter::FrameRateLimitStrategy, Time, transform::TransformBundle},
+    core::{frame_limiter::FrameRateLimitStrategy, transform::TransformBundle},
     prelude::*,
     renderer::{
         plugins::{RenderFlat2D, RenderToWindow},
@@ -8,18 +8,17 @@ use amethyst::{
     },
     input::InputBundle,
     utils::application_root_dir,
-    // network::simulation::{udp::UdpNetworkBundle, NetworkSimulationEvent, TransportResource},
-    network::simulation::{laminar::{LaminarNetworkBundle, LaminarSocket, LaminarConfig}, NetworkSimulationEvent, TransportResource},
+    network::simulation::{laminar::{LaminarNetworkBundle, LaminarSocket, LaminarConfig}},
 };
 use ron::de::from_reader;
-use crate::network::{Pack};
+
 use crate::appconfig::{AppConfig};
 
-use std::net::{SocketAddr, IpAddr, Ipv4Addr};
+
 use std::env; 
 use log::info;
 use core::time::Duration;
-use std::net::UdpSocket;
+
 
 use std::{
     fs::File,
@@ -39,7 +38,7 @@ mod appconfig;
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
     let args: Vec<String> = env::args().collect();
-    let mut rtn : amethyst::Result<()> = Ok(()); 
+    let rtn: amethyst::Result<()>; 
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
 

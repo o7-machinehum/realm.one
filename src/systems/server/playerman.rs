@@ -1,12 +1,11 @@
 use amethyst::{
-    core::{SystemDesc},
     derive::SystemDesc,
-    ecs::{Write, Read, System, SystemData, World},
+    ecs::{Write, Read, System, SystemData},
 };
 
 use crate::network::{Pack, IO, Cmd};
 use crate::components::{PlayerList, Action};
-use crate::map::{MapList, Room};
+use crate::map::{MapList};
 use log::info;
 
 /// A simple system that receives a ton of network events.

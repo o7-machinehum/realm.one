@@ -1,20 +1,19 @@
 use amethyst::{
-    core::{frame_limiter::FrameRateLimitStrategy, Time, bundle::SystemBundle},
+    core::{bundle::SystemBundle},
     core::{SystemDesc},
-    derive::SystemDesc,
-    ecs::{Entities, Read, Join, System, SystemData, World, Write, WriteStorage, DispatcherBuilder},
+    ecs::{Read, System, SystemData, World, Write, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
     network::simulation::{DeliveryRequirement, UrgencyRequirement, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
     Result, 
 };
 use log::{info, error};
-use crate::network;
+
 use crate::appconfig::{AppConfig};
-use crate::constants;
+
 use crate::network::{Pack, Cmd, IO};
 use crate::resources::ClientStatus;
-use crate::map::Room;
-use crate::components::{PlayerList, Action};
+
+
 
 /// A simple system that sends a ton of messages to all connections.
 /// In this case, only the server is connected.
@@ -95,7 +94,7 @@ impl<'a> System<'a> for ClientSystem {
         // Incoming packets
         for event in channel.read(&mut self.reader) {
             match event {
-                NetworkSimulationEvent::Message(addr, payload) => {
+                NetworkSimulationEvent::Message(_addr, payload) => {
                     if *payload != b"ok".to_vec() {
                         let pl =  Pack::from_bin(payload.to_vec());
                         info!("Payload: {:?}", pl);

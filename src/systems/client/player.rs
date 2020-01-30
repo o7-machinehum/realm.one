@@ -1,6 +1,6 @@
-use amethyst::core::{Transform, SystemDesc};
+use amethyst::core::{Transform};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Read, Write, Entities, Entity, System, SystemData, World, WriteStorage};
+use amethyst::ecs::{Read, Write, Entities, Entity, System, SystemData, WriteStorage};
 use amethyst::input::InputHandler;
 use amethyst::renderer::SpriteRender;
 
@@ -9,7 +9,7 @@ use log::info;
 
 use crate::components::{PlayerComponent, Action};
 use crate::key_bindings::{MovementBindingTypes, AxisBinding};
-use crate::map::{Room, Adj, SpritesContainer};
+use crate::map::{Room, SpritesContainer};
 use crate::network::{Pack, IO, Cmd};
 use crate::constants;
 
@@ -53,7 +53,7 @@ impl<'s> System<'s> for PlayerSystem{
         match self.p1 {
             Some(p1) => {
                 let now = Instant::now();
-                let mut player = players.get_mut(p1).unwrap();
+                let player = players.get_mut(p1).unwrap();
 
                 if now.duration_since(self.timer.unwrap()).as_millis() >= constants::MOVEMENT_DELAY_MS {
                     let horizontal = input

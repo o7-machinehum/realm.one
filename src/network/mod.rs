@@ -1,10 +1,6 @@
-use amethyst::{
-    ecs::{Component, VecStorage},
-    shrev::ReaderId,
-};
 use serde::{Serialize, Deserialize};
 use bincode;
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::net::{SocketAddr};
 
 use crate::components::{PlayerComponent, Action};
 
@@ -37,10 +33,6 @@ impl Pack {
     
     pub fn ip(&self) -> Option<SocketAddr> {
         self.addr
-    }
-
-    pub fn update_ip(&mut self, ip: SocketAddr) {
-        self.addr = Some(ip);
     }
 
     pub fn from_bin(bin: Vec<u8>) -> Self {
