@@ -22,7 +22,7 @@ impl SimpleState for GamePlayState {
         world.register::<map::TilePosition>();
         
         let sprites = SpritesContainer::new(&world, 371);
-        let room = map::Room::new("resources/maps/townCompress.tmx".to_string());
+        let room = map::Room::new("resources/maps/town.tmx".to_string());
         let player_list = PlayerList{ list: Vec::new() };
 
         let status = ClientStatus::new();

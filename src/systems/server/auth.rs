@@ -50,7 +50,7 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
     PlayerComponent {
         name,
         ip: ip.unwrap(),
-        room: "resources/maps/townCompress.tmx".to_string(),
+        room: "resources/maps/town.tmx".to_string(),
         x: 8.0,
         y: 8.0,
         north: 318,
