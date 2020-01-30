@@ -48,7 +48,7 @@ impl<'s> System<'s> for PlayerSystem{
                         .with(player, &mut players) 
                         .build());
                     self.timer = Some(Instant::now()); 
-                    },
+                },
                 _ => io.i.push(element), 
             }
         }
