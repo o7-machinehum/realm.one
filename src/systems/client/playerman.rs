@@ -1,17 +1,14 @@
 use amethyst::core::{Transform};
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Read, Write, System, SystemData, WriteStorage, Join};
-
 use amethyst::renderer::SpriteRender;
-
-
 use log::info;
 
-use crate::components::{PlayerComponent};
-
-use crate::map::{SpritesContainer};
-use crate::network::{IO, Cmd};
-
+use crate::{ 
+    components::{PlayerComponent},
+    network::Cmd,
+    resources::{IO, SpritesContainer},
+};
 
 #[derive(SystemDesc)]
 pub struct PlayerManSystem; 

@@ -7,11 +7,14 @@ use amethyst::renderer::SpriteRender;
 use std::time::Instant;
 use log::info;
 
-use crate::components::{PlayerComponent, Action};
-use crate::key_bindings::{MovementBindingTypes, AxisBinding};
-use crate::map::{Room, SpritesContainer};
-use crate::network::{Pack, IO, Cmd};
-use crate::constants;
+use crate::{
+    components::{PlayerComponent, Action},
+    key_bindings::{MovementBindingTypes, AxisBinding},
+    map::{Room},
+    network::{Pack, Cmd},
+    resources::{IO, SpritesContainer},
+    constants,
+};
 
 
 #[derive(SystemDesc)]

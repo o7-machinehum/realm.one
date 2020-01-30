@@ -10,19 +10,15 @@ use amethyst::{
     utils::application_root_dir,
     network::simulation::{laminar::{LaminarNetworkBundle, LaminarSocket, LaminarConfig}},
 };
-use ron::de::from_reader;
-
-use crate::appconfig::{AppConfig};
-
-
-use std::env; 
-use log::info;
-use core::time::Duration;
-
-
 use std::{
     fs::File,
 };
+
+use ron::de::from_reader;
+use crate::resources::{AppConfig};
+use std::env; 
+use log::info;
+use core::time::Duration;
 
 mod map;
 mod key_bindings;
@@ -33,7 +29,6 @@ mod constants;
 mod mech;
 mod network;
 mod resources;
-mod appconfig;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -66,7 +61,7 @@ fn main() -> amethyst::Result<()> {
     rtn
 }
 
-fn client(resources: std::path::PathBuf, config: appconfig::AppConfig) -> amethyst::Result<()> {
+fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<()> {
     let socket = LaminarSocket::bind_with_config(config.client_ip.clone(), get_client_config())?;
     
     let display_config = resources.join("display_config.ron");
@@ -103,7 +98,7 @@ fn client(resources: std::path::PathBuf, config: appconfig::AppConfig) -> amethy
     Ok(())
 }
 
-fn server(resources: std::path::PathBuf, config: appconfig::AppConfig) -> amethyst::Result<()> {
+fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<()> {
     let socket = LaminarSocket::bind_with_config(config.server_ip.clone(), get_server_config())?;
         
     let game_data = GameDataBuilder::default()

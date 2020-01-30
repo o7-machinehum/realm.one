@@ -8,12 +8,8 @@ use amethyst::{
 };
 use log::{info, error};
 
-use crate::appconfig::{AppConfig};
-
-use crate::network::{Pack, Cmd, IO};
-use crate::resources::ClientStatus;
-
-
+use crate::network::{Pack, Cmd};
+use crate::resources::{ClientStatus, IO, AppConfig};
 
 /// A simple system that sends a ton of messages to all connections.
 /// In this case, only the server is connected.

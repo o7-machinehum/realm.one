@@ -7,10 +7,8 @@ use amethyst::{
 };
 
 use crate::map;
-use crate::components::{PlayerComponent, PlayerList};
-use crate::resources::ClientStatus;
-use crate::network::IO;
-use crate::appconfig::{AppConfig};
+use crate::components::{PlayerComponent};
+use crate::resources::{ClientStatus, PlayerList, IO, AppConfig, SpritesContainer};
 
 pub struct GamePlayState {
     pub config: AppConfig,
@@ -23,7 +21,7 @@ impl SimpleState for GamePlayState {
         world.register::<PlayerComponent>();
         world.register::<map::TilePosition>();
         
-        let sprites = map::SpritesContainer::new(&world, 371);
+        let sprites = SpritesContainer::new(&world, 371);
         let room = map::Room::new("resources/maps/townCompress.tmx".to_string());
         let player_list = PlayerList{ list: Vec::new() };
 

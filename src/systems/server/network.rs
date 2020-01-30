@@ -7,7 +7,8 @@ use amethyst::{
 };
 
 use log::{info, error};
-use crate::network::{Pack, IO, Cmd};
+use crate::network::{Pack, Cmd};
+use crate::resources::{IO};
 use std::net::{SocketAddr};
 
 #[derive(Debug)]

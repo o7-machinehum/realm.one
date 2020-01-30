@@ -3,9 +3,11 @@ use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Read, Write, Entities, System, SystemData, WriteStorage, Entity};
 use amethyst::renderer::SpriteRender;
 
-use crate::map::{Room, TilePosition, SpritesContainer};
-
-use crate::network::{IO, Cmd};
+use crate::{
+    map::{Room, TilePosition},
+    network::Cmd,
+    resources::{IO, SpritesContainer},
+};
 
 #[derive(SystemDesc)]
 pub struct MapSystem ;

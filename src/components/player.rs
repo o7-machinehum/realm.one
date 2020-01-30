@@ -17,16 +17,6 @@ pub enum Orientation {
     North,
 }
 
-pub struct PlayerList {
-    pub list: Vec<PlayerComponent>,
-}
-
-impl Default for PlayerList {
-    fn default() -> Self {
-        Self{ list: Vec::new(), } 
-    }
-}
-
 /// Client Side player component
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
