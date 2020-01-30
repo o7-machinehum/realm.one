@@ -2,9 +2,8 @@ use amethyst::{
     prelude::*,
 };
 
-use crate::network::{IO};
-use crate::map::{Room, MapList};
-use crate::appconfig::{AppConfig};
+use crate::resources::{IO, AppConfig, MapList};
+use crate::map::{Room};
 
 pub struct ServerState{
     pub config: AppConfig,

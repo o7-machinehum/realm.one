@@ -3,12 +3,14 @@ use amethyst::{
     ecs::{Write, Read, System, SystemData},
 };
 
-
-
 use log::info;
-use crate::network::{Pack, Cmd, IO};
-use crate::map::{MapList, Room};
-use crate::components::{PlayerComponent, Orientation, PlayerList};
+use crate::{
+    network::{Pack, Cmd},
+    map::{Room},
+    components::{PlayerComponent, Orientation},
+    resources::{PlayerList, IO, MapList},
+};
+
 use std::net::{SocketAddr};
 
 /// A simple system that receives a ton of network events.
