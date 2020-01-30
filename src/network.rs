@@ -15,6 +15,7 @@ pub enum Cmd {
     RemovePlayer(SocketAddr),
 }
 
+/// Networking package. addr: None if a broadcast, Some(ip) if direct.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Pack {
     pub cmd: Cmd,

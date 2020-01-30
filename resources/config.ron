@@ -1,5 +1,9 @@
 AppConfig(
     server_ip: "3.14.71.151:3456",
-    client_ip: "192.168.10.10:3457",
-    player_name: "Turnip",
+    
+    client_ip: "192.168.10.10:3455",
+    player_name: "Turnip2",
+    
+    // player_name: "Turnip",
+    // client_ip: "192.168.10.10:3457",
 )

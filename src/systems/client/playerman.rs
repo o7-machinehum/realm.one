@@ -27,18 +27,19 @@ impl<'s> System<'s> for PlayerManSystem{
         for element in io.i.pop() {
             match element.cmd {
                 Cmd::UpdatePlayer(new) => {
-                    for (transform, player, _sprite_render) in (&mut transforms, &mut players, &mut sprite_renders).join() { 
+                    for (transform, player, sprite_render) in (&mut transforms, &mut players, &mut sprite_renders).join() { 
                         if player.name == new.name {
                             info!("Updating Player: {:?}", player);
-                            *player = new.clone();
-
-                            info!("{:?}", *transform.translation());
-                            info!("{:?}", new.xyz());
 
                             if *transform.translation() != new.xyz() { 
-                                info!("Replacing Translation");
-                                transform.set_translation(player.xyz()); 
+                                transform.set_translation(new.xyz()); 
                             }
+
+                            if player.orientation != new.orientation {
+                                sprite_render.sprite_number = new.get_dir();
+                            }
+                            
+                            *player = new.clone();
                         }
                     }        
                 }, 
