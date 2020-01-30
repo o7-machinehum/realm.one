@@ -82,6 +82,9 @@ impl<'a> System<'a> for ServerSystem {
                 NetworkSimulationEvent::Disconnect(addr) => {
                     info!("Client Disconnected: {}", addr);
                     self.clients.retain(|&x| x != *addr); 
+                    // Remove player from server and clinet side 
+                    io.i.push(Pack::new(Cmd::RemovePlayer(*addr), 0, None)); 
+                    io.o.push(Pack::new(Cmd::RemovePlayer(*addr), 0, None)); 
                 }
                 NetworkSimulationEvent::RecvError(e) => {
                     error!("Recv Error: {:?}", e);

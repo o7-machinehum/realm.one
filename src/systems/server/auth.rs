@@ -52,8 +52,7 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
     PlayerComponent {
         name,
         ip: ip.unwrap(),
-        modified: true,
-        room: "resources/maps/townCompress2.tmx".to_string(),
+        room: "resources/maps/townCompress.tmx".to_string(),
         x: 8.0,
         y: 8.0,
         north: 318,
@@ -87,16 +86,8 @@ impl<'a> System<'a> for AuthSystem {
                         },
                         None => (),
                     }
-                    // Add the other players to the game
-                    // for player in &pl.list {
-                    //     io.o.push(Pack::new(Cmd::InsertPlayer(player.clone()), 0, element.ip()));
-                    // }
-
-                    // Then probably add the monsters...
-                    // for monster in ml.list {
-                    //     io.o.push(Pack::new(Cmd::InsertMonster(monster), 0, ip));
-                    // } 
                 },
+                
                 _ => (io.i.push(element)), 
             }
         }

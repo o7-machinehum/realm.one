@@ -33,7 +33,6 @@ impl Default for PlayerList {
 pub struct PlayerComponent {
     pub name: String,
     pub ip: SocketAddr, 
-    pub modified: bool, 
     pub room: String,
     pub x: f32,          
     pub y: f32, 
