@@ -16,6 +16,7 @@ pub enum Cmd {
     InsertPlayer(PlayerComponent), 
     Action(Action),
     UpdatePlayer(PlayerComponent),
+    RemovePlayer(SocketAddr),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

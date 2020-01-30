@@ -44,6 +44,10 @@ impl<'s> System<'s> for PlayerManSystem{
                         }
                     }        
                 }, 
+                Cmd::RemovePlayer(ip) => {
+                    // Remove the player and delete the
+                    // components and entities
+                }, 
                 _ => io.i.push(element), 
             }
         }

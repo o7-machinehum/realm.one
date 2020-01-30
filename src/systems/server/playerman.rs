@@ -61,6 +61,18 @@ impl<'a> System<'a> for PlayerManSystem {
                         }
                     }
                 },
+                Cmd::RemovePlayer(ip) => {
+                    let mut p = 0;
+                    for i in 0..players.list.len() {
+                        if players.list[i].ip == *ip {
+                            info!("Removing player: {}", *ip); 
+                            p = i;
+                            break; 
+                        }
+                    }
+
+                    players.list.remove(p);
+                },
                 _ => (io.i.push(element)), 
             }
         }
