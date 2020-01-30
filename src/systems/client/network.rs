@@ -64,13 +64,6 @@ impl<'a> System<'a> for ClientSystem {
     );
 
     fn run(&mut self, (mut status, sim_time, mut net, channel, mut io, conf): Self::SystemData) {
-        // Use method `sim_time.sim_frames_to_run()` to determine if the system should send a
-        // message this frame. If, for example, the ECS frame rate is slower than the simulation
-        // frame rate, this code block will run until it catches up with the expected simulation
-        // frame number.
-        // let server_addr = constants::SERVER_IP.parse().unwrap();
-        
-        // for frame in sim_time.sim_frames_to_run() {
         if sim_time.should_send_message_now() {
             if !status.connected {
                 info!("We are not connected, ready player 1");
