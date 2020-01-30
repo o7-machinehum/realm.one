@@ -9,7 +9,7 @@ use amethyst::{
 extern crate tiled;
 use std::{
     fs::File,
-    io::{BufReader, Read},
+    io::{BufReader},
     path::Path,
     fs,
 };
@@ -106,7 +106,7 @@ pub struct Room {
 impl Default for Room {
     fn default() -> Self { 
         let file_name =  "resources/maps/first.tmx".to_string();
-        let mut file = File::open(&Path::new(&file_name)).unwrap();
+        let file = File::open(&Path::new(&file_name)).unwrap();
         let reader = BufReader::new(file);
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
         
@@ -123,7 +123,7 @@ impl Default for Room {
 
 impl Room {
     pub fn new(file_name: String) -> Self {
-        let mut file = File::open(&Path::new(&file_name)).unwrap();
+        let file = File::open(&Path::new(&file_name)).unwrap();
         let reader = BufReader::new(file);
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
 

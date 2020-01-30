@@ -3,9 +3,9 @@ use amethyst::{
     core::transform::Transform,
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
-use std::time::Instant;
+
 use serde::{Serialize, Deserialize};
-use crate::{constants, components::Action};
+use crate::{constants};
 use std::net::{SocketAddr};
 use nalgebra::base::Vector3;
 
@@ -46,13 +46,6 @@ pub struct PlayerComponent {
 impl PlayerComponent {
     pub fn new(p: PlayerComponent) -> Self {
         p 
-    }
-
-    pub fn action(&mut self, act: Action) {
-        match act {
-            Action::Move(dir) => self.walk(),
-            _=> (),
-        }
     }
     
     pub fn update_orientation(&mut self, x: &f32, y: &f32) {

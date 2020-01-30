@@ -1,6 +1,6 @@
-use amethyst::core::{Transform, SystemDesc};
+use amethyst::core::{Transform};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Read, Write, Entities, System, SystemData, World, WriteStorage, Entity};
+use amethyst::ecs::{Read, Write, Entities, System, SystemData, WriteStorage, Entity};
 use amethyst::renderer::SpriteRender;
 
 use crate::map::{Room, TilePosition, SpritesContainer};

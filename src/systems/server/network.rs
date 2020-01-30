@@ -1,12 +1,11 @@
 use amethyst::{
     core::{SystemDesc, bundle::SystemBundle},
-    derive::SystemDesc,
-    ecs::{Entities, Join, Read, Write, System, SystemData, World, WriteStorage, DispatcherBuilder},
+    ecs::{Read, Write, System, SystemData, World, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
     network::simulation::{DeliveryRequirement, UrgencyRequirement, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
     Result,
 };
-use crate::network;
+
 use log::{info, error};
 use crate::network::{Pack, IO, Cmd};
 use std::net::{SocketAddr};
@@ -94,7 +93,7 @@ impl<'a> System<'a> for ServerSystem {
         }
         
         // Send responces
-        for frame in sim_time.sim_frames_to_run() {
+        for _frame in sim_time.sim_frames_to_run() {
             for resp in io.o.pop() {
                 match resp.addr {
                     // Just send to one address 
