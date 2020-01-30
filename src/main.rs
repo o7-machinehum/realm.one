@@ -83,7 +83,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with_bundle(input_bundle)? 
         .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
         .with_bundle(systems::ClientSystemBundle)? 
-        .with(systems::PlayerSystem{p1: None, timer: None}, "player_system", &["input_system"])
+        .with(systems::PlayerSystem{p1: None, timer: None, p1_name: config.player_name.clone()}, "player_system", &["input_system"])
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::PlayerManSystem, "pm_system", &[]);
     

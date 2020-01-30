@@ -21,6 +21,7 @@ use crate::{
 pub struct PlayerSystem{ 
     pub p1: Option<Entity>,
     pub timer: Option<Instant>,
+    pub p1_name: String,
 }
 
 impl<'s> System<'s> for PlayerSystem{
@@ -38,16 +39,29 @@ impl<'s> System<'s> for PlayerSystem{
     fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
-                Cmd::InsertPlayer(play1) =>  {
-                    info!("Inserting Player"); 
-                    let player = PlayerComponent::new(play1.clone());
-                    self.p1 = Some(entities
-                        .build_entity()
-                        .with(player.trans(), &mut transforms)
-                        .with(player.get_orientated(&s.sprites), &mut sprite_renders)
-                        .with(player, &mut players) 
-                        .build());
-                    self.timer = Some(Instant::now()); 
+                Cmd::InsertPlayer(play) =>  {
+                    // If it's yourself
+                    if play.name == self.p1_name { 
+                        info!("Inserting Player 1"); 
+                        let player = PlayerComponent::new(play.clone());
+                        self.p1 = Some(entities
+                            .build_entity()
+                            .with(player.trans(), &mut transforms)
+                            .with(player.get_orientated(&s.sprites), &mut sprite_renders)
+                            .with(player, &mut players) 
+                            .build());
+                        self.timer = Some(Instant::now()); 
+                    }
+                    else {
+                        info!("Inserting Player"); 
+                        let player = PlayerComponent::new(play.clone());
+                        entities
+                            .build_entity()
+                            .with(player.trans(), &mut transforms)
+                            .with(player.get_orientated(&s.sprites), &mut sprite_renders)
+                            .with(player, &mut players) 
+                            .build();
+                    }
                 },
                 _ => io.i.push(element), 
             }

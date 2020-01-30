@@ -92,6 +92,15 @@ impl PlayerComponent {
             Orientation::West => return sprites[self.west].clone(),
         }
     }
+
+    pub fn get_dir(&self) -> usize{
+        match self.orientation {
+            Orientation::North=> self.north,
+            Orientation::South=> self.south,
+            Orientation::East => self.east,
+            Orientation::West => self.west,
+        }
+    }
 }
 
 impl Component for PlayerComponent {
