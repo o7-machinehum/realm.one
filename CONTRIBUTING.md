@@ -11,7 +11,7 @@ Maps are assembled from sprites using the ["Tiled" map editor](https://www.maped
 ## Keybindings
 The keybindings are described in the `resources/bindings.ron` file. You also need to create the proper enum variants in `src/key_bindings.rs` for our game to be able to parse the file properly.
 
-## Netoworking
+## Networking
 The project uses Amethyst Network for client/server sync.
 
 ## TODO
