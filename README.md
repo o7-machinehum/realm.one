@@ -4,7 +4,7 @@
 Realm one is an open source tile based game written in Rust using the Amethyst game engine. It is the first game that will be integrated into the distributed MMO platform [Worlds](https://github.com/Machine-Hum/Worlds). Following the implementation anyone will be able to fork this repository and add to the universe!
 
 ## Pre-Alpha Release
-Join on #realm.one on Freenode Monday February 3rd, 6PM PST for more info!
+Join on #realm.one on Freenode Monday February 3rd, 6PM PST for more info! Lets all run around togeather in game!
 
 ## Contribution
 The project is under heavy development and we are always looking for people to help out! Please see the CONTRIBUTING document for development information. Join us on IRC! (#realm.one on Freenode) [log here](https://freenode.logbot.info/realm.one). 
