@@ -1,21 +1,38 @@
 # CONTRIBUTING
+Quick notes on how this projects was made and how to contribute, to be improved in the future. This project uses the [Amethyst](https://amethyst.rs/) game engine.
 
-Quick notes on how this projects was made and how to contribute, to be
-improved in the future.
-
-This project uses the [Amethyst](https://amethyst.rs/) game engine.
-
+Join #realm.one on Freenode if you want to chat!
 
 ## Map creation
-
 Artwork comes from [OpenGameArt.org](https://opengameart.org/content/tiny-16-basic).
 
-Maps are assembled from sprites using the ["Tiled" map editor](https://www.mapeditor.org/). Which
-yields `.tmx` files we can then parse in rust using the [rs-tiled
-crate](https://github.com/mattyhall/rs-tiled).
+Maps are assembled from sprites using the ["Tiled" map editor](https://www.mapeditor.org/). Which yields `.tmx` files we can then parse in rust using the [rs-tiledcrate](https://github.com/mattyhall/rs-tiled).
 
 ## Keybindings
+The keybindings are described in the `resources/bindings.ron` file. You also need to create the proper enum variants in `src/key_bindings.rs` for our game to be able to parse the file properly.
 
-The keybindings are described in the `resources/bindings.ron` file.
-You also need to create the proper enum variants in `src/key_bindings.rs` for our game to be able
-to parse the file properly.
+## Netoworking
+The project uses Amethyst Network for client/server sync.
+
+## TODO
+There are lots of things that need to be worked on.
+
+- Character Interaction
+  - Chatting
+  - Combat mechanics
+  - Health Bar
+ 
+- Player Movement
+  - Up and Down stairs (changing map)
+  - Player should animate during walking
+
+- Monsters
+  - Need to be implemented
+
+- Items
+  - Need to be implemented
+ 
+- Creative
+  - Need more tiles
+  - Need more maps
+  - Story/Gameplay
