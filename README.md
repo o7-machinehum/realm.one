@@ -3,29 +3,53 @@
 
 Realm one is an open source tile based game written in Rust using the Amethyst game engine. It is the first game that will be integrated into the distributed MMO platform [Worlds](https://github.com/Machine-Hum/Worlds). Following the implementation anyone will be able to fork this repository and add to the universe!
 
+## Pre-Alpha Release
+Join on #realm.one on Freenode Monday February 3rd, 6PM PST for more info!
+
 ## Contribution
-The project is under heavy development and we are always looking for people to help out! Please see the CONTRIBUTING document for development information and the [specs](https://github.com/Machine-Hum/realm.one/blob/master/spec/spec.pdf) document for an outline of what we're trying to build. Join us on IRC! (#realm.one on Freenode) [log here](https://freenode.logbot.info/realm.one). Feel free to reach out!
+The project is under heavy development and we are always looking for people to help out! Please see the CONTRIBUTING document for development information. Join us on IRC! (#realm.one on Freenode) [log here](https://freenode.logbot.info/realm.one). 
 
 ### Tiles
 Tiles are taken from [here](https://opengameart.org/content/tiny-16-basic?page=1) credit to Lanea Zimmerman! Tiles are arranged using the [Tiled Map Editor](https://www.mapeditor.org/).
 
 ## Running
+
+### Client
+
 ```bash
 git clone https://github.com/Machine-Hum/realm.one
 cd realm.one
-cargo run --release server                # For the server
-cargo run client 127.0.0.1:3456           # For the client
 ```
 
-## Features
-The game is under heavy development.
+Setup the config file resources/config.ron 
+```
+AppConfig(
+    server_ip: "ServerIP",
+    client_ip: "YourIP",
+    player_name: "YourName",
+)
+```
 
-### Current Features
-  - Map can be drawn with the Tiled map editor
-  - The little guy can walk around, stay on the map and not walk through walls or off the map
+```bash
+cargo run --release client 
+```
 
-### Future Features
-  - little guy can go up and down stairs and to different sections of the map
-  - MMO style, will be able to interact with other players
-  - Will be able to fight monsters and gain exp
-  - Will be able to equipt items
+### Server 
+
+```bash
+git clone https://github.com/Machine-Hum/realm.one
+cd realm.one
+```
+
+Setup the config file resources/config.ron 
+```
+AppConfig(
+    server_ip: "YourIP",
+    client_ip: "",
+    player_name: "",
+)
+```
+
+```bash
+cargo run --release server
+```
