@@ -33,16 +33,6 @@ fn authenticate(proof: String) -> Option<String> {
     Some(v[2].to_string())
 }
 
-fn insert_map(room: &String, maps: &Vec<Room>) -> String {
-    // Find the map in the map vector
-    for map in maps {
-        if map.name == *room {
-            return map.raw.clone();
-        }
-    }
-    "fuck".to_string()
-}
-
 fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
     info!("Inserting player 1 ({})", name);
    
@@ -76,9 +66,8 @@ impl<'a> System<'a> for AuthSystem {
                         Some(s) => {
                             let player = ready_player_one(element.ip(), s);
                             let ip = player.ip;
-                            let map = insert_map(&player.room, &maps.list); 
 
-                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone(), map), 0, Some(ip))); 
+                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), 0, Some(ip))); 
                             io.o.push(Pack::new(Cmd::InsertPlayer(player.clone()), 0, None));
                             
                             // Push the rest of the players

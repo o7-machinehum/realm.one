@@ -8,7 +8,7 @@ use crate::components::{PlayerComponent, Action};
 pub enum Cmd {
     Ping,
     Connect(String),
-    TransferMap(String, String),
+    TransferMap(String),
     InsertPlayer(PlayerComponent), 
     Action(Action),
     UpdatePlayer(PlayerComponent),

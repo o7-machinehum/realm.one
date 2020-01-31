@@ -16,8 +16,7 @@ impl SimpleState for ServerState {
         
         // Load in all the maps in the world
         let mut maps = MapList{ list: Vec::<Room>::new(), };
-        maps.add("resources/maps/townCompress.tmx".to_string());
-        maps.add("resources/maps/townCompress2.tmx".to_string());
+        maps.add("resources/maps/town.tmx".to_string());
 
         world.insert(self.config.clone());
         world.insert(io);

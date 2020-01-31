@@ -50,7 +50,7 @@ impl<'s> System<'s> for PlayerSystem{
                             .with(player.get_orientated(&s.sprites), &mut sprite_renders)
                             .with(player, &mut players) 
                             .build());
-                        self.timer = Some(Instant::now()); 
+                        self.timer = Some(Instant::now());
                     }
                     else {
                         info!("Inserting Player"); 

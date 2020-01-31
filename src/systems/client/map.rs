@@ -28,7 +28,7 @@ impl<'s> System<'s> for MapSystem{
     fn run(&mut self, (mut transforms, mut sprite_renders, mut tiles_pos, mut room, mut io, container, entities): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
-                Cmd::TransferMap(name, data) => room.change(name.to_string(), data.to_string()),
+                Cmd::TransferMap(name) => room.change(name.to_string()),
                 _ => io.i.push(element), 
             }
         }
@@ -45,7 +45,7 @@ impl<'s> System<'s> for MapSystem{
                 for (x, row) in layer.tiles.iter().rev().enumerate() {
                     for (y, col) in row.iter().enumerate() {
                         if col.gid != 0 {
-                            let mut loc = TilePosition::new(x, y, z, col.gid as usize - 1);
+                            let mut loc = TilePosition::new(y, x, z, col.gid as usize - 1);
                             let transform = loc.to_trans(); 
                             ent_list.push(
                                 entities.build_entity()

@@ -26,6 +26,7 @@ enum Layers {
     L4,
     L5,
     L6,
+    L7,
 }
 
 pub struct Room {
@@ -33,7 +34,6 @@ pub struct Room {
     pub xsize: usize,
     pub tile_ent: Vec<Entity>,
     pub update: bool,
-    pub raw: String,
     pub name: String,
 }
 
@@ -49,7 +49,6 @@ impl Default for Room {
             map,
             tile_ent: Vec::new(),
             update: true,
-            raw: fs::read_to_string(file_name.clone()).unwrap(),
             name: file_name,
         }
     }
@@ -66,15 +65,13 @@ impl Room {
             map, 
             tile_ent: Vec::new(),
             update: true,
-            raw: fs::read_to_string(file_name.clone()).unwrap(),
             name: file_name,
         }
     }
 
-    pub fn change(&mut self, map_name: String, map_data: String) {
-        info!("Loading the map: {}!", map_name);
-        let streader = StringReader::new(&map_data);     // Make a buffer
-        let reader = BufReader::new(streader);
+    pub fn change(&mut self, map_name: String) {
+        let file = File::open(&Path::new(&map_name)).unwrap();
+        let reader = BufReader::new(file);
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
         
         self.map = map;
@@ -135,8 +132,10 @@ impl Room {
         let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
         let tile = self.map.layers[Layers::L4 as usize].tiles[y1 as usize][x1 as usize];
 
-        match self.map.get_tileset_by_gid(tile.gid){
-            Some(thing) => Some(thing.tiles[tile.gid as usize].properties.clone()),
+        match self.map.get_tileset_by_gid(tile.gid) {
+            Some(thing) => {
+                Some(thing.tiles[tile.gid as usize].properties.clone())
+            },
             None => None,
         }
     }
@@ -187,7 +186,7 @@ impl TilePosition {
         let mut transform = Transform::default();
         transform.set_translation_xyz((self.x as f32 * constants::TILE_SIZE) as f32 + 8.0, 
                                       (self.y as f32 * constants::TILE_SIZE) as f32 + 8.0, 
-                                      self.z as f32 * 0.1
+                                       self.z as f32 * 0.1
                                      );
         transform
     }
