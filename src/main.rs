@@ -63,9 +63,11 @@ fn main() -> amethyst::Result<()> {
 }
 
 fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<()> {
-    
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
+    
+    let listener = TcpListener::bind("0.0.0.0:3455")?;
+    listener.set_nonblocking(true)?;
     
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(key_bindings_config_path)?;
@@ -81,8 +83,9 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(input_bundle)? 
-        .with_bundle(TcpNetworkBundle::new(None, 2048))?
-        .with(systems::TcpSystem::new(), "spam", &[])
+        .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
+        .with_bundle(systems::client::TcpSystemBundle)?
+        // .with(systems::TcpSystem::new(), "spam", &[])
         .with(systems::PlayerSystem{p1: None, timer: None, p1_name: config.player_name.clone()}, "player_system", &["input_system"])
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::PlayerManSystem, "pm_system", &[]);
@@ -104,7 +107,7 @@ fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         
     let game_data = GameDataBuilder::default()
         .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
-        .with_bundle(systems::TcpSystemBundle)?
+        .with_bundle(systems::server::TcpSystemBundle)?
         .with(systems::AuthSystem, "auth_system", &[])
         .with(systems::server::PlayerManSystem, "playerman_system", &[]);
 

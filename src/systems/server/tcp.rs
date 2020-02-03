@@ -28,7 +28,6 @@ impl<'a, 'b> SystemBundle<'a, 'b> for TcpSystemBundle {
 #[derive(Default, Debug)]
 pub struct TcpSystemDesc;
 
-/// A simple system that receives a ton of network events.
 impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
     fn build(self, world: &mut World) -> TcpSystem {
         // Creates the EventChannel<NetworkEvent> managed by the ECS.

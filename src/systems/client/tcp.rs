@@ -3,7 +3,7 @@ use amethyst::{
     core::{SystemDesc},
     ecs::{Read, System, SystemData, World, Write, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
-    network::simulation::{tcp::TcpNetworkBundle, NetworkSimulationEvent, NetworkSimulationTime, TransportResource}, 
+    network::simulation::{tcp::{TcpNetworkBundle, TcpNetworkResource}, NetworkSimulationEvent, NetworkSimulationTime, TransportResource}, 
     Result, 
 };
 use log::{info, error};
@@ -13,13 +13,50 @@ use crate::resources::{ClientStatus, IO, AppConfig};
 
 /// A simple system that sends a ton of messages to all connections.
 /// In this case, only the server is connected.
-pub struct TcpSystem;
+pub struct TcpSystemBundle;
 
-impl TcpSystem {
-    pub fn new() -> Self {
-        TcpSystem {}
+impl<'a, 'b> SystemBundle<'a, 'b> for TcpSystemBundle {
+    fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
+        builder.add(
+            TcpSystemDesc::default().build(world),
+            "server_system",
+            &[],
+        );
+        Ok(())
     }
 }
+
+#[derive(Default, Debug)]
+pub struct TcpSystemDesc;
+
+/// A simple system that receives a ton of network events.
+impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
+    fn build(self, world: &mut World) -> TcpSystem {
+        // Creates the EventChannel<NetworkEvent> managed by the ECS.
+        // <TcpSystem as System<'_>>::SystemData::setup(world);
+        // Fetch the change we just created and call `register_reader` to get a
+        // ReaderId<NetworkEvent>. This reader id is used to fetch new events from the network event
+        // channel.
+        // let reader = world
+        //     .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
+        //     .register_reader();
+        TcpSystem
+    }
+}
+
+// pub struct TcpSystem {
+//     reader: ReaderId<NetworkSimulationEvent>,
+// }
+
+// impl TcpSystem {
+//     pub fn new(reader: ReaderId<NetworkSimulationEvent>) -> Self {
+//         Self { 
+//             reader,
+//         }
+//     }
+// }
+
+pub struct TcpSystem;
 
 impl<'a> System<'a> for TcpSystem {
     type SystemData = (
@@ -29,9 +66,8 @@ impl<'a> System<'a> for TcpSystem {
         // Read<'a, EventChannel<NetworkSimulationEvent>>,
         Write <'a, IO>,
         Read<'a, AppConfig>,
-
     );
-    fn run(&mut self, (mut status, sim_time, mut net, /* channel, */ mut io, conf): Self::SystemData) {
+    fn run(&mut self, (mut status, sim_time, mut net,/* channel,*/ mut io, conf): Self::SystemData) {
         if sim_time.should_send_message_now() {
             if !status.connected {
                 let server_addr = "127.0.0.1:3457".parse().unwrap(); 
