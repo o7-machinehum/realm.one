@@ -12,4 +12,4 @@ pub use self::server::AuthSystem;
 // tcp stuff
 pub use self::server::SpamReceiveBundle;
 
-pub use self::client::SpamSystem;
+pub use self::client::TcpSystem;
