@@ -66,8 +66,8 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
     
-    let listener = TcpListener::bind("0.0.0.0:3455")?;
-    listener.set_nonblocking(true)?;
+    // let listener = TcpListener::bind("0.0.0.0:3455")?;
+    // listener.set_nonblocking(true)?;
     
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(key_bindings_config_path)?;
@@ -83,9 +83,8 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(input_bundle)? 
-        .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
+        .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 2048))?
         .with_bundle(systems::client::TcpSystemBundle)?
-        // .with(systems::TcpSystem::new(), "spam", &[])
         .with(systems::PlayerSystem{p1: None, timer: None, p1_name: config.player_name.clone()}, "player_system", &["input_system"])
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::PlayerManSystem, "pm_system", &[]);
