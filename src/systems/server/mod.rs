@@ -9,4 +9,4 @@ mod playerman;
 pub use self::playerman::PlayerManSystem;
 
 mod tcp;
-pub use self::tcp::{SpamReceiveBundle};
+pub use self::tcp::{TcpSystemBundle};
