@@ -104,7 +104,7 @@ fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         
     let game_data = GameDataBuilder::default()
         .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
-        .with_bundle(systems::SpamReceiveBundle)?
+        .with_bundle(systems::TcpSystemBundle)?
         .with(systems::AuthSystem, "auth_system", &[])
         .with(systems::server::PlayerManSystem, "playerman_system", &[]);
 

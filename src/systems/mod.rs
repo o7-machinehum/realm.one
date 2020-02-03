@@ -10,6 +10,5 @@ pub use self::server::ServerSystemBundle;
 pub use self::server::AuthSystem;
 
 // tcp stuff
-pub use self::server::SpamReceiveBundle;
-
+pub use self::server::TcpSystemBundle;
 pub use self::client::TcpSystem;
