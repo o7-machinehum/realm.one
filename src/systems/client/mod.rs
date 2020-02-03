@@ -8,3 +8,6 @@ pub use self::playerman::PlayerManSystem;
 pub use self::network::ClientSystem;
 pub use self::network::ClientSystemBundle;
 pub use self::map::MapSystem;
+
+mod tcp;
+pub use self::tcp::SpamSystem;

@@ -8,10 +8,11 @@ use amethyst::{
     },
     input::InputBundle,
     utils::application_root_dir,
-    network::simulation::{laminar::{LaminarNetworkBundle, LaminarSocket, LaminarConfig}},
+    network::simulation::{tcp::TcpNetworkBundle, NetworkSimulationEvent, TransportResource},
 };
 use std::{
-    fs::File,
+   net::TcpListener,
+   fs::File,
 };
 
 use ron::de::from_reader;
@@ -62,7 +63,6 @@ fn main() -> amethyst::Result<()> {
 }
 
 fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<()> {
-    let socket = LaminarSocket::bind_with_config(config.client_ip.clone(), get_client_config())?;
     
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
@@ -81,8 +81,8 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(input_bundle)? 
-        .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
-        .with_bundle(systems::ClientSystemBundle)? 
+        .with_bundle(TcpNetworkBundle::new(None, 2048))?
+        .with(systems::SpamSystem::new(), "spam", &[])
         .with(systems::PlayerSystem{p1: None, timer: None, p1_name: config.player_name.clone()}, "player_system", &["input_system"])
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::PlayerManSystem, "pm_system", &[]);
@@ -99,11 +99,12 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
 }
 
 fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<()> {
-    let socket = LaminarSocket::bind_with_config(config.server_ip.clone(), get_server_config())?;
+    let listener = TcpListener::bind("0.0.0.0:3457")?;
+    listener.set_nonblocking(true)?;
         
     let game_data = GameDataBuilder::default()
-        .with_bundle(LaminarNetworkBundle::new(Some(socket)))? 
-        .with_bundle(systems::ServerSystemBundle)? 
+        .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
+        .with_bundle(systems::SpamReceiveBundle)?
         .with(systems::AuthSystem, "auth_system", &[])
         .with(systems::server::PlayerManSystem, "playerman_system", &[]);
 
@@ -116,40 +117,4 @@ fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
 
     game.run();
     Ok(())
-}
-
-fn get_server_config() -> LaminarConfig {
-    LaminarConfig {
-        blocking_mode: false,
-        idle_connection_timeout: Duration::from_millis(10000),
-        heartbeat_interval: Some(Duration::from_millis(1000)),
-        max_packet_size: 16384,
-        max_fragments: 18,
-        fragment_size: 4098,
-        fragment_reassembly_buffer_size: 1450,
-        receive_buffer_max_size: 4098,
-        rtt_smoothing_factor: 0.1,
-        rtt_max_value: 1000,
-        socket_event_buffer_size: 4098,
-        socket_polling_timeout: Some(Duration::from_millis(1)),
-        max_packets_in_flight: 10,
-    }
-}
-
-fn get_client_config() -> LaminarConfig {
-    LaminarConfig {
-        blocking_mode: false,
-        idle_connection_timeout: Duration::from_millis(10000),
-        heartbeat_interval: Some(Duration::from_millis(1000)),
-        max_packet_size: 16384,
-        max_fragments: 18,
-        fragment_size: 4098,
-        fragment_reassembly_buffer_size: 1450,
-        receive_buffer_max_size: 4098,
-        rtt_smoothing_factor: 0.1,
-        rtt_max_value: 1000,
-        socket_event_buffer_size: 4098,
-        socket_polling_timeout: Some(Duration::from_millis(1)),
-        max_packets_in_flight: 10,
-    }
 }
