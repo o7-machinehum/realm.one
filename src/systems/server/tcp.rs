@@ -69,7 +69,7 @@ impl<'a> System<'a> for SpamReceiveSystem {
                     // be exchanging messages at a constant rate. Laminar makes use of this by
                     // packaging message acks with the next sent message. Therefore, in order for
                     // reliability to work properly, we'll send a generic "ok" response.
-                    // net.send(*addr, b"ok");
+                    net.send(*addr, b"ok");
                 }
                 NetworkSimulationEvent::Connect(addr) => info!("New client connection: {}", addr),
                 NetworkSimulationEvent::Disconnect(addr) => {

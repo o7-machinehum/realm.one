@@ -82,7 +82,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         )?
         .with_bundle(input_bundle)? 
         .with_bundle(TcpNetworkBundle::new(None, 2048))?
-        .with(systems::SpamSystem::new(), "spam", &[])
+        .with(systems::TcpSystem::new(), "spam", &[])
         .with(systems::PlayerSystem{p1: None, timer: None, p1_name: config.player_name.clone()}, "player_system", &["input_system"])
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::PlayerManSystem, "pm_system", &[]);
