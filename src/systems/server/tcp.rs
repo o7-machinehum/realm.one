@@ -18,7 +18,7 @@ impl<'a, 'b> SystemBundle<'a, 'b> for TcpSystemBundle {
     fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
         builder.add(
             TcpSystemDesc::default().build(world),
-            "server_system",
+            "server_tcp_system",
             &[],
         );
         Ok(())
