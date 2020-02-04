@@ -30,31 +30,31 @@ pub struct TcpSystemDesc;
 impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
     fn build(self, world: &mut World) -> TcpSystem {
         // Creates the EventChannel<NetworkEvent> managed by the ECS.
-        // <TcpSystem as System<'_>>::SystemData::setup(world);
+        <TcpSystem as System<'_>>::SystemData::setup(world);
         // Fetch the change we just created and call `register_reader` to get a
         // ReaderId<NetworkEvent>. This reader id is used to fetch new events from the network event
         // channel.
-        // let reader = world
-        //     .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
-        //     .register_reader();
-        // TcpSystem::new(reader)
-        TcpSystem
+        let reader = world
+            .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
+            .register_reader();
+        TcpSystem::new(reader)
+        // TcpSystem
     }
 }
 
-// pub struct TcpSystem {
-//     reader: ReaderId<NetworkSimulationEvent>,
-// }
-// 
-// impl TcpSystem {
-//     pub fn new(reader: ReaderId<NetworkSimulationEvent>) -> Self {
-//         Self { 
-//             reader,
-//         }
-//     }
-// }
+pub struct TcpSystem {
+    reader: ReaderId<NetworkSimulationEvent>,
+}
 
-pub struct TcpSystem;
+impl TcpSystem {
+    pub fn new(reader: ReaderId<NetworkSimulationEvent>) -> Self {
+        Self { 
+            reader,
+        }
+    }
+}
+
+// pub struct TcpSystem;
 
 impl<'a> System<'a> for TcpSystem {
     type SystemData = (
