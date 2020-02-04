@@ -21,12 +21,12 @@ git clone https://github.com/Machine-Hum/realm.one
 cd realm.one
 ```
 
-Setup the config file resources/config.ron 
+Setup the config file resources/config.ron, public server is **18.220.126.218:3457** right now 
 ```
 AppConfig(
-    server_ip: "ServerIP",
-    client_ip: "YourIP",
-    player_name: "YourName",
+    server_ip: "18.220.126.218:3457",
+    client_ip: "Depricated, Can be blank",
+    player_name: "YourName - Change this!",
 )
 ```
 
