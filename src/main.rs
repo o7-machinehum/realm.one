@@ -66,9 +66,6 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
     
-    // let listener = TcpListener::bind("0.0.0.0:3455")?;
-    // listener.set_nonblocking(true)?;
-    
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(key_bindings_config_path)?;
     
@@ -101,7 +98,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
 }
 
 fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<()> {
-    let listener = TcpListener::bind("0.0.0.0:3457")?;
+    let listener = TcpListener::bind(config.server_ip.clone())?;
     listener.set_nonblocking(true)?;
         
     let game_data = GameDataBuilder::default()
