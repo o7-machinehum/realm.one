@@ -5,14 +5,14 @@ authors = ["Team Awesome"]
 edition = "2018"
 
 [dependencies]
-# amethyst = "0.13.2"
-amethyst = { git = "https://github.com/amethyst/amethyst" }
+amethyst = { git = "https://github.com/machine-hum/amethyst" }
+# amethyst = { git = "https://github.com/amethyst/amethyst" }
+# amethyst = { path = "../amethyst" }
 log = { version = "0.4.8", features = ["serde"] }
 tiled = { git = "https://github.com/mattyhall/rs-tiled" }
 serde = { version = "1", features = ["derive"] }
 bincode = "1.2.1"
 stringreader = "0.1.1"
-laminar = "0.3.2"
 ron = "*"
 nalgebra = "0.19.0"
 
