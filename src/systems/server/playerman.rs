@@ -6,7 +6,7 @@ use log::info;
 
 use crate::{
     network::{Pack, Cmd},
-    components::{Action},
+    components::{Action, Skins, get_outfit},
     resources::{PlayerList, IO, MapList},
 };
 
@@ -49,6 +49,11 @@ impl<'a> System<'a> for PlayerManSystem {
                                     else {
                                         None
                                     }
+                                },
+                                Action::ChangeOutfit(skin) => {
+                                    player.skin = get_outfit(skin);
+                                    //TODO: Make sure skin in legal!
+                                    Some(Pack::new(Cmd::UpdatePlayer(player.clone()), 0, None))
                                 },
                                 _ => None, 
                             };

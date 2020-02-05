@@ -3,8 +3,11 @@ use amethyst::{
     prelude::*,
     renderer::{Camera},
     window::ScreenDimensions,
+    input::{get_key, is_close_requested, is_key_down, InputBundle, StringBindings},
     ecs::World,
+    winit::VirtualKeyCode,
 };
+use log::info;
 
 use crate::map;
 use crate::components::{PlayerComponent};
@@ -37,6 +40,20 @@ impl SimpleState for GamePlayState {
         world.insert(player_list);
         world.insert(io);
     }
+
+    // fn handle_event(
+    //     &mut self,
+    //     mut _data: StateData<'_, GameData<'_, '_>>,
+    //     event: StateEvent,
+    // ) -> SimpleTrans {
+    //     if let StateEvent::Window(event) = &event {
+    //         if let Some(event) = get_key(&event) {
+    //             info!("handling key event: {:?}", event);
+    //         }
+    //     }
+    //     // Keep going
+    //     Trans::None
+    // }
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {

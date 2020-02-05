@@ -17,6 +17,27 @@ pub enum Orientation {
     North,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum Skins {
+    Male,
+    Female,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Outfit {
+    pub n: usize,      
+    pub e: usize, 
+    pub s: usize,
+    pub w: usize, 
+}
+
+pub fn get_outfit(skin: &Skins) -> Outfit {
+    match skin {
+        Skins::Female => Outfit { n: 318, e: 306, s: 282, w: 294 },
+        Skins::Male   => Outfit { n: 315, e: 303, s: 279, w: 291 },
+    }
+}
+
 /// Client Side player component
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -26,10 +47,7 @@ pub struct PlayerComponent {
     pub room: String,
     pub x: f32,          
     pub y: f32, 
-    pub north: usize,      
-    pub east: usize, 
-    pub south: usize,
-    pub west: usize, 
+    pub skin: Outfit,
     pub orientation: Orientation,
 }
 
@@ -86,19 +104,19 @@ impl PlayerComponent {
     
     pub fn get_orientated(&self, sprites: &Vec<SpriteRender>) -> SpriteRender {
         match self.orientation {
-            Orientation::North=> return sprites[self.north].clone(),
-            Orientation::South=> return sprites[self.south].clone(),
-            Orientation::East => return sprites[self.east].clone(),
-            Orientation::West => return sprites[self.west].clone(),
+            Orientation::North=> return sprites[self.skin.n].clone(),
+            Orientation::South=> return sprites[self.skin.s].clone(),
+            Orientation::East => return sprites[self.skin.e].clone(),
+            Orientation::West => return sprites[self.skin.w].clone(),
         }
     }
 
     pub fn get_dir(&self) -> usize{
         match self.orientation {
-            Orientation::North=> self.north,
-            Orientation::South=> self.south,
-            Orientation::East => self.east,
-            Orientation::West => self.west,
+            Orientation::North => self.skin.n,
+            Orientation::South => self.skin.s,
+            Orientation::East  => self.skin.e,
+            Orientation::West  => self.skin.w,
         }
     }
 }
