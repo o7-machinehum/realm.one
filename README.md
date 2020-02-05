@@ -58,7 +58,7 @@ cargo run --release server
 Once connected, you can move your character around with 'wasd' controls. There is also a command system that allows configuration of your character. To get into this command system press the '/' key, you can you freely type. Once you have finished your command press enter.
 
 ### Command listing
-Commands are of the form: cmd <arg> <subargs>
+Commands are of the form: cmd arg subargs
 
 ```
 cmd outfit male    // Change char to male
