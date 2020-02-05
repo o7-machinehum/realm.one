@@ -1,8 +1,11 @@
-use amethyst::core::{Transform};
-use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Read, Write, Entities, Entity, System, SystemData, WriteStorage};
-use amethyst::input::InputHandler;
-use amethyst::renderer::SpriteRender;
+use amethyst::{
+    core::{Transform, Parent},
+    derive::SystemDesc,
+    ecs::{Read, Write, Entities, Entity, System, SystemData, WriteStorage},
+    input::InputHandler,
+    renderer::SpriteRender
+};
+use nalgebra::base::Vector3;
 
 use std::time::Instant;
 use log::info;
@@ -14,11 +17,12 @@ use crate::{
     network::{Pack, Cmd},
     resources::{IO, SpritesContainer},
     constants,
+    mech::get_letter,
 };
 
 
 #[derive(SystemDesc)]
-pub struct PlayerSystem{ 
+pub struct PlayerSystem { 
     pub p1: Option<Entity>,
     pub timer: Option<Instant>,
     pub p1_name: String,
@@ -28,6 +32,7 @@ impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
+        WriteStorage<'s, Parent>,
         WriteStorage<'s, SpriteRender>,
         Write<'s, IO>,
         Write<'s, Room>,
@@ -36,31 +41,33 @@ impl<'s> System<'s> for PlayerSystem{
         Read<'s, SpritesContainer>,
     );
  
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut players, mut parents, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::InsertPlayer(play) =>  {
-                    // If it's yourself
-                    if play.name == self.p1_name { 
-                        info!("Inserting Player 1"); 
-                        let player = PlayerComponent::new(play.clone());
-                        self.p1 = Some(entities
-                            .build_entity()
-                            .with(player.trans(), &mut transforms)
-                            .with(player.get_orientated(&s.sprites), &mut sprite_renders)
-                            .with(player, &mut players) 
-                            .build());
-                        self.timer = Some(Instant::now());
-                    }
-                    else {
-                        info!("Inserting Player"); 
-                        let player = PlayerComponent::new(play.clone());
+                    let e = Some(entities
+                        .build_entity()
+                        .with(play.trans(), &mut transforms)
+                        .with(play.get_orientated(&s.sprites), &mut sprite_renders)
+                        .with(play.clone(), &mut players) 
+                        .build());
+                    
+                    // Write the players name
+                    let mut letter_trans = Transform::default();
+                    letter_trans.move_up(10.0);
+                    for bytes in play.name.bytes() {
                         entities
                             .build_entity()
-                            .with(player.trans(), &mut transforms)
-                            .with(player.get_orientated(&s.sprites), &mut sprite_renders)
-                            .with(player, &mut players) 
+                            .with(get_letter(bytes, &s.text), &mut sprite_renders)
+                            .with(letter_trans.clone(), &mut transforms) 
+                            .with(Parent::new(e.unwrap()), &mut parents)
                             .build();
+                        letter_trans.move_right(8.0);
+                    }
+                    if play.name == self.p1_name { 
+                        info!("Inserting Player 1"); 
+                        self.p1 = e;
+                        self.timer = Some(Instant::now());
                     }
                 },
                 _ => io.i.push(element), 
