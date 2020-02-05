@@ -12,4 +12,5 @@ notes
 *.log
 *.out
 test
-
+cpy.sh
+con.sh
