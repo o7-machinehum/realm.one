@@ -7,45 +7,55 @@ use amethyst::{
 #[derive(Default)]
 pub struct SpritesContainer {
     pub sprites: Vec<SpriteRender>,
+    pub text: Vec<SpriteRender>,
+}
+
+fn load(world: &World, img: String, ron: String, num_sprites: u32) -> Vec<SpriteRender> {
+    let texture_handle = {
+        let loader = world.read_resource::<Loader>();
+        let texture_storage = world.read_resource::<AssetStorage<Texture>>();
+        
+        loader.load(
+            img,
+            ImageFormat::default(),
+            (),
+            &texture_storage,
+        )
+    };
+    
+    let sheet_handle = {
+        let loader = world.read_resource::<Loader>();
+        let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
+    
+        loader.load(
+            ron,
+            SpriteSheetFormat(texture_handle),
+            (),
+            &sheet_storage,
+        )
+    };
+    
+    let mut container: Vec<SpriteRender> = Vec::new();
+    for i in 0..num_sprites { 
+        container.push(SpriteRender {
+            sprite_sheet: sheet_handle.clone(),
+            sprite_number: i as usize,
+        });
+    };
+    container
 }
 
 impl SpritesContainer {
-    pub fn new(world: &World, num_sprites: u32) -> Self {
-        let texture_handle = {
-            let loader = world.read_resource::<Loader>();
-            let texture_storage = world.read_resource::<AssetStorage<Texture>>();
-            
-            loader.load(
-                "sprites/master16.png",
-                ImageFormat::default(),
-                (),
-                &texture_storage,
-            )
-        };
-    
-        let sheet_handle = {
-            let loader = world.read_resource::<Loader>();
-            let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
-    
-            loader.load(
-                "sprites/master16.ron",
-                SpriteSheetFormat(texture_handle),
-                (),
-                &sheet_storage,
-            )
-        };
-        
-        let mut container: Vec<SpriteRender> = Vec::new();
-    
-        for i in 0..num_sprites { 
-            container.push(SpriteRender {
-                sprite_sheet: sheet_handle.clone(),
-                sprite_number: i as usize,
-            });
-        };
-        
+    pub fn new(world: &World) -> Self {
         Self {
-            sprites: container,
+            sprites: load(world,
+                          "sprites/master16.png".to_string(), 
+                          "sprites/master16.ron".to_string(),
+                          371),
+            text: load(world,
+                       "fonts/fontlarge-0.png".to_string(),
+                       "fonts/fontlarge-0.ron".to_string(),
+                       52),
         }
     }
 }
