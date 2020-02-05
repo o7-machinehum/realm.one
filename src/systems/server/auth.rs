@@ -7,7 +7,7 @@ use log::info;
 use crate::{
     network::{Pack, Cmd},
     map::{Room},
-    components::{PlayerComponent, Orientation},
+    components::{PlayerComponent, Orientation, Skins, get_outfit},
     resources::{PlayerList, IO, MapList},
 };
 
@@ -43,10 +43,7 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
         room: "resources/maps/town.tmx".to_string(),
         x: 8.0,
         y: 8.0,
-        north: 318,
-        east: 306,
-        south: 282,
-        west: 294,
+        skin: get_outfit(Skins::Female),
         orientation: Orientation::North,
     }
 }
