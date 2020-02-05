@@ -30,7 +30,7 @@ pub struct Outfit {
     pub w: usize, 
 }
 
-pub fn get_outfit(skin: Skins) -> Outfit {
+pub fn get_outfit(skin: &Skins) -> Outfit {
     match skin {
         Skins::Female => Outfit { n: 318, e: 306, s: 282, w: 294 },
     }

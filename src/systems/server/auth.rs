@@ -43,7 +43,7 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
         room: "resources/maps/town.tmx".to_string(),
         x: 8.0,
         y: 8.0,
-        skin: get_outfit(Skins::Female),
+        skin: get_outfit(&Skins::Female),
         orientation: Orientation::North,
     }
 }
