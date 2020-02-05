@@ -45,18 +45,16 @@ impl<'s> System<'s> for PlayerSystem{
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::InsertPlayer(play) =>  {
-                    let player = PlayerComponent::new(play.clone());
                     let e = Some(entities
                         .build_entity()
-                        .with(player.trans(), &mut transforms)
-                        .with(player.get_orientated(&s.sprites), &mut sprite_renders)
-                        .with(player, &mut players) 
+                        .with(play.trans(), &mut transforms)
+                        .with(play.get_orientated(&s.sprites), &mut sprite_renders)
+                        .with(play.clone(), &mut players) 
                         .build());
                     
                     // Write the players name
-                    let mut letter_trans = play.trans();
+                    let mut letter_trans = Transform::default();
                     letter_trans.move_up(10.0);
-                    letter_trans.set_scale(Vector3::new(0.8, 0.8, 0.8));
                     for bytes in play.name.bytes() {
                         entities
                             .build_entity()
@@ -64,7 +62,7 @@ impl<'s> System<'s> for PlayerSystem{
                             .with(letter_trans.clone(), &mut transforms) 
                             .with(Parent::new(e.unwrap()), &mut parents)
                             .build();
-                        letter_trans.move_right(15.0);
+                        letter_trans.move_right(8.0);
                     }
                     if play.name == self.p1_name { 
                         info!("Inserting Player 1"); 

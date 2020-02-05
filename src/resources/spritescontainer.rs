@@ -53,9 +53,9 @@ impl SpritesContainer {
                           "sprites/master16.ron".to_string(),
                           371),
             text: load(world,
-                       "fonts/fontlarge-0.png".to_string(),
-                       "fonts/fontlarge-0.ron".to_string(),
-                       52),
+                       "fonts/text.png".to_string(),
+                       "fonts/text.ron".to_string(),
+                       225),
         }
     }
 }
