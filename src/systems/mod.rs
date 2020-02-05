@@ -3,6 +3,8 @@ pub use self::client::ClientSystem;
 pub use self::client::PlayerSystem;
 pub use self::client::MapSystem;
 pub use self::client::ClientSystemBundle;
+pub use self::client::ChatSystem;
+pub use self::client::ChatSystemBundle;
 
 pub mod server;
 pub use self::server::ServerSystem;
