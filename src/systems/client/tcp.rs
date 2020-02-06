@@ -3,7 +3,7 @@ use amethyst::{
     core::{SystemDesc},
     ecs::{Read, System, SystemData, World, Write, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
-    network::simulation::{tcp::{TcpNetworkBundle, TcpNetworkResource}, NetworkSimulationEvent, NetworkSimulationTime, TransportResource}, 
+    network::simulation::{NetworkSimulationEvent, NetworkSimulationTime, TransportResource}, 
     Result, 
 };
 use log::{info, error};

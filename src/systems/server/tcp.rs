@@ -2,7 +2,7 @@ use amethyst::{
     core::{SystemDesc, bundle::SystemBundle},
     ecs::{Read, Write, System, SystemData, World, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
-    network::simulation::{DeliveryRequirement, UrgencyRequirement, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
+    network::simulation::{NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
     Result,
 };
 

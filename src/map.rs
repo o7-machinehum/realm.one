@@ -8,14 +8,13 @@ use std::{
     fs::File,
     io::{BufReader},
     path::Path,
-    fs,
 };
 
-use log::info;
+
 use crate::constants;
 use crate::components::Orientation;
 use crate::mech::{colision};
-use stringreader::StringReader;
+
 
 #[derive(Clone, Debug)]
 #[allow(dead_code)]

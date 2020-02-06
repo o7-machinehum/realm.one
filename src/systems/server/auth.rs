@@ -6,7 +6,6 @@ use amethyst::{
 use log::info;
 use crate::{
     network::{Pack, Cmd},
-    map::{Room},
     components::{PlayerComponent, Orientation, Skins, get_outfit},
     resources::{PlayerList, IO, MapList},
 };
@@ -55,7 +54,7 @@ impl<'a> System<'a> for AuthSystem {
         Read <'a, MapList>,
     );
 
-    fn run(&mut self, (mut io, mut pl, maps): Self::SystemData) {
+    fn run(&mut self, (mut io, mut pl, _maps): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::Connect(packet) => {

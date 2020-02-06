@@ -7,7 +7,7 @@ use amethyst::{
     ecs::World,
     winit::VirtualKeyCode,
 };
-use log::info;
+
 
 use crate::map;
 use crate::components::{PlayerComponent};

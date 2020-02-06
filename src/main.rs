@@ -8,7 +8,7 @@ use amethyst::{
     },
     input::InputBundle,
     utils::application_root_dir,
-    network::simulation::{tcp::TcpNetworkBundle, NetworkSimulationEvent, TransportResource},
+    network::simulation::{tcp::TcpNetworkBundle},
 };
 use std::{
    net::TcpListener,

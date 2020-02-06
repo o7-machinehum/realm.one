@@ -6,7 +6,7 @@ use log::info;
 
 use crate::{
     network::{Pack, Cmd},
-    components::{Action, Skins, get_outfit},
+    components::{Action, get_outfit},
     resources::{PlayerList, IO, MapList},
 };
 

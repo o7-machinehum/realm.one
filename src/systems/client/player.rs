@@ -5,7 +5,7 @@ use amethyst::{
     input::InputHandler,
     renderer::SpriteRender
 };
-use nalgebra::base::Vector3;
+
 
 use std::time::Instant;
 use log::info;
@@ -99,7 +99,7 @@ impl<'s> System<'s> for PlayerSystem{
                     }
                     
                     // Get player and transform component of yourself
-                    let mut adj_player_tr = { 
+                    let adj_player_tr = { 
                         let player = players.get_mut(p1).unwrap();  // Get yourself
                         let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
                         player.update_orientation(&horizontal, &vertical);  // Update self

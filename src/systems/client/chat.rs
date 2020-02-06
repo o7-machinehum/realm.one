@@ -8,7 +8,7 @@ use amethyst::{
     winit::{WindowEvent, Event},
     Result, 
 };
-use nalgebra::base::Vector3;
+
 
 use std::time::Instant;
 use log::info;
@@ -181,7 +181,7 @@ fn parse_command(cmd: &mut String) -> Option<Action>{
     
     //"cmd"
     match iter.next() {
-       Some(thing) => (),
+       Some(_thing) => (),
        None => (),
     }
 
