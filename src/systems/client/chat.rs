@@ -196,8 +196,14 @@ fn parse_command(cmd: &mut String) -> Option<Action>{
                         Some(arg2) => {
                             info!("{}", arg2);
                             match arg2 {
+                                "nude" => Some(Action::ChangeOutfit(Skins::Nude)),
                                 "male"   => Some(Action::ChangeOutfit(Skins::Male)),
                                 "female" => Some(Action::ChangeOutfit(Skins::Female)),
+                                "skeleton" => Some(Action::ChangeOutfit(Skins::Skeleton)),
+                                "slime" => Some(Action::ChangeOutfit(Skins::Slime)),
+                                "bat" => Some(Action::ChangeOutfit(Skins::Bat)),
+                                "ghost" => Some(Action::ChangeOutfit(Skins::Ghost)),
+                                "spider" => Some(Action::ChangeOutfit(Skins::Spider)),
                                 _ => None,
                             }
                         },

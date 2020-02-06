@@ -19,8 +19,14 @@ pub enum Orientation {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Skins {
+    Nude,
     Male,
     Female,
+    Skeleton,
+    Slime,
+    Bat,
+    Ghost,
+    Spider,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -33,8 +39,14 @@ pub struct Outfit {
 
 pub fn get_outfit(skin: &Skins) -> Outfit {
     match skin {
-        Skins::Female => Outfit { n: 318, e: 306, s: 282, w: 294 },
-        Skins::Male   => Outfit { n: 315, e: 303, s: 279, w: 291 },
+        Skins::Nude     => Outfit { n: 312, e: 300, s: 276, w: 288 },
+        Skins::Male     => Outfit { n: 315, e: 303, s: 279, w: 291 },
+        Skins::Female   => Outfit { n: 318, e: 306, s: 282, w: 294 },
+        Skins::Skeleton => Outfit { n: 321, e: 309, s: 285, w: 297 },
+        Skins::Slime    => Outfit { n: 360, e: 349, s: 324, w: 336 },
+        Skins::Bat      => Outfit { n: 363, e: 352, s: 327, w: 339 },
+        Skins::Ghost    => Outfit { n: 366, e: 355, s: 330, w: 342},
+        Skins::Spider   => Outfit { n: 369, e: 358, s: 233, w: 245 },
     }
 }
 

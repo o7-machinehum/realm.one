@@ -63,4 +63,7 @@ Commands are of the form: cmd arg subargs
 ```
 cmd outfit male    // Change char to male
 cmd outfit female  // Change char to female
+cmd outfit nude    // Change char nude androgynous person 
 ```
+
+Other outfits: bat, skeleton, slime, ghost, spider
