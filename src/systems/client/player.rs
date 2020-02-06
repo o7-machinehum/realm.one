@@ -1,7 +1,7 @@
 use amethyst::{
     core::{Transform, Parent},
     derive::SystemDesc,
-    ecs::{Read, Write, Entities, Entity, System, SystemData, WriteStorage},
+    ecs::{Read, Write, Entities, Entity, System, SystemData, WriteStorage, Join},
     input::InputHandler,
     renderer::SpriteRender
 };
@@ -27,6 +27,14 @@ pub struct PlayerSystem {
     pub timer: Option<Instant>,
     pub p1_name: String,
 }
+
+// fn foo<'e>(
+//     transforms: &mut Storage<'e, Transform, DerefMut<Target = MaskedStorage<Transform>>>,
+//     players: &mut Storage<'e, PlayerComponent, DerefMut<Target = MaskedStorage<PlayerComponent>>>
+//     ) {
+//         for (transform, player) in (transforms, players).join() {
+//             }
+//       }
 
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
@@ -77,7 +85,6 @@ impl<'s> System<'s> for PlayerSystem{
         match self.p1 {
             Some(p1) => {
                 let now = Instant::now();
-                let player = players.get_mut(p1).unwrap();
 
                 if now.duration_since(self.timer.unwrap()).as_millis() >= constants::MOVEMENT_DELAY_MS {
                     let horizontal = input
@@ -91,17 +98,31 @@ impl<'s> System<'s> for PlayerSystem{
                         return;
                     }
                     
-                    let tr = transforms.get_mut(p1).unwrap(); 
+                    // Get player and transform component of yourself
+                    let mut adj_player_tr = { 
+                        let player = players.get_mut(p1).unwrap();  // Get yourself
+                        let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
+                        player.update_orientation(&horizontal, &vertical);  // Update self
+                        spr.sprite_number = player.get_dir();             // Change sprite
+                        player.in_front()    // Get transform of in front
+                    };
+                    
+                    let mut adj_player : Option<PlayerComponent> = None;
+                    for (transform, p) in (&mut transforms, &mut players).join() {
+                        if *transform.translation() == *adj_player_tr.translation(){
+                            // There's someone in the way!
+                            adj_player = Some(p.clone());    
+                        }
+                    }
 
-                    player.update_orientation(&horizontal, &vertical);
-                    self.timer = Some(now.clone());
-                    sprite_renders.insert(p1, player.get_orientated(&s.sprites)).expect("Failed to insert orientated player!");
-
-                    if room.allowed_move(tr, &player.orientation) {
+                    let player = players.get_mut(p1).unwrap();
+                    if room.allowed_move(&player.trans(), &player.orientation) && !adj_player.is_some() {
+                        let tr = transforms.get_mut(p1).unwrap(); 
                         player.walk(); // Walk one step in forward direction
                         tr.set_translation_xyz(player.x(), player.y(), player.z()); 
                         io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                     }
+                    self.timer = Some(now.clone());
                 }
             },
             None => ()
