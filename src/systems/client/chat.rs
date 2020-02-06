@@ -1,9 +1,8 @@
 use amethyst::{
-    core::{SystemDesc, Transform, Parent, bundle::SystemBundle},
+    core::{SystemDesc, Transform, bundle::SystemBundle},
     derive::SystemDesc,
     ecs::{Read, Write, World, Entities, Entity, System, SystemData, WriteStorage, DispatcherBuilder},
     shrev::{EventChannel, ReaderId},
-    input::{InputHandler, ControllerButton, VirtualKeyCode, StringBindings}, 
     renderer::{SpriteRender},
     winit::{WindowEvent, Event},
     Result, 
@@ -14,9 +13,7 @@ use std::time::Instant;
 use log::info;
 
 use crate::{
-    components::{PlayerComponent, Action, Skins},
-    key_bindings::{MovementBindingTypes, AxisBinding},
-    map::{Room},
+    components::{Action, Skins},
     network::{Pack, Cmd},
     resources::{IO, SpritesContainer},
     constants,

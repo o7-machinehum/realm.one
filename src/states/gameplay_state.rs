@@ -3,9 +3,7 @@ use amethyst::{
     prelude::*,
     renderer::{Camera},
     window::ScreenDimensions,
-    input::{get_key, is_close_requested, is_key_down, InputBundle, StringBindings},
     ecs::World,
-    winit::VirtualKeyCode,
 };
 
 
