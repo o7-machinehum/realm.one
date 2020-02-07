@@ -10,4 +10,5 @@ pub enum Action {
     Attack(u32),
     UseItem(u32),
     ChangeOutfit(Skins),
+    Melee,
 }
