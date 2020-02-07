@@ -1,8 +1,11 @@
 use crate::components::PlayerComponent;
 use std::net::SocketAddr;
 
+// Couple of biz guys, remember this
 pub struct PlayerList {
-    pub list: Vec<PlayerComponent>,
+    pub list: Vec<Option<PlayerComponent>>,
+    pub ips: HashMap<String, usize>,
+    pub name: HashMap<String, usize>,
 }
 
 impl Default for PlayerList {
@@ -15,4 +18,5 @@ impl PlayerList {
     pub fn remove(&mut self, ip: SocketAddr) {
         self.list.retain(|x| x.ip != ip); 
     }
+
 }
