@@ -24,7 +24,7 @@ impl SimpleState for GamePlayState {
         
         let sprites = SpritesContainer::new(&world);
         let room = map::Room::new("resources/maps/town.tmx".to_string());
-        let player_list = PlayerList{ list: Vec::new() };
+        let player_list = PlayerList::new();
 
         let status = ClientStatus::new();
 
@@ -38,20 +38,6 @@ impl SimpleState for GamePlayState {
         world.insert(player_list);
         world.insert(io);
     }
-
-    // fn handle_event(
-    //     &mut self,
-    //     mut _data: StateData<'_, GameData<'_, '_>>,
-    //     event: StateEvent,
-    // ) -> SimpleTrans {
-    //     if let StateEvent::Window(event) = &event {
-    //         if let Some(event) = get_key(&event) {
-    //             info!("handling key event: {:?}", event);
-    //         }
-    //     }
-    //     // Keep going
-    //     Trans::None
-    // }
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {

@@ -6,7 +6,7 @@ use amethyst::{
 
 use serde::{Serialize, Deserialize};
 use crate::{constants};
-use crate::components::{Outfit};
+use crate::components::{Outfit, Skins, get_outfit};
 use std::net::{SocketAddr};
 use nalgebra::base::Vector3;
 
@@ -29,11 +29,21 @@ pub struct PlayerComponent {
     pub y: f32, 
     pub skin: Outfit,
     pub orientation: Orientation,
+    hp: f32,
 }
 
 impl PlayerComponent {
-    pub fn new(p: PlayerComponent) -> Self {
-        p 
+    pub fn new(name: String, ip: SocketAddr) -> Self {
+        Self {
+            name,
+            ip,
+            room: "resources/maps/town.tmx".to_string(),
+            x: 8.0,
+            y: 8.0,
+            skin: get_outfit(&Skins::Female),
+            orientation: Orientation::North,
+            hp: 100.0,
+        }
     }
     
     pub fn update_orientation(&mut self, x: &f32, y: &f32) {
@@ -87,6 +97,10 @@ impl PlayerComponent {
     pub fn xyz(&self) -> Vector3<f32> {
         Vector3::new(self.x, self.y, self.z()) 
     }
+
+    // pub fn hp(&mut self, amt: f32) {
+    //     self.hp += amt;
+    // }
 
     pub fn trans(&self) -> Transform {
         let mut tr = Transform::default();

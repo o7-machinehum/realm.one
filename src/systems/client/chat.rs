@@ -51,7 +51,6 @@ impl<'a, 'b> SystemDesc<'a, 'b, ChatSystem> for ChatSystemDesc {
 
 #[derive(SystemDesc)]
 pub struct ChatSystem {
-    p1_input: String,
     ent_cmd: bool,
     send_cmd: bool,
     cmd: String,
@@ -68,7 +67,6 @@ impl ChatSystem {
         tr.move_up(760.0);
         tr.move_right(10.0);
         Self {
-            p1_input: String::new(),
             ent_cmd: false,
             send_cmd: false,
             cmd: String::new(),
