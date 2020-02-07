@@ -27,7 +27,7 @@ impl<'a> System<'a> for PlayerManSystem {
                 Cmd::Action(act) => {
                     info!("Action from Address: {:?}, Action: {:?}", element.ip(), element.cmd);
                     let mut acting_player = pl.get_from_ip(element.ip().unwrap()).unwrap(); 
-                    let packs_players = self.act(acting_player, act, &maps);
+                    let packs_players = self.act(acting_player, act, &maps, &pl);
                     
                     for pack in packs_players.0 {
                         info!("{:?}", pack);
@@ -39,9 +39,7 @@ impl<'a> System<'a> for PlayerManSystem {
                         pl.replace(player); 
                     }
                 },
-                Cmd::RemovePlayer(ip) => {
-                    pl.remove_with_ip(*ip); 
-                },
+                Cmd::RemovePlayer(ip) => pl.remove_with_ip(*ip), 
                 _ => (io.i.push(element)), 
             }
         }
@@ -49,7 +47,13 @@ impl<'a> System<'a> for PlayerManSystem {
 }
 
 impl PlayerManSystem {
-    fn act(&mut self, mut player: PlayerComponent, act: &Action, maps: &MapList) -> (Vec<Pack>, Vec<PlayerComponent>) {
+    fn act(&mut self, 
+           mut player: PlayerComponent, 
+           act: &Action, 
+           maps: &MapList, 
+           pl: &PlayerList) 
+           -> (Vec<Pack>, Vec<PlayerComponent>) 
+        {
         let mut out = Vec::<Pack>::new();
         let mut players = Vec::<PlayerComponent>::new();
 
@@ -64,9 +68,30 @@ impl PlayerManSystem {
                     out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
                 }
             },
+            
             Action::ChangeOutfit(skin) => {
                 player.skin = get_outfit(&skin);
                 //TODO: Make sure skin in legal!
+                players.push(player.clone());
+                out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+            },
+
+            Action::Melee => {
+                let victom = pl.get_from_transform(player.in_front()); // Anyone in front of the player???
+                info!("Swing!"); 
+                match victom{
+                    Some(mut victom) => {
+                        info!("Direct Hit!");
+                        victom.hp(-10.0); // Oh shit
+                        players.push(victom.clone());
+                        out.push(Pack::new(Cmd::UpdatePlayer(victom), 0, None));
+                    },
+                    None => info!("And a miss!"), 
+                }
+            },
+            
+            Action::Rotate(dir) => {
+                player.orientation = dir.clone();
                 players.push(player.clone());
                 out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
             },

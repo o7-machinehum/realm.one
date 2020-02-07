@@ -1,3 +1,7 @@
+use amethyst::{
+    core::{Transform},
+};
+
 use crate::components::PlayerComponent;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -45,7 +49,21 @@ impl PlayerList {
     pub fn replace(&mut self, player: PlayerComponent) {
         let name = player.name.clone();
         self.list[*self.name.get(&name).unwrap()] = Some(player); 
-    } 
+    }
+
+    pub fn get_from_transform(&self, tr: Transform) -> Option<PlayerComponent> {
+        for player in self.list.iter() {
+            match player {
+                Some(pl) => {
+                    if pl.trans().translation() == tr.translation() {
+                        return Some(pl.clone());
+                    } 
+                },
+                None => (),
+            }
+        }
+        None
+    }
 }
 
 impl Iterator for PlayerList {

@@ -30,6 +30,5 @@ impl MapList {
     pub fn get_mut(&mut self, file_name: &String) -> Option<&mut Room> {
         self.list.get_mut(file_name)
     }
-
 }
 

@@ -131,8 +131,10 @@ impl<'s> System<'s> for PlayerSystem{
                     let adj_player_tr = { 
                         let player = players.get_mut(p1).unwrap();  // Get yourself
                         let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
-                        player.update_orientation(&self.horizontal, &self.vertical);  // Update self
-                        spr.sprite_number = player.get_dir();             // Change sprite
+                        if(player.update_orientation(&self.horizontal, &self.vertical)) { // Update self
+                            spr.sprite_number = player.get_dir();             // Change sprite
+                            io.o.push(Pack::new(Cmd::Action(Action::Rotate(player.orientation.clone())), 0, None));
+                        } 
                         player.in_front()    // Get transform of in front
                     };
                     
@@ -158,6 +160,7 @@ impl<'s> System<'s> for PlayerSystem{
                 if self.melee {
                     info!("Punch"); 
                     io.o.push(Pack::new(Cmd::Action(Action::Melee), 0, None));
+                    self.melee = false;
                 }
 
                 self.timer = Some(now.clone());

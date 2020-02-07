@@ -7,6 +7,7 @@ use crate::components::{Skins};
 pub enum Action {
     Nothing,
     Move(Orientation),
+    Rotate(Orientation),
     Attack(u32),
     UseItem(u32),
     ChangeOutfit(Skins),

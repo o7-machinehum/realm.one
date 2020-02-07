@@ -46,7 +46,8 @@ impl PlayerComponent {
         }
     }
     
-    pub fn update_orientation(&mut self, x: &f32, y: &f32) {
+    pub fn update_orientation(&mut self, x: &f32, y: &f32) -> bool{
+        let old = self.orientation.clone(); 
         let x = *x;
         let y = *y;
 
@@ -59,6 +60,11 @@ impl PlayerComponent {
         } else if y < 0. {
             self.orientation = Orientation::South;
         }
+
+        if old == self.orientation {
+            return false
+        }
+        true
     }
     
     pub fn walk(&mut self) {
@@ -98,9 +104,9 @@ impl PlayerComponent {
         Vector3::new(self.x, self.y, self.z()) 
     }
 
-    // pub fn hp(&mut self, amt: f32) {
-    //     self.hp += amt;
-    // }
+    pub fn hp(&mut self, amt: f32) {
+        self.hp += amt;
+    }
 
     pub fn trans(&self) -> Transform {
         let mut tr = Transform::default();
