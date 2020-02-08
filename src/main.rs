@@ -85,7 +85,9 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with_bundle(systems::ChatSystemBundle)?
         .with(systems::PlayerSystem::new(config.player_name.clone()), "player_system", &["input_system"])
         .with(systems::MapSystem, "map_system", &[])
-        .with(systems::client::PlayerManSystem, "pm_system", &[]);
+        .with(systems::client::PlayerManSystem, "pm_system", &[])
+        .with(systems::SimpleAnimationSystem, "pm_system", &[]);
+
     
     let mut game = Application::build(resources, states::GamePlayState{config})?
         .with_frame_limit(
