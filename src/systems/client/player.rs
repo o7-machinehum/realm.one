@@ -46,18 +46,20 @@ impl PlayerSystem {
     fn get_input<'s>(&mut self, input: Read<'s, InputHandler<MovementBindingTypes>>) {
         match input.axis_value(&AxisBinding::Horizontal) {
             Some(value) => {
-                if value != 0.0 {
-                    self.horizontal = value;
-                }
+                self.horizontal = value; 
+                // if value != 0.0 {
+                //     self.horizontal = value;
+                // }
             },
             None => (),
         }
         
         match input.axis_value(&AxisBinding::Vertical) {
             Some(value) => {
-                if value != 0.0 {
-                    self.vertical = value;
-                }
+                self.vertical = value;
+                // if value != 0.0 {
+                //     self.vertical = value;
+                // }
             },
             None => (),
         }
@@ -152,10 +154,9 @@ impl<'s> System<'s> for PlayerSystem{
                         let tr = transforms.get_mut(p1).unwrap(); 
                         player.walk(); // Walk one step in forward direction
 
-                        anim.insert(p1, 
-                                    SimpleAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0, 
-                                    *tr.translation(), 
-                                    *player.trans().translation()));
+                        anim.insert(p1, SimpleAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0, 
+                                                              *tr.translation(), 
+                                                              *player.trans().translation()));
 
                         io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                     }
