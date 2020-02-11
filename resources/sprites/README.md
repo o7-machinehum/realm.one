@@ -1,9 +1,9 @@
 # Cheat Sheet
-If you change the spritesheet master16.png there are three things you must must do!
+If you want to change the master16.png there are three things you must must do!
+  - Where indicated in the build.sh, add another line merging in your new spritesheet
   - Ensure the all new sprites have been placed BELOW the old master16.png, this is to ensure the sprite number do _not_ change
   - Change the number of sprites constant inside spritescontainer.rs! 
   - Change master16.ron to reflect the new resolution!
-
 
 ## Padding pixels on an image
 
@@ -33,4 +33,12 @@ This will resize
 
 ```
 convert 10Tile-B.png -resize 128x224 10Tile-B.png
+```
+
+
+## Removing Background
+This will make the background transparent, note pixel at position 0,0 _must_ be the colour that you want to make transparent
+
+```
+convert 07Tiny16-ExpandedFemaleSprites.png -fill none -draw "matte 0,0 replace" result.png
 ```
