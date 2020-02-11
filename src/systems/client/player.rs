@@ -3,7 +3,9 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Read, Write, Entities, Entity, System, SystemData, WriteStorage, Join},
     input::InputHandler,
-    renderer::SpriteRender
+    renderer::SpriteRender, 
+    renderer::resources::Tint,
+    renderer::palette::rgb::Srgba,
 };
 
 
@@ -11,8 +13,8 @@ use std::time::Instant;
 use log::info;
 
 use crate::{
-    components::{PlayerComponent, Action},
-    key_bindings::{MovementBindingTypes, AxisBinding},
+    components::{PlayerComponent, Action, SimpleAnimation},
+    key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
     map::{Room},
     network::{Pack, Cmd},
     resources::{IO, SpritesContainer},
@@ -23,25 +25,66 @@ use crate::{
 
 #[derive(SystemDesc)]
 pub struct PlayerSystem { 
-    pub p1: Option<Entity>,
-    pub timer: Option<Instant>,
-    pub p1_name: String,
+    p1: Option<Entity>,
+    timer: Option<Instant>,
+    p1_name: String,
+    horizontal: f32,
+    vertical: f32,
+    melee: bool,
 }
 
-// fn foo<'e>(
-//     transforms: &mut Storage<'e, Transform, DerefMut<Target = MaskedStorage<Transform>>>,
-//     players: &mut Storage<'e, PlayerComponent, DerefMut<Target = MaskedStorage<PlayerComponent>>>
-//     ) {
-//         for (transform, player) in (transforms, players).join() {
-//             }
-//       }
+impl PlayerSystem {
+    pub fn new(name: String) -> Self {
+        Self {
+            p1: None,
+            timer: None, 
+            p1_name: name,
+            horizontal: 0.0,
+            vertical: 0.0,
+            melee: false,
+        }
+    }
+
+    fn get_input<'s>(&mut self, input: Read<'s, InputHandler<MovementBindingTypes>>) {
+        match input.axis_value(&AxisBinding::Horizontal) {
+            Some(value) => {
+                self.horizontal = value; 
+                // if value != 0.0 {
+                //     self.horizontal = value;
+                // }
+            },
+            None => (),
+        }
+        
+        match input.axis_value(&AxisBinding::Vertical) {
+            Some(value) => {
+                self.vertical = value;
+                // if value != 0.0 {
+                //     self.vertical = value;
+                // }
+            },
+            None => (),
+        }
+
+        match input.action_is_down(&ActionBinding::Melee) {
+            Some(value) => {
+                if value == true {
+                    self.melee = true;
+                }
+            },
+            None => (),
+        }
+    }
+}
 
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
+        WriteStorage<'s, SimpleAnimation>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, Parent>,
         WriteStorage<'s, SpriteRender>,
+        WriteStorage<'s, Tint>,
         Write<'s, IO>,
         Write<'s, Room>,
         Entities<'s>,
@@ -49,7 +92,19 @@ impl<'s> System<'s> for PlayerSystem{
         Read<'s, SpritesContainer>,
     );
  
-    fn run(&mut self, (mut transforms, mut players, mut parents, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
+    fn run(&mut self, 
+         (mut anim, 
+          mut transforms, 
+          mut players, 
+          mut parents, 
+          mut sprite_renders, 
+          mut tints,
+          mut io, 
+          room, 
+          entities, 
+          input, 
+          s): Self::SystemData) 
+    {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::InsertPlayer(play) =>  {
@@ -57,7 +112,8 @@ impl<'s> System<'s> for PlayerSystem{
                         .build_entity()
                         .with(play.trans(), &mut transforms)
                         .with(play.get_orientated(&s.sprites), &mut sprite_renders)
-                        .with(play.clone(), &mut players) 
+                        .with(Tint(play.tint()), &mut tints)
+                        .with(play.clone(), &mut players)
                         .build());
                     
                     // Write the players name
@@ -82,28 +138,22 @@ impl<'s> System<'s> for PlayerSystem{
             }
         }
         
-        match self.p1 {
-            Some(p1) => {
-                let now = Instant::now();
-
-                if now.duration_since(self.timer.unwrap()).as_millis() >= constants::MOVEMENT_DELAY_MS {
-                    let horizontal = input
-                        .axis_value(&AxisBinding::Horizontal)
-                        .unwrap_or(0.0);
-                    let vertical = input
-                        .axis_value(&AxisBinding::Vertical)
-                        .unwrap_or(0.0);
-                    
-                    if horizontal == 0. && vertical == 0. {
-                        return;
-                    }
-                    
+        if self.p1.is_some() {
+            let now = Instant::now();
+            let p1 = self.p1.unwrap();
+            
+            self.get_input(input);
+                        
+            if now.duration_since(self.timer.unwrap()).as_millis() >= constants::MOVEMENT_DELAY_MS {
+                if self.horizontal != 0. || self.vertical != 0. {
                     // Get player and transform component of yourself
                     let adj_player_tr = { 
                         let player = players.get_mut(p1).unwrap();  // Get yourself
                         let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
-                        player.update_orientation(&horizontal, &vertical);  // Update self
-                        spr.sprite_number = player.get_dir();             // Change sprite
+                        if(player.update_orientation(&self.horizontal, &self.vertical)) { // Update self
+                            spr.sprite_number = player.get_dir();             // Change sprite
+                            io.o.push(Pack::new(Cmd::Action(Action::Rotate(player.orientation.clone())), 0, None));
+                        } 
                         player.in_front()    // Get transform of in front
                     };
                     
@@ -119,13 +169,25 @@ impl<'s> System<'s> for PlayerSystem{
                     if room.allowed_move(&player.trans(), &player.orientation) && !adj_player.is_some() {
                         let tr = transforms.get_mut(p1).unwrap(); 
                         player.walk(); // Walk one step in forward direction
-                        tr.set_translation_xyz(player.x(), player.y(), player.z()); 
+
+                        anim.insert(p1, SimpleAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0, 
+                                                              *tr.translation(), 
+                                                              *player.trans().translation()));
+
                         io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                     }
-                    self.timer = Some(now.clone());
+                    self.horizontal = 0.0;
+                    self.vertical = 0.0;
                 }
-            },
-            None => ()
+
+                if self.melee {
+                    info!("Punch"); 
+                    io.o.push(Pack::new(Cmd::Action(Action::Melee), 0, None));
+                    self.melee = false;
+                }
+
+                self.timer = Some(now.clone());
+            }
         }
     }
 }

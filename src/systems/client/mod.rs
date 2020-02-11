@@ -17,3 +17,6 @@ pub use self::tcp::TcpSystemBundle;
 mod chat;
 pub use self::chat::ChatSystem;
 pub use self::chat::ChatSystemBundle;
+
+mod animation;
+pub use self::animation::SimpleAnimationSystem;
