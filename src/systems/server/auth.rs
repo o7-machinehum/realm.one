@@ -6,11 +6,12 @@ use amethyst::{
 use log::info;
 use crate::{
     network::{Pack, Cmd},
-    components::{PlayerComponent, Orientation, Skins, get_outfit},
+    components::{PlayerComponent},
     resources::{PlayerList, IO, MapList},
 };
 
 use std::net::{SocketAddr};
+use std::iter::{Iterator};
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
@@ -36,15 +37,7 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
     info!("Inserting player 1 ({})", name);
    
     // Dig through database to find the correct player by name = name 
-    PlayerComponent {
-        name,
-        ip: ip.unwrap(),
-        room: "resources/maps/town.tmx".to_string(),
-        x: 8.0,
-        y: 8.0,
-        skin: get_outfit(&Skins::Female),
-        orientation: Orientation::North,
-    }
+    PlayerComponent::new(name, ip.unwrap())
 }
 
 impl<'a> System<'a> for AuthSystem {
@@ -67,11 +60,14 @@ impl<'a> System<'a> for AuthSystem {
                             io.o.push(Pack::new(Cmd::InsertPlayer(player.clone()), 0, None));
                             
                             // Push the rest of the players
-                            for p in &pl.list {
-                                io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), 0, Some(ip)));
+                            for p in pl.list.iter() {
+                                match p {
+                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), 0, Some(ip))),
+                                    None => (),
+                                }
                             }
                             
-                            pl.list.push(player); 
+                            pl.add(player); 
                         },
                         None => (),
                     }

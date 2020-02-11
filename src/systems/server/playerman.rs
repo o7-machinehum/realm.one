@@ -6,7 +6,7 @@ use log::info;
 
 use crate::{
     network::{Pack, Cmd},
-    components::{Action, get_outfit},
+    components::{Action, get_outfit, PlayerComponent},
     resources::{PlayerList, IO, MapList},
 };
 
@@ -21,66 +21,82 @@ impl<'a> System<'a> for PlayerManSystem {
         Read <'a, MapList>,
     );
 
-    fn run(&mut self, (mut io, mut players, maps): Self::SystemData) {
+    fn run(&mut self, (mut io, mut pl, maps): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::Action(act) => {
                     info!("Action from Address: {:?}, Action: {:?}", element.ip(), element.cmd);
-                    for mut player in &mut players.list {
-                        if player.ip == element.ip().unwrap() {
-                            // Get room the player is in
-                            let mut k : usize = 0;
-                            for x in 0..maps.list.len() {
-                                if maps.list[x].name == player.room {
-                                    k = x;
-                                    break
-                                }
-                            };
-
-                            let pk = match act {
-                                Action::Move(dir) => {
-                                    player.orientation = dir.clone();
-                                    info!("Checking to see if walk is allowed"); 
-                                    if maps.list[k].allowed_move(&player.trans(), &player.orientation) {
-                                        info!("Player Walking"); 
-                                        player.walk();
-                                        Some(Pack::new(Cmd::UpdatePlayer(player.clone()), 0, None))
-                                    }
-                                    else {
-                                        None
-                                    }
-                                },
-                                Action::ChangeOutfit(skin) => {
-                                    player.skin = get_outfit(skin);
-                                    //TODO: Make sure skin in legal!
-                                    Some(Pack::new(Cmd::UpdatePlayer(player.clone()), 0, None))
-                                },
-                                _ => None, 
-                            };
-
-                            info!("{:?}", pk);
-                            
-                            match pk {
-                                Some(pk) => io.o.push(pk),
-                                None => (),
-                            }
-                        }
+                    let mut acting_player = pl.get_from_ip(element.ip().unwrap()).unwrap(); 
+                    let packs_players = self.act(acting_player, act, &maps, &pl);
+                    
+                    for pack in packs_players.0 {
+                        info!("{:?}", pack);
+                        io.o.push(pack) 
+                    }
+                    
+                    for player in packs_players.1 {
+                        info!("{:?}", player);
+                        pl.replace(player); 
                     }
                 },
-                Cmd::RemovePlayer(ip) => {
-                    let mut p = 0;
-                    for i in 0..players.list.len() {
-                        if players.list[i].ip == *ip {
-                            info!("Removing player: {}", *ip); 
-                            p = i;
-                            break; 
-                        }
-                    }
-
-                    players.list.remove(p);
-                },
+                Cmd::RemovePlayer(ip) => pl.remove_with_ip(*ip), 
                 _ => (io.i.push(element)), 
             }
         }
+    }
+}
+
+impl PlayerManSystem {
+    fn act(&mut self, 
+           mut player: PlayerComponent, 
+           act: &Action, 
+           maps: &MapList, 
+           pl: &PlayerList) 
+           -> (Vec<Pack>, Vec<PlayerComponent>) 
+        {
+        let mut out = Vec::<Pack>::new();
+        let mut players = Vec::<PlayerComponent>::new();
+
+        match act {
+            Action::Move(dir) => {
+                player.orientation = dir.clone();
+                info!("Checking to see if walk is allowed"); 
+                if maps.get(&player.room).unwrap().allowed_move(&player.trans(), &player.orientation) {
+                    info!("Player Walking"); 
+                    player.walk();
+                    players.push(player.clone());
+                    out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+                }
+            },
+            
+            Action::ChangeOutfit(skin) => {
+                player.skin = get_outfit(&skin);
+                //TODO: Make sure skin in legal!
+                players.push(player.clone());
+                out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+            },
+
+            Action::Melee => {
+                let victom = pl.get_from_transform(player.in_front()); // Anyone in front of the player???
+                info!("Swing!"); 
+                match victom{
+                    Some(mut victom) => {
+                        info!("Direct Hit!");
+                        victom.hp(-10.0); // Oh shit
+                        players.push(victom.clone());
+                        out.push(Pack::new(Cmd::UpdatePlayer(victom), 0, None));
+                    },
+                    None => info!("And a miss!"), 
+                }
+            },
+            
+            Action::Rotate(dir) => {
+                player.orientation = dir.clone();
+                players.push(player.clone());
+                out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+            },
+            _ => (), 
+        };
+        (out, players)
     }
 }

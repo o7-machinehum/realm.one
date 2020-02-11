@@ -11,7 +11,7 @@ pub enum AxisBinding {
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ActionBinding {
-    Shoot,
+    Melee,
 }
 
 impl Display for AxisBinding {

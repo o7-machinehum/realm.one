@@ -9,3 +9,6 @@ mod outfits;
 pub use self::outfits::Skins;
 pub use self::outfits::Outfit;
 pub use self::outfits::get_outfit;
+
+mod animation;
+pub use self::animation::SimpleAnimation;
