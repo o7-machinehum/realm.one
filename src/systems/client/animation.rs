@@ -41,8 +41,7 @@ impl<'s> System<'s> for SimpleAnimationSystem {
 
             match anim.get_seq() {
                 Some(new_footing) => {
-                    info!("{}", new_footing);
-                    sprite_render.sprite_number = player.get_dir() + (new_footing as usize);
+                    sprite_render.sprite_number = (player.get_dir() as i32 + new_footing) as usize;
                 }
                 None => ()
             };

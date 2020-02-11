@@ -1,7 +1,10 @@
-use amethyst::core::{Transform};
-use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Read, Write, System, SystemData, WriteStorage, Join, Entities};
-use amethyst::renderer::SpriteRender;
+use amethyst::{ 
+    core::{Transform},
+    derive::SystemDesc,
+    ecs::{Read, Write, System, SystemData, WriteStorage, Join, Entities},
+    renderer::{SpriteRender, resources::Tint},
+};
+
 use log::info;
 
 use crate::{ 
@@ -18,16 +21,16 @@ impl<'s> System<'s> for PlayerManSystem{
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, SpriteRender>,
+        WriteStorage<'s, Tint>,
         Write<'s, IO>,
-        Read<'s, SpritesContainer>,
         Entities<'s>,
     );
  
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut io, _s, entities): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut tints, mut io, entities): Self::SystemData) {
         for element in io.i.pop() {
             match element.cmd {
                 Cmd::UpdatePlayer(new) => {
-                    for (transform, player, sprite_render) in (&mut transforms, &mut players, &mut sprite_renders).join() { 
+                    for (transform, player, sprite_render, tint) in (&mut transforms, &mut players, &mut sprite_renders, &mut tints).join() { 
                         if player.name == new.name {
                             info!("Updating Player: {:?}", player);
 
@@ -37,6 +40,11 @@ impl<'s> System<'s> for PlayerManSystem{
 
                             if player.orientation != new.orientation {
                                 sprite_render.sprite_number = new.get_dir();
+                            }
+
+                            if player.hp != new.hp {
+                                // oh damn we hurtin
+                                *tint = Tint(new.tint());  
                             }
                             
                             *player = new.clone();

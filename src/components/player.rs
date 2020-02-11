@@ -2,6 +2,8 @@ use amethyst::{
     renderer::SpriteRender,
     core::transform::Transform,
     ecs::{Component, DenseVecStorage, FlaggedStorage},
+    renderer::resources::Tint,
+    renderer::palette::rgb::Srgba,
 };
 
 use serde::{Serialize, Deserialize};
@@ -29,7 +31,7 @@ pub struct PlayerComponent {
     pub y: f32, 
     pub skin: Outfit,
     pub orientation: Orientation,
-    hp: f32,
+    pub hp: f32,
 }
 
 impl PlayerComponent {
@@ -123,13 +125,17 @@ impl PlayerComponent {
         }
     }
 
-    pub fn get_dir(&self) -> usize{
+    pub fn get_dir(&self) -> usize {
         match self.orientation {
             Orientation::North => self.skin.n,
             Orientation::South => self.skin.s,
             Orientation::East  => self.skin.e,
             Orientation::West  => self.skin.w,
         }
+    }
+
+    pub fn tint(&self) -> Srgba {
+        Srgba::new((100.0 - self.hp)*0.05 + 1.0, 1.0, 1.0, 1.0)
     }
 }
 

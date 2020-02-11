@@ -1,4 +1,9 @@
 # Cheat Sheet
+If you change the spritesheet master16.png there are three things you must must do!
+  - Ensure the all new sprites have been placed BELOW the old master16.png, this is to ensure the sprite number do _not_ change
+  - Change the number of sprites constant inside spritescontainer.rs! 
+  - Change master16.ron to reflect the new resolution!
+
 
 ## Padding pixels on an image
 

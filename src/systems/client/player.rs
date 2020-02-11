@@ -3,7 +3,9 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Read, Write, Entities, Entity, System, SystemData, WriteStorage, Join},
     input::InputHandler,
-    renderer::SpriteRender
+    renderer::SpriteRender, 
+    renderer::resources::Tint,
+    renderer::palette::rgb::Srgba,
 };
 
 
@@ -82,6 +84,7 @@ impl<'s> System<'s> for PlayerSystem{
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, Parent>,
         WriteStorage<'s, SpriteRender>,
+        WriteStorage<'s, Tint>,
         Write<'s, IO>,
         Write<'s, Room>,
         Entities<'s>,
@@ -89,7 +92,19 @@ impl<'s> System<'s> for PlayerSystem{
         Read<'s, SpritesContainer>,
     );
  
-    fn run(&mut self, (mut anim, mut transforms, mut players, mut parents, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
+    fn run(&mut self, 
+         (mut anim, 
+          mut transforms, 
+          mut players, 
+          mut parents, 
+          mut sprite_renders, 
+          mut tints,
+          mut io, 
+          room, 
+          entities, 
+          input, 
+          s): Self::SystemData) 
+    {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::InsertPlayer(play) =>  {
@@ -97,7 +112,8 @@ impl<'s> System<'s> for PlayerSystem{
                         .build_entity()
                         .with(play.trans(), &mut transforms)
                         .with(play.get_orientated(&s.sprites), &mut sprite_renders)
-                        .with(play.clone(), &mut players) 
+                        .with(Tint(play.tint()), &mut tints)
+                        .with(play.clone(), &mut players)
                         .build());
                     
                     // Write the players name
