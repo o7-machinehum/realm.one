@@ -1,34 +1,60 @@
 use amethyst::{
-    core:: Time,
-    ecs::{Read, System, WriteStorage, Join},
+    core:: {Transform, Time},
+    ecs::{Read, System, WriteStorage, ReadStorage, Join, Entities, Entity},
     renderer::SpriteRender
 };
 
+use log::info;
 use crate::{
-    components::{SimpleAnimation},
+    components::{SimpleAnimation, PlayerComponent},
 };
 
-pub struct SimpleAnimationSystem;
+pub struct SimpleAnimationSystem {
+    delete_list : Vec::<Entity>,
+}
+
+impl SimpleAnimationSystem {
+    pub fn new() -> Self {
+        Self {
+            delete_list: Vec::<Entity>::new(),
+        }
+    }
+}
 
 impl<'s> System<'s> for SimpleAnimationSystem {
     type SystemData = (
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, SimpleAnimation>,
+        ReadStorage<'s, PlayerComponent>,
+        WriteStorage<'s, Transform>,
+        Entities<'s>, 
         Read<'s, Time>,
     );
 
-    fn run(&mut self, (mut sprite_renders, mut anim, time): Self::SystemData) {
-        for (sprite_render, anim) in (&mut sprite_renders, &mut anim).join() {
-            anim.elapsed_time += time.delta_seconds();
+    fn run(&mut self, (mut sprite_renders, mut anims, players, mut transforms, entities, time): Self::SystemData) {
+        for item in self.delete_list.pop() {
+            anims.remove(item);
+        }
+        
+        for (e, sprite_render, anim, player, tr) in (&entities, &mut sprite_renders, &mut anims, &players, &mut transforms).join() {
+            anim.update(time.delta_seconds());
 
-            let frame_count = (anim.elapsed_time / anim.time_per_frame) as usize
-                              % anim.frames;
-            
-            if frame_count != anim.current_frame {
-                anim.current_frame = frame_count;
-                sprite_render.sprite_number = frame_count;
+            match anim.get_seq() {
+                Some(new_footing) => {
+                    info!("{}", new_footing);
+                    sprite_render.sprite_number = player.get_dir() + (new_footing as usize);
+                }
+                None => ()
+            };
+
+            // tr.set_translation(anim.pos());
+            tr.set_translation(anim.pos());
+        
+            if anim.delete() {
+                // Clean up to a reasonable number
+                tr.set_translation(*player.trans().translation());
+                self.delete_list.push(e.clone());
             }
-            println!("{}", frame_count);
         }
     }
 }

@@ -6,7 +6,7 @@ use amethyst::{
 
 use serde::{Serialize, Deserialize};
 use crate::{constants};
-use crate::components::{Outfit, Skins, get_outfit};
+use crate::components::{Outfit, Skins, get_outfit, SimpleAnimation };
 use std::net::{SocketAddr};
 use nalgebra::base::Vector3;
 

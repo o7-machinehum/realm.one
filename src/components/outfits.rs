@@ -24,7 +24,7 @@ pub fn get_outfit(skin: &Skins) -> Outfit {
     match skin {
         Skins::Nude     => Outfit { n: 312, e: 300, s: 276, w: 288 },
         Skins::Male     => Outfit { n: 315, e: 303, s: 279, w: 291 },
-        Skins::Female   => Outfit { n: 318, e: 306, s: 282, w: 294 },
+        Skins::Female   => Outfit { n: 319, e: 307, s: 283, w: 295 },
         Skins::Skeleton => Outfit { n: 321, e: 309, s: 285, w: 297 },
         Skins::Slime    => Outfit { n: 360, e: 349, s: 324, w: 336 },
         Skins::Bat      => Outfit { n: 363, e: 352, s: 327, w: 339 },

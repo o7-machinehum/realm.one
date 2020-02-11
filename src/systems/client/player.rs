@@ -11,7 +11,7 @@ use std::time::Instant;
 use log::info;
 
 use crate::{
-    components::{PlayerComponent, Action},
+    components::{PlayerComponent, Action, SimpleAnimation},
     key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
     map::{Room},
     network::{Pack, Cmd},
@@ -75,6 +75,7 @@ impl PlayerSystem {
 
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
+        WriteStorage<'s, SimpleAnimation>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, Parent>,
@@ -86,7 +87,7 @@ impl<'s> System<'s> for PlayerSystem{
         Read<'s, SpritesContainer>,
     );
  
-    fn run(&mut self, (mut transforms, mut players, mut parents, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
+    fn run(&mut self, (mut anim, mut transforms, mut players, mut parents, mut sprite_renders, mut io, room, entities, input, s): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::InsertPlayer(play) =>  {
@@ -150,7 +151,12 @@ impl<'s> System<'s> for PlayerSystem{
                     if room.allowed_move(&player.trans(), &player.orientation) && !adj_player.is_some() {
                         let tr = transforms.get_mut(p1).unwrap(); 
                         player.walk(); // Walk one step in forward direction
-                        tr.set_translation_xyz(player.x(), player.y(), player.z()); 
+
+                        anim.insert(p1, 
+                                    SimpleAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0, 
+                                    *tr.translation(), 
+                                    *player.trans().translation()));
+
                         io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                     }
                     self.horizontal = 0.0;

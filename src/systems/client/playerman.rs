@@ -31,7 +31,7 @@ impl<'s> System<'s> for PlayerManSystem{
                         if player.name == new.name {
                             info!("Updating Player: {:?}", player);
 
-                            if *transform.translation() != new.xyz() { 
+                            if *player.trans().translation() != new.xyz() { 
                                 transform.set_translation(new.xyz()); 
                             }
 
