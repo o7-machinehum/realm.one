@@ -1,5 +1,5 @@
 AppConfig(
-    server_ip: "18.220.126.218:3457",
+    server_ip: "18.220.126.218:117",
     
     player_name: "Nicola",
     // player_name: "Turnip",
