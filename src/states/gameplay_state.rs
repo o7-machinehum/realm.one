@@ -6,7 +6,7 @@ use amethyst::{
     ecs::World,
 };
 
-
+use log::info;
 use crate::map;
 use crate::components::{PlayerComponent};
 use crate::resources::{ClientStatus, PlayerList, IO, AppConfig, SpritesContainer};
@@ -42,11 +42,15 @@ impl SimpleState for GamePlayState {
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
     let mut transform = Transform::default();
-    transform.set_translation_xyz(dimensions.width() * 0.5, dimensions.height() * 0.5, 10.);
+    let width = dimensions.width() as f64 / dimensions.hidpi_factor();
+    let height = dimensions.height() as f64 / dimensions.hidpi_factor();
+
+    info!("{:?}", dimensions);
+    transform.set_translation_xyz(width as f32 * 0.5, height as f32 * 0.5, 10.);
 
     world
         .create_entity()
-        .with(Camera::standard_2d(dimensions.width(), dimensions.height()))
+        .with(Camera::standard_2d(width as f32, height as f32))
         .with(transform)
         .build();
 }
