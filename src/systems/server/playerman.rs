@@ -26,7 +26,7 @@ impl<'a> System<'a> for PlayerManSystem {
             match &element.cmd {
                 Cmd::Action(act) => {
                     info!("Action from Address: {:?}, Action: {:?}", element.ip(), element.cmd);
-                    let mut acting_player = pl.get_from_ip(element.ip().unwrap()).unwrap(); 
+                    let acting_player = pl.get_from_ip(element.ip().unwrap()).unwrap(); 
                     let packs_players = self.act(acting_player, act, &maps, &pl);
                     
                     for pack in packs_players.0 {

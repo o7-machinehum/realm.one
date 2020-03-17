@@ -4,9 +4,9 @@ use amethyst::{
     renderer::SpriteRender
 };
 
-use log::info;
+
 use crate::{
-    components::{WalkAnimation, PlayerComponent, Move},
+    components::{Move},
 };
 
 pub struct MoveSystem {

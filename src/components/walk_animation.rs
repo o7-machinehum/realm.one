@@ -2,10 +2,10 @@ use amethyst::{
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 
-use log::info;
+
 use serde::{Serialize, Deserialize};
-use nalgebra::base::{Vector3, Matrix4};
-use nalgebra::geometry::Isometry3;
+
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Step {

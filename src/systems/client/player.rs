@@ -5,7 +5,6 @@ use amethyst::{
     input::InputHandler,
     renderer::SpriteRender, 
     renderer::resources::Tint,
-    renderer::palette::rgb::Srgba,
 };
 
 
@@ -108,7 +107,7 @@ impl<'s> System<'s> for PlayerSystem{
                     let adj_player_tr = {
                         let player = players.get_mut(p1).unwrap();  // Get yourself
                         let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
-                        if(player.update_orientation(&self.horizontal, &self.vertical)) { // Update self
+                        if player.update_orientation(&self.horizontal, &self.vertical) { // Update self
                             spr.sprite_number = player.get_dir();             // Change sprite
                             io.o.push(Pack::new(Cmd::Action(Action::Rotate(player.orientation.clone())), 0, None));
                         } 
