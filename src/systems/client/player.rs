@@ -13,7 +13,7 @@ use std::time::Instant;
 use log::info;
 
 use crate::{
-    components::{PlayerComponent, Action, WalkAnimation},
+    components::{PlayerComponent, Action, WalkAnimation, Move},
     key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
     map::{Room},
     network::{Pack, Cmd},
@@ -33,52 +33,9 @@ pub struct PlayerSystem {
     melee: bool,
 }
 
-impl PlayerSystem {
-    pub fn new(name: String) -> Self {
-        Self {
-            p1: None,
-            timer: None, 
-            p1_name: name,
-            horizontal: 0.0,
-            vertical: 0.0,
-            melee: false,
-        }
-    }
-
-    fn get_input<'s>(&mut self, input: Read<'s, InputHandler<MovementBindingTypes>>) {
-        match input.axis_value(&AxisBinding::Horizontal) {
-            Some(value) => {
-                self.horizontal = value; 
-                // if value != 0.0 {
-                //     self.horizontal = value;
-                // }
-            },
-            None => (),
-        }
-        
-        match input.axis_value(&AxisBinding::Vertical) {
-            Some(value) => {
-                self.vertical = value;
-                // if value != 0.0 {
-                //     self.vertical = value;
-                // }
-            },
-            None => (),
-        }
-
-        match input.action_is_down(&ActionBinding::Melee) {
-            Some(value) => {
-                if value == true {
-                    self.melee = true;
-                }
-            },
-            None => (),
-        }
-    }
-}
-
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
+        WriteStorage<'s, Move>,
         WriteStorage<'s, WalkAnimation>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
@@ -93,7 +50,8 @@ impl<'s> System<'s> for PlayerSystem{
     );
  
     fn run(&mut self, 
-         (mut anim, 
+         (mut moves,
+          mut anim, 
           mut transforms, 
           mut players, 
           mut parents, 
@@ -169,10 +127,13 @@ impl<'s> System<'s> for PlayerSystem{
                     if room.allowed_move(&player.trans(), &player.orientation) && !adj_player.is_some() {
                         let tr = transforms.get_mut(p1).unwrap(); 
                         player.walk(); // Walk one step in forward direction
-
-                        anim.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0, 
-                                                              *tr.translation(), 
-                                                              *player.trans().translation()));
+                        
+                        let mv = Move::new(*tr.translation(), 
+                            *player.trans().translation(),
+                            (constants::MOVEMENT_DELAY_MS as f32) / 1000.0); 
+                        
+                        anim.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0));
+                        moves.insert(p1, mv);
 
                         io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                     }
@@ -188,6 +149,50 @@ impl<'s> System<'s> for PlayerSystem{
 
                 self.timer = Some(now.clone());
             }
+        }
+    }
+}
+
+impl PlayerSystem {
+    pub fn new(name: String) -> Self {
+        Self {
+            p1: None,
+            timer: None, 
+            p1_name: name,
+            horizontal: 0.0,
+            vertical: 0.0,
+            melee: false,
+        }
+    }
+
+    fn get_input<'s>(&mut self, input: Read<'s, InputHandler<MovementBindingTypes>>) {
+        match input.axis_value(&AxisBinding::Horizontal) {
+            Some(value) => {
+                self.horizontal = value; 
+                // if value != 0.0 {
+                //     self.horizontal = value;
+                // }
+            },
+            None => (),
+        }
+        
+        match input.axis_value(&AxisBinding::Vertical) {
+            Some(value) => {
+                self.vertical = value;
+                // if value != 0.0 {
+                //     self.vertical = value;
+                // }
+            },
+            None => (),
+        }
+
+        match input.action_is_down(&ActionBinding::Melee) {
+            Some(value) => {
+                if value == true {
+                    self.melee = true;
+                }
+            },
+            None => (),
         }
     }
 }

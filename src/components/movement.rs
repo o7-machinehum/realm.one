@@ -14,18 +14,20 @@ pub struct Move {
     vel: f32,
     time: f32,
     elapsed_time: f32,
+    pec: f32,
 }
 
 impl Move {
-    pub fn new(point_a: Vector3<f32>, point_b: Vector3<f32>, vel: f32)
+    pub fn new(point_a: Vector3<f32>, point_b: Vector3<f32>, time: f32)
         -> Self 
     {
         Self {
             point_a,
             point_b,
-            vel,
-            time = 1.0,
+            vel: 1.0,  // TODO: This should be calculated
+            time, 
             elapsed_time: 0.0,
+            pec: 0.0,
         }
     }
 
