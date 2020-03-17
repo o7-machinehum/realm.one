@@ -105,7 +105,7 @@ impl<'s> System<'s> for PlayerSystem{
             if now.duration_since(self.timer.unwrap()).as_millis() >= constants::MOVEMENT_DELAY_MS {
                 if self.horizontal != 0. || self.vertical != 0. {
                     // Get player and transform component of yourself
-                    let adj_player_tr = { 
+                    let adj_player_tr = {
                         let player = players.get_mut(p1).unwrap();  // Get yourself
                         let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
                         if(player.update_orientation(&self.horizontal, &self.vertical)) { // Update self
@@ -167,22 +167,12 @@ impl PlayerSystem {
 
     fn get_input<'s>(&mut self, input: Read<'s, InputHandler<MovementBindingTypes>>) {
         match input.axis_value(&AxisBinding::Horizontal) {
-            Some(value) => {
-                self.horizontal = value; 
-                // if value != 0.0 {
-                //     self.horizontal = value;
-                // }
-            },
+            Some(value) => self.horizontal = value,
             None => (),
         }
         
         match input.axis_value(&AxisBinding::Vertical) {
-            Some(value) => {
-                self.vertical = value;
-                // if value != 0.0 {
-                //     self.vertical = value;
-                // }
-            },
+            Some(value) => self.vertical = value,
             None => (),
         }
 
