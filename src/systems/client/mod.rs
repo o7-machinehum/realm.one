@@ -19,4 +19,4 @@ pub use self::chat::ChatSystem;
 pub use self::chat::ChatSystemBundle;
 
 mod animation;
-pub use self::animation::SimpleAnimationSystem;
+pub use self::animation::WalkAnimationSystem;

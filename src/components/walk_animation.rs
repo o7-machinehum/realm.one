@@ -15,7 +15,7 @@ pub enum Step {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct SimpleAnimation {
+pub struct WalkAnimation {
     current_frame: usize,
     start: Vector3<f32>,
     end: Vector3<f32>,
@@ -25,11 +25,11 @@ pub struct SimpleAnimation {
     pec: f32,
 }
 
-impl SimpleAnimation {
+impl WalkAnimation {
     pub fn new(walk_time: f32, start: Vector3<f32>, end: Vector3<f32>)
-        -> SimpleAnimation
+        -> WalkAnimation
     {
-        SimpleAnimation {
+        WalkAnimation {
             current_frame: 0,
             start,
             end,
@@ -74,7 +74,7 @@ impl SimpleAnimation {
     }
 }
 
-impl Component for SimpleAnimation {
+impl Component for WalkAnimation {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }
 

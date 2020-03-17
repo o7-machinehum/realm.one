@@ -13,7 +13,7 @@ use std::time::Instant;
 use log::info;
 
 use crate::{
-    components::{PlayerComponent, Action, SimpleAnimation},
+    components::{PlayerComponent, Action, WalkAnimation},
     key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
     map::{Room},
     network::{Pack, Cmd},
@@ -79,7 +79,7 @@ impl PlayerSystem {
 
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
-        WriteStorage<'s, SimpleAnimation>,
+        WriteStorage<'s, WalkAnimation>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, Parent>,
@@ -170,7 +170,7 @@ impl<'s> System<'s> for PlayerSystem{
                         let tr = transforms.get_mut(p1).unwrap(); 
                         player.walk(); // Walk one step in forward direction
 
-                        anim.insert(p1, SimpleAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0, 
+                        anim.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0, 
                                                               *tr.translation(), 
                                                               *player.trans().translation()));
 
