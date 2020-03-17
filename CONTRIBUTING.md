@@ -1,8 +1,6 @@
 # CONTRIBUTING
 Quick notes on how this projects was made and how to contribute, to be improved in the future. This project uses the [Amethyst](https://amethyst.rs/) game engine.
 
-Join #realm.one on Freenode if you want to chat!
-
 ## Map creation
 Artwork comes from [OpenGameArt.org](https://opengameart.org/content/tiny-16-basic).
 
