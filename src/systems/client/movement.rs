@@ -6,7 +6,7 @@ use amethyst::{
 
 use log::info;
 use crate::{
-    components::{WalkAnimation, PlayerComponent},
+    components::{WalkAnimation, PlayerComponent, Move},
 };
 
 pub struct MoveSystem {

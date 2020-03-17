@@ -20,3 +20,6 @@ pub use self::chat::ChatSystemBundle;
 
 mod animation;
 pub use self::animation::WalkAnimationSystem;
+
+mod movement;
+pub use self::movement::MoveSystem;

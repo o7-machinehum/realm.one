@@ -6,6 +6,7 @@ pub use self::client::ClientSystemBundle;
 pub use self::client::ChatSystem;
 pub use self::client::ChatSystemBundle;
 pub use self::client::WalkAnimationSystem;
+pub use self::client::MoveSystem;
 
 pub mod server;
 pub use self::server::ServerSystem;

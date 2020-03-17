@@ -86,7 +86,8 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with(systems::PlayerSystem::new(config.player_name.clone()), "player_system", &["input_system"])
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::PlayerManSystem, "pm_system", &[])
-        .with(systems::WalkAnimationSystem::new(), "anim_system", &[]);
+        .with(systems::WalkAnimationSystem::new(), "anim_system", &[])
+        .with(systems::MoveSystem::new(), "move_system", &[]);
 
     
     let mut game = Application::build(resources, states::GamePlayState{config})?
