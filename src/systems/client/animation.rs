@@ -1,10 +1,10 @@
 use amethyst::{
-    core:: {Transform, Time},
+    core:: {Time},
     ecs::{Read, System, WriteStorage, ReadStorage, Join, Entities, Entity},
     renderer::SpriteRender
 };
 
-use log::info;
+
 use crate::{
     components::{WalkAnimation, PlayerComponent},
 };
