@@ -6,14 +6,14 @@ use amethyst::{
 
 use log::info;
 use crate::{
-    components::{SimpleAnimation, PlayerComponent},
+    components::{WalkAnimation, PlayerComponent},
 };
 
-pub struct SimpleAnimationSystem {
+pub struct WalkAnimationSystem {
     delete_list : Vec::<Entity>,
 }
 
-impl SimpleAnimationSystem {
+impl WalkAnimationSystem {
     pub fn new() -> Self {
         Self {
             delete_list: Vec::<Entity>::new(),
@@ -21,10 +21,10 @@ impl SimpleAnimationSystem {
     }
 }
 
-impl<'s> System<'s> for SimpleAnimationSystem {
+impl<'s> System<'s> for WalkAnimationSystem {
     type SystemData = (
         WriteStorage<'s, SpriteRender>,
-        WriteStorage<'s, SimpleAnimation>,
+        WriteStorage<'s, WalkAnimation>,
         ReadStorage<'s, PlayerComponent>,
         WriteStorage<'s, Transform>,
         Entities<'s>, 

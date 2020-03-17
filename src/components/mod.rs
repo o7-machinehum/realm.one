@@ -10,5 +10,5 @@ pub use self::outfits::Skins;
 pub use self::outfits::Outfit;
 pub use self::outfits::get_outfit;
 
-mod animation;
-pub use self::animation::SimpleAnimation;
+mod walk_animation;
+pub use self::walk_animation::WalkAnimation;
