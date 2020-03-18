@@ -16,14 +16,16 @@ use crate::{
 
 #[derive(SystemDesc)]
 pub struct InputSystem {
-    mv_latch: bool,
+    mv_h_latch: bool,
+    mv_v_latch: bool,
     melee_latch: bool,
 } 
 
 impl InputSystem {
     pub fn new() -> Self {
         Self {
-            mv_latch: false,
+            mv_h_latch: false,
+            mv_v_latch: false,
             melee_latch: false,
         }
     }
@@ -38,18 +40,18 @@ impl<'s> System<'s> for InputSystem {
     fn run(&mut self, ( input, mut input_res): Self::SystemData) {
         match input.axis_value(&AxisBinding::Horizontal) {
             Some(value) => {
-                if value > 0.0 && !self.mv_latch {
+                if value > 0.0 && !self.mv_h_latch {
                     input_res.add(Inputs::Move(Orientation::East));
-                    self.mv_latch = true;
+                    self.mv_h_latch = true;
                 }
 
-                if value < 0.0 && !self.mv_latch {
+                if value < 0.0 && !self.mv_h_latch {
                     input_res.add(Inputs::Move(Orientation::West));
-                    self.mv_latch = true;
+                    self.mv_h_latch = true;
                 }
                 
                 if value == 0.0 {
-                    self.mv_latch = false;
+                    self.mv_h_latch = false;
                 }
 
             },
@@ -58,18 +60,18 @@ impl<'s> System<'s> for InputSystem {
         
         match input.axis_value(&AxisBinding::Vertical) {
             Some(value) => {
-                if value > 0.0 && !self.mv_latch {
+                if value > 0.0 && !self.mv_v_latch {
                     input_res.add(Inputs::Move(Orientation::North));
-                    self.mv_latch = true;
+                    self.mv_v_latch = true;
                 }
 
-                if value < 0.0 && !self.mv_latch {
+                if value < 0.0 && !self.mv_v_latch {
                     input_res.add(Inputs::Move(Orientation::South));
-                    self.mv_latch = true;
+                    self.mv_v_latch = true;
                 }
                 
                 if value == 0.0 {
-                    self.mv_latch = false;
+                    self.mv_v_latch = false;
                 }
 
             },

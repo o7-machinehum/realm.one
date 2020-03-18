@@ -27,7 +27,6 @@ impl Input {
     }
     
     pub fn add(&mut self, input: Inputs) {
-        info!("{:?}", input);
         self.list.push(input);
     }
     

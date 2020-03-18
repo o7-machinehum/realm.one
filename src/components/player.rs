@@ -47,26 +47,36 @@ impl PlayerComponent {
         }
     }
     
-    pub fn update_orientation(&mut self, x: &f32, y: &f32) -> bool{
-        let old = self.orientation.clone(); 
-        let x = *x;
-        let y = *y;
+//    pub fn update_orientation(&mut self, x: &f32, y: &f32) -> bool{
+//        let old = self.orientation.clone(); 
+//        let x = *x;
+//        let y = *y;
+//
+//        if x > 0. {
+//            self.orientation = Orientation::East;
+//        } else if x < 0. {
+//            self.orientation = Orientation::West;
+//        } else if y > 0. {
+//            self.orientation = Orientation::North;
+//        } else if y < 0. {
+//            self.orientation = Orientation::South;
+//        }
+//
+//        if old == self.orientation {
+//            return false
+//        }
+//        true
+//    }
 
-        if x > 0. {
-            self.orientation = Orientation::East;
-        } else if x < 0. {
-            self.orientation = Orientation::West;
-        } else if y > 0. {
-            self.orientation = Orientation::North;
-        } else if y < 0. {
-            self.orientation = Orientation::South;
-        }
+   pub fn update_orientation(&mut self, or: Orientation) -> bool{
+       let old = self.orientation.clone(); 
+       self.orientation = or; 
 
-        if old == self.orientation {
-            return false
-        }
-        true
-    }
+       if old == self.orientation {
+           return false
+       }
+       true
+   }
     
     pub fn walk(&mut self) {
         match self.orientation {
