@@ -23,3 +23,6 @@ pub use self::animation::WalkAnimationSystem;
 
 mod movement;
 pub use self::movement::MoveSystem;
+
+mod input;
+pub use self::input::InputSystem;
