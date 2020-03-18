@@ -27,8 +27,8 @@ impl MapList {
         self.list.get(file_name)
     }
     
-    pub fn get_mut(&mut self, file_name: &String) -> Option<&mut Room> {
-        self.list.get_mut(file_name)
-    }
+//    pub fn get_mut(&mut self, file_name: &String) -> Option<&mut Room> {
+//        self.list.get_mut(file_name)
+//    }
 }
 
