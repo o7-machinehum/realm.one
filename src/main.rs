@@ -87,6 +87,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::PlayerManSystem, "pm_system", &[])
         .with(systems::WalkAnimationSystem::new(), "anim_system", &[])
+        .with(systems::InputSystem::new(), "in_system", &[])
         .with(systems::MoveSystem::new(), "move_system", &[]);
 
     
