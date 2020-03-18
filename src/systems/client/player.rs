@@ -130,7 +130,7 @@ impl<'s> System<'s> for PlayerSystem{
                         let mv = Move::new(*tr.translation(), 
                             *player.trans().translation(),
                             (constants::MOVEMENT_DELAY_MS as f32) / 1000.0); 
-                        
+
                         anim.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0));
                         moves.insert(p1, mv);
 
