@@ -1,7 +1,7 @@
 use amethyst::{ 
     core::{Transform},
     derive::SystemDesc,
-    ecs::{Read, Write, System, SystemData, WriteStorage, Join, Entities},
+    ecs::{Write, System, SystemData, WriteStorage, Join, Entities},
     renderer::{SpriteRender, resources::Tint},
 };
 
@@ -10,7 +10,7 @@ use log::info;
 use crate::{ 
     components::{PlayerComponent},
     network::Cmd,
-    resources::{IO, SpritesContainer},
+    resources::{IO},
 };
 
 #[derive(SystemDesc)]

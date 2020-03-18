@@ -70,7 +70,7 @@ impl Iterator for PlayerList {
     type Item = PlayerComponent;
     
     fn next(&mut self) -> Option<Self::Item> {
-        let mut i = 0;
+        let i = 0;
 
         while i < self.index {
             if self.list[i].is_some() {

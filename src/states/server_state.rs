@@ -3,7 +3,7 @@ use amethyst::{
 };
 
 use crate::resources::{IO, AppConfig, MapList};
-use crate::map::{Room};
+
 
 pub struct ServerState{
     pub config: AppConfig,

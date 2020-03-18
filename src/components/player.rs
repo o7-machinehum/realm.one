@@ -2,13 +2,12 @@ use amethyst::{
     renderer::SpriteRender,
     core::transform::Transform,
     ecs::{Component, DenseVecStorage, FlaggedStorage},
-    renderer::resources::Tint,
     renderer::palette::rgb::Srgba,
 };
 
 use serde::{Serialize, Deserialize};
 use crate::{constants};
-use crate::components::{Outfit, Skins, get_outfit, SimpleAnimation };
+use crate::components::{Outfit, Skins, get_outfit };
 use std::net::{SocketAddr};
 use nalgebra::base::Vector3;
 
