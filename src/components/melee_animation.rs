@@ -10,11 +10,12 @@ use crate::components::{PlayerComponent};
 pub struct MeleeAnimation {
     end_stance: usize,
     at_stance: usize,
-    sword: usize,
-    sword_pos: Transform,
+    pub sword: usize,
+    pub sword_pos: Transform,
     swing_time: f32,
     elapsed_time: f32,
     pec: f32,
+    pub draw_sword: bool,
 }
 
 impl MeleeAnimation {
@@ -27,7 +28,7 @@ impl MeleeAnimation {
             swing_time: 0.25,
             elapsed_time: 0.0,
             pec: 0.0,
-
+            draw_sword: true,
         }
     }
 
