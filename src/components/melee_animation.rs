@@ -1,21 +1,21 @@
 use amethyst::{
-    ecs::{Component, DenseVecStorage, FlaggedStorage},
+    ecs::{Component, DenseVecStorage, FlaggedStorage, Entity},
     core::transform::Transform,
 };
 
 use serde::{Serialize, Deserialize};
 use crate::components::{PlayerComponent};
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct MeleeAnimation {
     end_stance: usize,
     at_stance: usize,
-    pub sword: usize,
+    pub sword_spr: usize,
     pub sword_pos: Transform,
     swing_time: f32,
     elapsed_time: f32,
     pec: f32,
-    pub draw_sword: bool,
+    pub sword: Option<Entity>,
 }
 
 impl MeleeAnimation {
@@ -23,12 +23,12 @@ impl MeleeAnimation {
         Self {
             end_stance: pl.get_dir(),
             at_stance: pl.get_at(),
-            sword: pl.get_sword(),
+            sword_spr: pl.get_sword(),
             sword_pos: pl.get_sword_pos(),
             swing_time: 0.25,
             elapsed_time: 0.0,
             pec: 0.0,
-            draw_sword: true,
+            sword: None,
         }
     }
 

@@ -141,7 +141,6 @@ impl<'s> System<'s> for PlayerSystem{
                             info!("Punch");
                             swing.insert(p1, MeleeAnimation::new(players.get_mut(p1).unwrap()));
                             io.o.push(Pack::new(Cmd::Action(Action::Melee), 0, None));
-                            // self.melee = false;
                         }
                     }
                 }

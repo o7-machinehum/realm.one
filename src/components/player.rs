@@ -143,10 +143,10 @@ impl PlayerComponent {
     /// Get the positions of the sword in space
     pub fn get_sword_pos(&self) -> Transform {
         match self.orientation {
-            Orientation::North => self.trans().move_forward(16.0).clone(),
-            Orientation::South => self.trans().move_backward(16.0).clone(),
-            Orientation::East  => self.trans().move_right(16.0).clone(),
-            Orientation::West  => self.trans().move_left(16.0).clone(),
+            Orientation::North => Transform::default().move_forward(16.0).clone(),
+            Orientation::South => Transform::default().move_backward(16.0).clone(),
+            Orientation::East  => Transform::default().move_right(16.0).clone(),
+            Orientation::West  => Transform::default().move_left(16.0).clone(),
         }
     }
     pub fn tint(&self) -> Srgba {
