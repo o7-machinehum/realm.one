@@ -1,40 +1,46 @@
 use amethyst::{
-    core:: {Time},
+    core:: {Time, Transform},
     ecs::{Read, System, WriteStorage, ReadStorage, Join, Entities, Entity},
     renderer::SpriteRender
 };
 
 use crate::{
     components::{MeleeAnimation, PlayerComponent},
+    resources::{SpritesContainer},
 };
 
 pub struct MeleeAnimationSystem {
     delete_list : Vec::<Entity>,
+    ent: Option<Entity>,
+    com: Option<MeleeAnimation>,
 }
 
 impl MeleeAnimationSystem {
     pub fn new() -> Self {
         Self {
             delete_list: Vec::<Entity>::new(),
+            ent: None,
+            com: None,
         }
     }
 }
 
 impl<'s> System<'s> for MeleeAnimationSystem {
     type SystemData = (
+        WriteStorage<'s, Transform>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, MeleeAnimation>,
-        ReadStorage<'s, PlayerComponent>,
         Entities<'s>, 
         Read<'s, Time>,
+        Read<'s, SpritesContainer>,
     );
 
-    fn run(&mut self, (mut sprite_renders, mut anims, players, entities, time): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut sprite_renders, mut anims, entities, time, s): Self::SystemData) {
         for item in self.delete_list.pop() {
             anims.remove(item);
         }
         
-        for (e, sprite_render, anim, player) in (&entities, &mut sprite_renders, &mut anims, &players).join() {
+        for (sprite_render, anim, e) in (&mut sprite_renders, &mut anims, &entities).join() {
             anim.update(time.delta_seconds());
 
             match anim.get_seq() {
@@ -46,6 +52,14 @@ impl<'s> System<'s> for MeleeAnimationSystem {
 
             if anim.delete() {
                 self.delete_list.push(e.clone());
+            }
+
+            if anim.draw_sword == true {
+                entities
+                    .build_entity()
+                    .with(s.sprites[anim.sword].clone(), &mut sprite_renders)
+                    .with(anim.sword_pos, &mut transforms) 
+                    .build();
             }
         }
     }
