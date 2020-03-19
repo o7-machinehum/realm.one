@@ -18,8 +18,11 @@ mod chat;
 pub use self::chat::ChatSystem;
 pub use self::chat::ChatSystemBundle;
 
-mod animation;
-pub use self::animation::WalkAnimationSystem;
+mod walk;
+pub use self::walk::WalkAnimationSystem;
+
+mod melee;
+pub use self::melee::MeleeAnimationSystem;
 
 mod movement;
 pub use self::movement::MoveSystem;

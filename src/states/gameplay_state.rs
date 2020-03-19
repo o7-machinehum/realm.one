@@ -9,7 +9,7 @@ use amethyst::{
 use log::info;
 use crate::map;
 use crate::components::{PlayerComponent};
-use crate::resources::{ClientStatus, PlayerList, IO, AppConfig, SpritesContainer};
+use crate::resources::{ClientStatus, PlayerList, IO, AppConfig, SpritesContainer, Input};
 
 pub struct GamePlayState {
     pub config: AppConfig,
@@ -25,6 +25,7 @@ impl SimpleState for GamePlayState {
         let sprites = SpritesContainer::new(&world);
         let room = map::Room::new("resources/maps/town.tmx".to_string());
         let player_list = PlayerList::new();
+        let inputs = Input::new();
 
         let status = ClientStatus::new();
 
@@ -37,6 +38,7 @@ impl SimpleState for GamePlayState {
         world.insert(room);
         world.insert(player_list);
         world.insert(io);
+        world.insert(inputs);
     }
 }
 

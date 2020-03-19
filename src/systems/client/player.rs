@@ -12,7 +12,7 @@ use std::time::Instant;
 use log::info;
 
 use crate::{
-    components::{PlayerComponent, Action, WalkAnimation, Move},
+    components::{PlayerComponent, Action, WalkAnimation, MeleeAnimation, Move},
     key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
     map::{Room},
     network::{Pack, Cmd},
@@ -32,6 +32,7 @@ impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
         WriteStorage<'s, Move>,
         WriteStorage<'s, WalkAnimation>,
+        WriteStorage<'s, MeleeAnimation>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, Parent>,
@@ -46,7 +47,8 @@ impl<'s> System<'s> for PlayerSystem{
  
     fn run(&mut self, 
          (mut moves,
-          mut anim, 
+          mut walk,
+          mut swing,
           mut transforms, 
           mut players, 
           mut parents, 
@@ -129,14 +131,15 @@ impl<'s> System<'s> for PlayerSystem{
                                     *player.trans().translation(),
                                     (constants::MOVEMENT_DELAY_MS as f32) / 1000.0); 
 
-                                anim.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0));
+                                walk.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0));
                                 moves.insert(p1, mv);
 
                                 io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
                             }
                         },
                         Inputs::Melee => {
-                            info!("Punch"); 
+                            info!("Punch");
+                            swing.insert(p1, MeleeAnimation::new(players.get_mut(p1).unwrap()));
                             io.o.push(Pack::new(Cmd::Action(Action::Melee), 0, None));
                             // self.melee = false;
                         }
