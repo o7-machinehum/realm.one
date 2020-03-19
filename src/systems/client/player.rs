@@ -12,30 +12,27 @@ use std::time::Instant;
 use log::info;
 
 use crate::{
-    components::{PlayerComponent, Action, WalkAnimation, Move},
+    components::{PlayerComponent, Action, WalkAnimation, MeleeAnimation, Move},
     key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
     map::{Room},
     network::{Pack, Cmd},
-    resources::{IO, SpritesContainer},
+    resources::{IO, SpritesContainer, Input, Inputs},
     constants,
     mech::get_letter,
 };
-
 
 #[derive(SystemDesc)]
 pub struct PlayerSystem { 
     p1: Option<Entity>,
     timer: Option<Instant>,
     p1_name: String,
-    horizontal: f32,
-    vertical: f32,
-    melee: bool,
 }
 
 impl<'s> System<'s> for PlayerSystem{
     type SystemData = (
         WriteStorage<'s, Move>,
         WriteStorage<'s, WalkAnimation>,
+        WriteStorage<'s, MeleeAnimation>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, PlayerComponent>,
         WriteStorage<'s, Parent>,
@@ -44,13 +41,14 @@ impl<'s> System<'s> for PlayerSystem{
         Write<'s, IO>,
         Write<'s, Room>,
         Entities<'s>,
-        Read<'s, InputHandler<MovementBindingTypes>>,
+        Write<'s, Input>,
         Read<'s, SpritesContainer>,
     );
  
     fn run(&mut self, 
          (mut moves,
-          mut anim, 
+          mut walk,
+          mut swing,
           mut transforms, 
           mut players, 
           mut parents, 
@@ -59,7 +57,7 @@ impl<'s> System<'s> for PlayerSystem{
           mut io, 
           room, 
           entities, 
-          input, 
+          mut input, 
           s): Self::SystemData) 
     {
         for element in io.i.pop() {
@@ -98,55 +96,54 @@ impl<'s> System<'s> for PlayerSystem{
         if self.p1.is_some() {
             let now = Instant::now();
             let p1 = self.p1.unwrap();
-            
-            self.get_input(input);
                         
             if now.duration_since(self.timer.unwrap()).as_millis() >= constants::MOVEMENT_DELAY_MS {
-                if self.horizontal != 0. || self.vertical != 0. {
-                    // Get player and transform component of yourself
-                    let adj_player_tr = {
-                        let player = players.get_mut(p1).unwrap();  // Get yourself
-                        let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
-                        if player.update_orientation(&self.horizontal, &self.vertical) { // Update self
-                            spr.sprite_number = player.get_dir();             // Change sprite
-                            io.o.push(Pack::new(Cmd::Action(Action::Rotate(player.orientation.clone())), 0, None));
-                        } 
-                        player.in_front()    // Get transform of in front
-                    };
-                    
-                    let mut adj_player : Option<PlayerComponent> = None;
-                    for (transform, p) in (&mut transforms, &mut players).join() {
-                        if *transform.translation() == *adj_player_tr.translation(){
-                            // There's someone in the way!
-                            adj_player = Some(p.clone());    
+                self.timer = Some(now.clone());
+                let inp = input.get(); // Get the move
+                if inp.is_some() {
+                    match inp.unwrap() {
+                        Inputs::Move(dir) => {
+                            // Get player and transform component of yourself
+                            let adj_player_tr = {
+                                let player = players.get_mut(p1).unwrap();  // Get yourself
+                                let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
+                                if player.update_orientation(dir) { // Update self
+                                    spr.sprite_number = player.get_dir();             // Change sprite
+                                    io.o.push(Pack::new(Cmd::Action(Action::Rotate(player.orientation.clone())), 0, None));
+                                } 
+                                player.in_front()    // Get transform of in front
+                            };
+                            
+                            let mut adj_player : Option<PlayerComponent> = None;
+                            for (transform, p) in (&mut transforms, &mut players).join() {
+                                if *transform.translation() == *adj_player_tr.translation(){
+                                    // There's someone in the way!
+                                    adj_player = Some(p.clone());    
+                                }
+                            }
+
+                            let player = players.get_mut(p1).unwrap();
+                            if room.allowed_move(&player.trans(), &player.orientation) && !adj_player.is_some() {
+                                let tr = transforms.get_mut(p1).unwrap(); 
+                                player.walk(); // Walk one step in forward direction
+                                
+                                let mv = Move::new(*tr.translation(), 
+                                    *player.trans().translation(),
+                                    (constants::MOVEMENT_DELAY_MS as f32) / 1000.0); 
+
+                                walk.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0));
+                                moves.insert(p1, mv);
+
+                                io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
+                            }
+                        },
+                        Inputs::Melee => {
+                            info!("Punch");
+                            swing.insert(p1, MeleeAnimation::new(players.get_mut(p1).unwrap()));
+                            io.o.push(Pack::new(Cmd::Action(Action::Melee), 0, None));
                         }
                     }
-
-                    let player = players.get_mut(p1).unwrap();
-                    if room.allowed_move(&player.trans(), &player.orientation) && !adj_player.is_some() {
-                        let tr = transforms.get_mut(p1).unwrap(); 
-                        player.walk(); // Walk one step in forward direction
-                        
-                        let mv = Move::new(*tr.translation(), 
-                            *player.trans().translation(),
-                            (constants::MOVEMENT_DELAY_MS as f32) / 1000.0); 
-
-                        anim.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0));
-                        moves.insert(p1, mv);
-
-                        io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
-                    }
-                    self.horizontal = 0.0;
-                    self.vertical = 0.0;
                 }
-
-                if self.melee {
-                    info!("Punch"); 
-                    io.o.push(Pack::new(Cmd::Action(Action::Melee), 0, None));
-                    self.melee = false;
-                }
-
-                self.timer = Some(now.clone());
             }
         }
     }
@@ -158,30 +155,6 @@ impl PlayerSystem {
             p1: None,
             timer: None, 
             p1_name: name,
-            horizontal: 0.0,
-            vertical: 0.0,
-            melee: false,
-        }
-    }
-
-    fn get_input<'s>(&mut self, input: Read<'s, InputHandler<MovementBindingTypes>>) {
-        match input.axis_value(&AxisBinding::Horizontal) {
-            Some(value) => self.horizontal = value,
-            None => (),
-        }
-        
-        match input.axis_value(&AxisBinding::Vertical) {
-            Some(value) => self.vertical = value,
-            None => (),
-        }
-
-        match input.action_is_down(&ActionBinding::Melee) {
-            Some(value) => {
-                if value == true {
-                    self.melee = true;
-                }
-            },
-            None => (),
         }
     }
 }

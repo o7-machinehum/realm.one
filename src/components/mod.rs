@@ -13,5 +13,8 @@ pub use self::outfits::get_outfit;
 mod walk_animation;
 pub use self::walk_animation::WalkAnimation;
 
+mod melee_animation;
+pub use self::melee_animation::MeleeAnimation;
+
 mod movement;
 pub use self::movement::Move;

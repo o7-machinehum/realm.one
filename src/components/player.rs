@@ -7,7 +7,7 @@ use amethyst::{
 
 use serde::{Serialize, Deserialize};
 use crate::{constants};
-use crate::components::{Outfit, Skins, get_outfit };
+use crate::components::{Outfit, Skins, get_outfit};
 use std::net::{SocketAddr};
 use nalgebra::base::Vector3;
 
@@ -46,27 +46,16 @@ impl PlayerComponent {
             hp: 100.0,
         }
     }
-    
-    pub fn update_orientation(&mut self, x: &f32, y: &f32) -> bool{
-        let old = self.orientation.clone(); 
-        let x = *x;
-        let y = *y;
 
-        if x > 0. {
-            self.orientation = Orientation::East;
-        } else if x < 0. {
-            self.orientation = Orientation::West;
-        } else if y > 0. {
-            self.orientation = Orientation::North;
-        } else if y < 0. {
-            self.orientation = Orientation::South;
-        }
+   pub fn update_orientation(&mut self, or: Orientation) -> bool{
+       let old = self.orientation.clone(); 
+       self.orientation = or; 
 
-        if old == self.orientation {
-            return false
-        }
-        true
-    }
+       if old == self.orientation {
+           return false
+       }
+       true
+   }
     
     pub fn walk(&mut self) {
         match self.orientation {
@@ -132,7 +121,34 @@ impl PlayerComponent {
             Orientation::West  => self.skin.w,
         }
     }
+    
+    pub fn get_at(&self) -> usize {
+        match self.orientation {
+            Orientation::North => self.skin.at.n,
+            Orientation::South => self.skin.at.s,
+            Orientation::East  => self.skin.at.e,
+            Orientation::West  => self.skin.at.w,
+        }
+    }
 
+    pub fn get_sword(&self) -> usize {
+        match self.orientation {
+            Orientation::North => self.skin.at.s_n,
+            Orientation::South => self.skin.at.s_s,
+            Orientation::East  => self.skin.at.s_e,
+            Orientation::West  => self.skin.at.s_w,
+        }
+    }
+    
+    /// Get the positions of the sword in space
+    pub fn get_sword_pos(&self) -> Transform {
+        match self.orientation {
+            Orientation::North => Transform::default().move_forward(16.0).clone(),
+            Orientation::South => Transform::default().move_backward(16.0).clone(),
+            Orientation::East  => Transform::default().move_right(16.0).clone(),
+            Orientation::West  => Transform::default().move_left(16.0).clone(),
+        }
+    }
     pub fn tint(&self) -> Srgba {
         Srgba::new((100.0 - self.hp)*0.05 + 1.0, 1.0, 1.0, 1.0)
     }

@@ -18,7 +18,7 @@ nalgebra = "0.19.0"
 
 [features]
 # default = ["vulkan"] # For linux Windows
-default = ["metal"] # For linux Windows
+default = ["metal"] # For osx
 empty = ["amethyst/empty"]
 metal = ["amethyst/metal"]
 vulkan = ["amethyst/vulkan"]

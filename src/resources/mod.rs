@@ -15,3 +15,7 @@ pub use self::maplist::MapList;
 
 mod spritescontainer;
 pub use self::spritescontainer::SpritesContainer;
+
+mod input;
+pub use self::input::Input;
+pub use self::input::Inputs;
