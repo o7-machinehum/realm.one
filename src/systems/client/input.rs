@@ -80,8 +80,12 @@ impl<'s> System<'s> for InputSystem {
 
         match input.action_is_down(&ActionBinding::Melee) {
             Some(value) => {
-                if value == true {
+                if value == true && !self.melee_latch {
                     input_res.add(Inputs::Melee);
+                    self.melee_latch = true;
+                }
+                if value == false {
+                    self.melee_latch = false;
                 }
             },
             None => (),
