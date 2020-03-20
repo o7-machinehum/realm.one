@@ -1,6 +1,6 @@
-mod player;
-pub use self::player::LifeformComponent;
-pub use self::player::Orientation;
+mod lifeform;
+pub use self::lifeform::LifeformComponent;
+pub use self::lifeform::Orientation;
 
 mod player_action;
 pub use self::player_action::Action;
