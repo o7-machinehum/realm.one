@@ -4,7 +4,7 @@ use amethyst::{
 };
 
 use serde::{Serialize, Deserialize};
-use crate::components::{PlayerComponent};
+use crate::components::{LifeformComponent};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MeleeAnimation {
@@ -19,7 +19,7 @@ pub struct MeleeAnimation {
 }
 
 impl MeleeAnimation {
-    pub fn new(pl: &PlayerComponent) -> Self { 
+    pub fn new(pl: &LifeformComponent) -> Self { 
         Self {
             end_stance: pl.get_dir(),
             at_stance: pl.get_at(),

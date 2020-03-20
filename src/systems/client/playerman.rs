@@ -8,7 +8,7 @@ use amethyst::{
 use log::info;
 
 use crate::{ 
-    components::{PlayerComponent},
+    components::{LifeformComponent},
     network::Cmd,
     resources::{IO},
 };
@@ -19,7 +19,7 @@ pub struct PlayerManSystem;
 impl<'s> System<'s> for PlayerManSystem{
     type SystemData = (
         WriteStorage<'s, Transform>,
-        WriteStorage<'s, PlayerComponent>,
+        WriteStorage<'s, LifeformComponent>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Tint>,
         Write<'s, IO>,

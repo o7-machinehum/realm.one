@@ -8,7 +8,7 @@ use amethyst::{
 
 use log::info;
 use crate::map;
-use crate::components::{PlayerComponent};
+use crate::components::{LifeformComponent};
 use crate::resources::{ClientStatus, PlayerList, IO, AppConfig, SpritesContainer, Input};
 
 pub struct GamePlayState {
@@ -19,7 +19,7 @@ impl SimpleState for GamePlayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         let io = IO::new();
-        world.register::<PlayerComponent>();
+        world.register::<LifeformComponent>();
         world.register::<map::TilePosition>();
         
         let sprites = SpritesContainer::new(&world);

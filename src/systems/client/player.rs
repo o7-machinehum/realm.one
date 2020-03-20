@@ -12,7 +12,7 @@ use std::time::Instant;
 use log::info;
 
 use crate::{
-    components::{PlayerComponent, Action, WalkAnimation, MeleeAnimation, Move},
+    components::{LifeformComponent, Action, WalkAnimation, MeleeAnimation, Move},
     key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
     map::{Room},
     network::{Pack, Cmd},
@@ -34,7 +34,7 @@ impl<'s> System<'s> for PlayerSystem{
         WriteStorage<'s, WalkAnimation>,
         WriteStorage<'s, MeleeAnimation>,
         WriteStorage<'s, Transform>,
-        WriteStorage<'s, PlayerComponent>,
+        WriteStorage<'s, LifeformComponent>,
         WriteStorage<'s, Parent>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Tint>,
@@ -114,7 +114,7 @@ impl<'s> System<'s> for PlayerSystem{
                                 player.in_front()    // Get transform of in front
                             };
                             
-                            let mut adj_player : Option<PlayerComponent> = None;
+                            let mut adj_player : Option<LifeformComponent> = None;
                             for (transform, p) in (&mut transforms, &mut players).join() {
                                 if *transform.translation() == *adj_player_tr.translation(){
                                     // There's someone in the way!

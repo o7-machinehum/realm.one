@@ -6,7 +6,7 @@ use log::info;
 
 use crate::{
     network::{Pack, Cmd},
-    components::{Action, get_outfit, PlayerComponent},
+    components::{Action, get_outfit, LifeformComponent},
     resources::{PlayerList, IO, MapList},
 };
 
@@ -48,14 +48,14 @@ impl<'a> System<'a> for PlayerManSystem {
 
 impl PlayerManSystem {
     fn act(&mut self, 
-           mut player: PlayerComponent, 
+           mut player: LifeformComponent, 
            act: &Action, 
            maps: &MapList, 
            pl: &PlayerList) 
-           -> (Vec<Pack>, Vec<PlayerComponent>) 
+           -> (Vec<Pack>, Vec<LifeformComponent>) 
         {
         let mut out = Vec::<Pack>::new();
-        let mut players = Vec::<PlayerComponent>::new();
+        let mut players = Vec::<LifeformComponent>::new();
 
         match act {
             Action::Move(dir) => {

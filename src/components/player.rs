@@ -22,7 +22,7 @@ pub enum Orientation {
 /// Client Side player component
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct PlayerComponent {
+pub struct LifeformComponent {
     pub name: String,
     pub ip: SocketAddr, 
     pub room: String,
@@ -33,7 +33,7 @@ pub struct PlayerComponent {
     pub hp: f32,
 }
 
-impl PlayerComponent {
+impl LifeformComponent {
     pub fn new(name: String, ip: SocketAddr) -> Self {
         Self {
             name,
@@ -154,6 +154,6 @@ impl PlayerComponent {
     }
 }
 
-impl Component for PlayerComponent {
+impl Component for LifeformComponent {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }

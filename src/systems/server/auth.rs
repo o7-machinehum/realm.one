@@ -6,7 +6,7 @@ use amethyst::{
 use log::info;
 use crate::{
     network::{Pack, Cmd},
-    components::{PlayerComponent},
+    components::{LifeformComponent},
     resources::{PlayerList, IO, MapList},
 };
 
@@ -33,11 +33,11 @@ fn authenticate(proof: String) -> Option<String> {
     Some(v[2].to_string())
 }
 
-fn ready_player_one(ip: Option<SocketAddr>, name: String) -> PlayerComponent {
+fn ready_player_one(ip: Option<SocketAddr>, name: String) -> LifeformComponent {
     info!("Inserting player 1 ({})", name);
    
     // Dig through database to find the correct player by name = name 
-    PlayerComponent::new(name, ip.unwrap())
+    LifeformComponent::new(name, ip.unwrap())
 }
 
 impl<'a> System<'a> for AuthSystem {
