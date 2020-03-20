@@ -2,16 +2,16 @@ use serde::{Serialize, Deserialize};
 use bincode;
 use std::net::{SocketAddr};
 
-use crate::components::{PlayerComponent, Action};
+use crate::components::{LifeformComponent, Action};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Cmd {
     Ping,
     Connect(String),
     TransferMap(String),
-    InsertPlayer(PlayerComponent), 
+    InsertPlayer(LifeformComponent), 
     Action(Action),
-    UpdatePlayer(PlayerComponent),
+    UpdatePlayer(LifeformComponent),
     RemovePlayer(SocketAddr),
 }
 

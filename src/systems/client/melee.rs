@@ -6,7 +6,7 @@ use amethyst::{
 use log::info;
 
 use crate::{
-    components::{MeleeAnimation, PlayerComponent},
+    components::{MeleeAnimation, LifeformComponent},
     resources::{SpritesContainer},
 };
 

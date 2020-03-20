@@ -6,7 +6,7 @@ use amethyst::{
 
 
 use crate::{
-    components::{WalkAnimation, PlayerComponent},
+    components::{WalkAnimation, LifeformComponent},
 };
 
 pub struct WalkAnimationSystem {
@@ -25,7 +25,7 @@ impl<'s> System<'s> for WalkAnimationSystem {
     type SystemData = (
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, WalkAnimation>,
-        ReadStorage<'s, PlayerComponent>,
+        ReadStorage<'s, LifeformComponent>,
         Entities<'s>, 
         Read<'s, Time>,
     );
