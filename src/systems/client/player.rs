@@ -62,7 +62,7 @@ impl<'s> System<'s> for PlayerSystem {
     {
         for element in io.i.pop() {
             match &element.cmd {
-                Cmd::InsertPlayer(play) =>  {
+                Cmd::InsertPlayer(play) => {
                     let e = Some(entities
                         .build_entity()
                         .with(play.trans(), &mut transforms)
@@ -83,7 +83,30 @@ impl<'s> System<'s> for PlayerSystem {
                             .build();
                         letter_trans.move_right(8.0);
                     }
-                    if play.name == self.p1_name { 
+                },
+                Cmd::InsertPlayer1(play) => {
+                    let e = Some(entities
+                        .build_entity()
+                        .with(play.trans(), &mut transforms)
+                        .with(play.get_orientated(&s.sprites), &mut sprite_renders)
+                        .with(Tint(play.tint()), &mut tints)
+                        .with(play.clone(), &mut players)
+                        .build());
+                    
+                    // Write the players name
+                    let mut letter_trans = Transform::default();
+                    letter_trans.move_up(10.0);
+                    for bytes in play.name.bytes() {
+                        entities
+                            .build_entity()
+                            .with(get_letter(bytes, &s.text), &mut sprite_renders)
+                            .with(letter_trans.clone(), &mut transforms) 
+                            .with(Parent::new(e.unwrap()), &mut parents)
+                            .build();
+                        letter_trans.move_right(8.0);
+                    }
+                    
+                    if self.p1.is_none() { 
                         info!("Inserting Player 1"); 
                         self.p1 = e;
                         self.timer = Some(Instant::now());
