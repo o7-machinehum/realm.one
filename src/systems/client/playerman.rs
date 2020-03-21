@@ -31,7 +31,7 @@ impl<'s> System<'s> for PlayerManSystem{
             match element.cmd {
                 Cmd::UpdatePlayer(new) => {
                     for (transform, player, sprite_render, tint) in (&mut transforms, &mut players, &mut sprite_renders, &mut tints).join() { 
-                        if player.name == new.name {
+                        if player.id() == new.id() {
                             info!("Updating Player: {:?}", player);
 
                             if *player.trans().translation() != new.xyz() { 
@@ -51,10 +51,10 @@ impl<'s> System<'s> for PlayerManSystem{
                         }
                     }        
                 }, 
-                Cmd::RemovePlayer(ip) => {
-                    info!("Removing Player of ip: {}", ip);
+                Cmd::RemovePlayer(uid) => {
+                    info!("Removing Player of id: {}", uid);
                     for (e, player) in (&*entities, &mut players).join() { 
-                        if player.ip == ip {
+                        if player.id() == uid {
                             entities.delete(e).expect("Failed to delete old player entities");
                         }
                     } 

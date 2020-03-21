@@ -68,7 +68,7 @@ Other outfits: bat, skeleton, slime, ghost, spider
 
 ## Hitlist (In no particular order)
 * [ ] [Monster AI](features/F001/)
-* [ ] [Player UID](features/F002/)
+* [x] [Player UID](features/F002/)
 * [ ] Moving through different areas of the map
 * [ ] Should be able to open and close doors
 * [ ] Blood Splat during combat

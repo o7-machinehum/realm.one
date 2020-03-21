@@ -27,19 +27,22 @@ impl<'a> System<'a> for PlayerManSystem {
                 Cmd::Action(act) => {
                     info!("Action from Address: {:?}, Action: {:?}", element.ip(), element.cmd);
                     let acting_player = pl.get_from_ip(element.ip().unwrap()).unwrap(); 
+                    info!("player gotten from IP is: {:?}", acting_player);
                     let packs_players = self.act(acting_player, act, &maps, &pl);
                     
+                    // If packs come out of the action
                     for pack in packs_players.0 {
                         info!("{:?}", pack);
                         io.o.push(pack) 
                     }
-                    
+
+                    // If a player needs to be replacd  
                     for player in packs_players.1 {
                         info!("{:?}", player);
                         pl.replace(player); 
                     }
                 },
-                Cmd::RemovePlayer(ip) => pl.remove_with_ip(*ip), 
+                Cmd::RemovePlayer(uid) => pl.remove_with_id(*uid), 
                 _ => (io.i.push(element)), 
             }
         }

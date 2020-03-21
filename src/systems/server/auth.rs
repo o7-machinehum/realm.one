@@ -7,7 +7,7 @@ use log::info;
 use crate::{
     network::{Pack, Cmd},
     components::{LifeformComponent},
-    resources::{PlayerList, IO, MapList},
+    resources::{PlayerList, IO, MapList, LifeformUID},
 };
 
 use std::net::{SocketAddr};
@@ -33,11 +33,11 @@ fn authenticate(proof: String) -> Option<String> {
     Some(v[2].to_string())
 }
 
-fn ready_player_one(ip: Option<SocketAddr>, name: String) -> LifeformComponent {
+fn ready_player_one(ip: Option<SocketAddr>, name: String, id: u64) -> LifeformComponent {
     info!("Inserting player 1 ({})", name);
    
     // Dig through database to find the correct player by name = name 
-    LifeformComponent::new(name, ip.unwrap())
+    LifeformComponent::new(name, ip.unwrap(), id)
 }
 
 impl<'a> System<'a> for AuthSystem {
@@ -45,24 +45,24 @@ impl<'a> System<'a> for AuthSystem {
         Write <'a, IO>,
         Write <'a, PlayerList>,
         Read <'a, MapList>,
+        Write <'a, LifeformUID>,
     );
 
-    fn run(&mut self, (mut io, mut pl, _maps): Self::SystemData) {
+    fn run(&mut self, (mut io, mut pl, _maps, mut id): Self::SystemData) {
         for element in io.i.pop() {
             match &element.cmd {
                 Cmd::Connect(packet) => {
                     match authenticate(packet.to_string()) {
                         Some(s) => {
-                            let player = ready_player_one(element.ip(), s);
-                            let ip = player.ip;
+                            let player = ready_player_one(element.ip(), s, id.add());
 
-                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), 0, Some(ip))); 
-                            io.o.push(Pack::new(Cmd::InsertPlayer(player.clone()), 0, None));
+                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), 0, Some(player.ip))); 
+                            io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), 0, None));
                             
                             // Push the rest of the players
                             for p in pl.list.iter() {
                                 match p {
-                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), 0, Some(ip))),
+                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), 0, Some(player.ip))),
                                     None => (),
                                 }
                             }
