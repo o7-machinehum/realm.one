@@ -27,6 +27,7 @@ impl<'a> System<'a> for PlayerManSystem {
                 Cmd::Action(act) => {
                     info!("Action from Address: {:?}, Action: {:?}", element.ip(), element.cmd);
                     let acting_player = pl.get_from_ip(element.ip().unwrap()).unwrap(); 
+                    info!("player gotten from IP is: {:?}", acting_player);
                     let packs_players = self.act(acting_player, act, &maps, &pl);
                     
                     for pack in packs_players.0 {
