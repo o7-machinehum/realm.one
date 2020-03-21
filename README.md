@@ -65,3 +65,18 @@ cmd outfit nude    // Change char nude androgynous person
 ```
 
 Other outfits: bat, skeleton, slime, ghost, spider
+
+## Hitlist (In no particular order)
+* [ ] [Monster AI](features/F001/)
+* [ ] [Player UID](features/F002/)
+* [ ] Moving through different areas of the map
+* [ ] Should be able to open and close doors
+* [ ] Blood Splat during combat
+* [ ] Other player should animate (Walking and melee)
+* [ ] Controls are clunky
+* [ ] Serverside database
+* [ ] Proper player authentication
+* [ ] Build more maps
+* [ ] lil guy should have a health bar (Zelda Style hearts)
+* [ ] Gameplay ideas
+* [ ] A story lol
