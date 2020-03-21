@@ -19,3 +19,6 @@ pub use self::spritescontainer::SpritesContainer;
 mod input;
 pub use self::input::Input;
 pub use self::input::Inputs;
+
+mod lifeform_uid;
+pub use self::lifeform_uid::LifeformUID;

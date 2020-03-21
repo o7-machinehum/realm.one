@@ -28,7 +28,7 @@ pub struct PlayerSystem {
     p1_name: String,
 }
 
-impl<'s> System<'s> for PlayerSystem{
+impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
         WriteStorage<'s, Move>,
         WriteStorage<'s, WalkAnimation>,

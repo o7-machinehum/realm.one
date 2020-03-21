@@ -39,7 +39,7 @@ impl<'a> System<'a> for PlayerManSystem {
                         pl.replace(player); 
                     }
                 },
-                Cmd::RemovePlayer(ip) => pl.remove_with_ip(*ip), 
+                Cmd::RemovePlayer(uid) => pl.remove_with_id(*uid), 
                 _ => (io.i.push(element)), 
             }
         }
