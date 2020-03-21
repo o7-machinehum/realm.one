@@ -30,11 +30,13 @@ impl<'a> System<'a> for PlayerManSystem {
                     info!("player gotten from IP is: {:?}", acting_player);
                     let packs_players = self.act(acting_player, act, &maps, &pl);
                     
+                    // If packs come out of the action
                     for pack in packs_players.0 {
                         info!("{:?}", pack);
                         io.o.push(pack) 
                     }
-                    
+
+                    // If a player needs to be replacd  
                     for player in packs_players.1 {
                         info!("{:?}", player);
                         pl.replace(player); 

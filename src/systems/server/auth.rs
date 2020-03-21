@@ -55,15 +55,14 @@ impl<'a> System<'a> for AuthSystem {
                     match authenticate(packet.to_string()) {
                         Some(s) => {
                             let player = ready_player_one(element.ip(), s, id.add());
-                            let ip = player.ip;
 
-                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), 0, Some(ip))); 
+                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), 0, Some(player.ip))); 
                             io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), 0, None));
                             
                             // Push the rest of the players
                             for p in pl.list.iter() {
                                 match p {
-                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), 0, Some(ip))),
+                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), 0, Some(player.ip))),
                                     None => (),
                                 }
                             }
