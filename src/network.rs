@@ -10,6 +10,7 @@ pub enum Cmd {
     Connect(String),
     TransferMap(String),
     InsertPlayer(LifeformComponent), 
+    InsertPlayer1(LifeformComponent), 
     Action(Action),
     UpdatePlayer(LifeformComponent),
     RemovePlayer(u64),
