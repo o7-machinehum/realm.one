@@ -23,6 +23,7 @@ pub enum Orientation {
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct LifeformComponent {
+    uid: u64,
     pub name: String,
     pub ip: SocketAddr, 
     pub room: String,
@@ -34,8 +35,9 @@ pub struct LifeformComponent {
 }
 
 impl LifeformComponent {
-    pub fn new(name: String, ip: SocketAddr) -> Self {
+    pub fn new(name: String, ip: SocketAddr, uid: u64) -> Self {
         Self {
+            uid,
             name,
             ip,
             room: "resources/maps/town.tmx".to_string(),
@@ -149,9 +151,12 @@ impl LifeformComponent {
             Orientation::West  => Transform::default().move_left(16.0).clone(),
         }
     }
+    
     pub fn tint(&self) -> Srgba {
         Srgba::new((100.0 - self.hp)*0.05 + 1.0, 1.0, 1.0, 1.0)
     }
+
+    pub fn id(&self) -> u64 { self.uid }
 }
 
 impl Component for LifeformComponent {

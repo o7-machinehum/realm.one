@@ -11,6 +11,7 @@ pub struct PlayerList {
     pub list: Vec<Option<LifeformComponent>>,
     ips: HashMap<SocketAddr, usize>,
     name: HashMap<String, usize>,
+    ids: HashMap<u64, usize>,
     index: usize,
 }
 
@@ -26,6 +27,7 @@ impl PlayerList {
         Self {
             list: Vec::<Option<LifeformComponent>>::new(),
             ips: HashMap::<SocketAddr, usize>::new(),
+            ids: HashMap::<u64, usize>::new(),
             name: HashMap::<String, usize>::new(),
             index: 0 as usize, 
         }
@@ -33,6 +35,7 @@ impl PlayerList {
 
     pub fn add(&mut self, player: LifeformComponent) {
         self.ips.insert(player.ip.clone(), self.index); 
+        self.ids.insert(player.id(), self.index); 
         self.name.insert(player.name.clone(), self.index); 
         self.list.push(Some(player));
         self.index += 1;
@@ -41,9 +44,17 @@ impl PlayerList {
     pub fn get_from_ip(&mut self, ip: SocketAddr) -> Option<LifeformComponent> {
         self.list[*self.ips.get(&ip).unwrap()].clone()
     }
+    
+    pub fn get_from_id(&mut self, id: u64) -> Option<LifeformComponent> {
+        self.list[*self.ids.get(&id).unwrap()].clone()
+    }
 
     pub fn remove_with_ip(&mut self, ip: SocketAddr) {
         self.list[*self.ips.get(&ip).unwrap()] = None; 
+    }
+
+    pub fn remove_with_id(&mut self, id: u64) {
+        self.list[*self.ids.get(&id).unwrap()] = None; 
     }
 
     pub fn replace(&mut self, player: LifeformComponent) {

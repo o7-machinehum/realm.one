@@ -8,7 +8,7 @@ use amethyst::{
 
 use log::{info, error};
 use crate::network::{Pack, Cmd};
-use crate::resources::{IO};
+use crate::resources::{IO, PlayerList};
 use std::net::{SocketAddr};
 
 #[derive(Debug)]
@@ -63,9 +63,10 @@ impl<'a> System<'a> for ServerSystem {
         Read<'a, NetworkSimulationTime>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
         Write <'a, IO>,
+        Write <'a, PlayerList>,
     );
 
-    fn run(&mut self, (mut net, sim_time, channel, mut io): Self::SystemData) {
+    fn run(&mut self, (mut net, sim_time, channel, mut io, mut pl): Self::SystemData) {
         for event in channel.read(&mut self.reader) {
             match event {
                 NetworkSimulationEvent::Message(addr, payload) => {
@@ -82,9 +83,12 @@ impl<'a> System<'a> for ServerSystem {
                 NetworkSimulationEvent::Disconnect(addr) => {
                     info!("Client Disconnected: {}", addr);
                     self.clients.retain(|&x| x != *addr); 
-                    // Remove player from server and clinet side 
-                    io.i.push(Pack::new(Cmd::RemovePlayer(*addr), 0, None)); 
-                    io.o.push(Pack::new(Cmd::RemovePlayer(*addr), 0, None)); 
+                    // Remove player from server and clinet side
+                    if let p = pl.get_from_ip(*addr) {
+                        let id = p.unwrap().id().clone();
+                        io.i.push(Pack::new(Cmd::RemovePlayer(id), 0, None)); 
+                        io.o.push(Pack::new(Cmd::RemovePlayer(id), 0, None)); 
+                    }
                 }
                 NetworkSimulationEvent::RecvError(e) => {
                     error!("Recv Error: {:?}", e);

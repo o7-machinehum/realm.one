@@ -12,7 +12,7 @@ pub enum Cmd {
     InsertPlayer(LifeformComponent), 
     Action(Action),
     UpdatePlayer(LifeformComponent),
-    RemovePlayer(SocketAddr),
+    RemovePlayer(u64),
 }
 
 /// Networking package. addr: None if a broadcast, Some(ip) if direct.
