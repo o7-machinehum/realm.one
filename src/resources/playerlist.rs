@@ -10,7 +10,6 @@ use std::net::SocketAddr;
 pub struct PlayerList {
     pub list: Vec<Option<LifeformComponent>>,
     ips: HashMap<SocketAddr, usize>,
-    name: HashMap<String, usize>,
     ids: HashMap<u64, usize>,
     index: usize,
 }
@@ -28,7 +27,6 @@ impl PlayerList {
             list: Vec::<Option<LifeformComponent>>::new(),
             ips: HashMap::<SocketAddr, usize>::new(),
             ids: HashMap::<u64, usize>::new(),
-            name: HashMap::<String, usize>::new(),
             index: 0 as usize, 
         }
     }
@@ -36,7 +34,6 @@ impl PlayerList {
     pub fn add(&mut self, player: LifeformComponent) {
         self.ips.insert(player.ip.clone(), self.index); 
         self.ids.insert(player.id(), self.index); 
-        self.name.insert(player.name.clone(), self.index); 
         self.list.push(Some(player));
         self.index += 1;
     }
@@ -58,8 +55,8 @@ impl PlayerList {
     }
 
     pub fn replace(&mut self, player: LifeformComponent) {
-        let name = player.name.clone();
-        self.list[*self.name.get(&name).unwrap()] = Some(player); 
+        let id = player.id(); 
+        self.list[*self.ids.get(&id).unwrap()] = Some(player); 
     }
 
     pub fn get_from_transform(&self, tr: Transform) -> Option<LifeformComponent> {
