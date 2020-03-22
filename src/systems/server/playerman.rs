@@ -7,7 +7,7 @@ use log::info;
 use crate::{
     network::{Pack, Cmd},
     components::{Action, get_outfit, LifeformComponent},
-    resources::{PlayerList, IO, MapList},
+    resources::{LifeformList, IO, MapList},
 };
 
 /// A simple system that receives a ton of network events.
@@ -17,7 +17,7 @@ pub struct PlayerManSystem;
 impl<'a> System<'a> for PlayerManSystem {
     type SystemData = (
         Write <'a, IO>,
-        Write<'a, PlayerList>,
+        Write<'a, LifeformList>,
         Read <'a, MapList>,
     );
 
@@ -54,7 +54,7 @@ impl PlayerManSystem {
            mut player: LifeformComponent, 
            act: &Action, 
            maps: &MapList, 
-           pl: &PlayerList) 
+           pl: &LifeformList) 
            -> (Vec<Pack>, Vec<LifeformComponent>) 
         {
         let mut out = Vec::<Pack>::new();

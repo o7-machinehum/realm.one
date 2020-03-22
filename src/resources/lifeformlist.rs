@@ -7,21 +7,21 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 
 // Couple of biz guys, remember this
-pub struct PlayerList {
+pub struct LifeformList {
     pub list: Vec<Option<LifeformComponent>>,
     ips: HashMap<SocketAddr, usize>,
     ids: HashMap<u64, usize>,
     index: usize,
 }
 
-impl Default for PlayerList {
+impl Default for LifeformList {
     fn default() -> Self {
-        PlayerList::new() 
+        LifeformList::new() 
     }
 
 }
 
-impl PlayerList {
+impl LifeformList {
     pub fn new() -> Self {
         Self {
             list: Vec::<Option<LifeformComponent>>::new(),
@@ -74,7 +74,7 @@ impl PlayerList {
     }
 }
 
-impl Iterator for PlayerList {
+impl Iterator for LifeformList {
     type Item = LifeformComponent;
     
     fn next(&mut self) -> Option<Self::Item> {

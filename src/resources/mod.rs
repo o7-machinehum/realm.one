@@ -1,8 +1,8 @@
 mod client_status;
 pub use self::client_status::ClientStatus;
 
-mod playerlist;
-pub use self::playerlist::PlayerList;
+mod lifeformlist;
+pub use self::lifeformlist::LifeformList;
 
 mod io;
 pub use self::io::IO;

@@ -9,7 +9,7 @@ use amethyst::{
 use log::info;
 use crate::map;
 use crate::components::{LifeformComponent};
-use crate::resources::{ClientStatus, PlayerList, IO, AppConfig, SpritesContainer, Input};
+use crate::resources::{ClientStatus, LifeformList, IO, AppConfig, SpritesContainer, Input};
 
 pub struct GamePlayState {
     pub config: AppConfig,
@@ -24,7 +24,7 @@ impl SimpleState for GamePlayState {
         
         let sprites = SpritesContainer::new(&world);
         let room = map::Room::new("resources/maps/town.tmx".to_string());
-        let player_list = PlayerList::new();
+        let player_list = LifeformList::new();
         let inputs = Input::new();
 
         let status = ClientStatus::new();
