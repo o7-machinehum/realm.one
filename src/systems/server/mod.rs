@@ -5,8 +5,8 @@ pub use self::network::ServerSystemBundle;
 mod auth;
 pub use self::auth::AuthSystem;
 
-mod playerman;
-pub use self::playerman::LifeformManSystem;
+mod lifeform_man;
+pub use self::lifeform_man::LifeformManSystem;
 
 mod tcp;
 pub use self::tcp::{TcpSystemBundle};
