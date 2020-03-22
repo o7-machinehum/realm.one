@@ -14,9 +14,9 @@ use crate::{
 };
 
 #[derive(SystemDesc)]
-pub struct PlayerManSystem; 
+pub struct LifeformManSystem; 
 
-impl<'s> System<'s> for PlayerManSystem{
+impl<'s> System<'s> for LifeformManSystem{
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, LifeformComponent>,

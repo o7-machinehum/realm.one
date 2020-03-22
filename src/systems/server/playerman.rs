@@ -12,9 +12,9 @@ use crate::{
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
-pub struct PlayerManSystem;
+pub struct LifeformManSystem;
 
-impl<'a> System<'a> for PlayerManSystem {
+impl<'a> System<'a> for LifeformManSystem {
     type SystemData = (
         Write <'a, IO>,
         Write<'a, LifeformList>,
@@ -49,7 +49,7 @@ impl<'a> System<'a> for PlayerManSystem {
     }
 }
 
-impl PlayerManSystem {
+impl LifeformManSystem {
     fn act(&mut self, 
            mut player: LifeformComponent, 
            act: &Action, 

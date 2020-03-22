@@ -1,8 +1,8 @@
 mod player;
 pub use self::player::PlayerSystem;
 
-mod playerman;
-pub use self::playerman::PlayerManSystem;
+mod lifeform_man;
+pub use self::lifeform_man::LifeformManSystem;
 
 mod network;
 pub use self::network::ClientSystem;
