@@ -7,7 +7,7 @@ use log::info;
 use crate::{
     network::{Pack, Cmd},
     components::{LifeformComponent},
-    resources::{PlayerList, IO, MapList, LifeformUID},
+    resources::{LifeformList, IO, MapList, LifeformUID},
 };
 
 use std::net::{SocketAddr};
@@ -43,7 +43,7 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String, id: u64) -> LifeformCo
 impl<'a> System<'a> for AuthSystem {
     type SystemData = (
         Write <'a, IO>,
-        Write <'a, PlayerList>,
+        Write <'a, LifeformList>,
         Read <'a, MapList>,
         Write <'a, LifeformUID>,
     );

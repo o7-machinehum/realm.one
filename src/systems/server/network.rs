@@ -8,7 +8,7 @@ use amethyst::{
 
 use log::{info, error};
 use crate::network::{Pack, Cmd};
-use crate::resources::{IO, PlayerList};
+use crate::resources::{IO, LifeformList};
 use std::net::{SocketAddr};
 
 #[derive(Debug)]
@@ -63,7 +63,7 @@ impl<'a> System<'a> for ServerSystem {
         Read<'a, NetworkSimulationTime>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
         Write <'a, IO>,
-        Write <'a, PlayerList>,
+        Write <'a, LifeformList>,
     );
 
     fn run(&mut self, (mut net, sim_time, channel, mut io, mut pl): Self::SystemData) {
