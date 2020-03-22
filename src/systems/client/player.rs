@@ -2,7 +2,6 @@ use amethyst::{
     core::{Transform, Parent},
     derive::SystemDesc,
     ecs::{Read, Write, Entities, Entity, System, SystemData, WriteStorage, Join},
-    input::InputHandler,
     renderer::SpriteRender, 
     renderer::resources::Tint,
 };
@@ -13,7 +12,6 @@ use log::info;
 
 use crate::{
     components::{LifeformComponent, Action, WalkAnimation, MeleeAnimation, Move},
-    key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
     map::{Room},
     network::{Pack, Cmd},
     resources::{IO, SpritesContainer, Input, Inputs},
