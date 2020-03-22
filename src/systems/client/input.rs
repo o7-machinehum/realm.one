@@ -2,11 +2,10 @@ use amethyst::{
     derive::SystemDesc,
     ecs::{Read, Write, System, SystemData},
     input::InputHandler,
-    renderer::resources::Tint,
 };
 
-use std::time::Instant;
-use log::info;
+
+
 
 use crate::{
     components::{Orientation},
