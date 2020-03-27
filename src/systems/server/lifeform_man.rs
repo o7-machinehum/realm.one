@@ -5,7 +5,7 @@ use amethyst::{
 use log::info;
 
 use crate::{
-    network::{Pack, Cmd},
+    network::{Pack, Cmd, Dest},
     components::{Action, get_outfit, LifeformComponent},
     resources::{LifeformList, IO, MapList},
 };
@@ -68,7 +68,7 @@ impl LifeformManSystem {
                     info!("Player Walking"); 
                     player.walk();
                     players.push(player.clone());
-                    out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+                    out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::All));
                 }
             },
             
@@ -76,7 +76,7 @@ impl LifeformManSystem {
                 player.skin = get_outfit(&skin);
                 //TODO: Make sure skin in legal!
                 players.push(player.clone());
-                out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::All));
             },
 
             Action::Melee => {
@@ -87,7 +87,7 @@ impl LifeformManSystem {
                         info!("Direct Hit!");
                         victom.hp(-10.0); // Oh shit
                         players.push(victom.clone());
-                        out.push(Pack::new(Cmd::UpdatePlayer(victom), 0, None));
+                        out.push(Pack::new(Cmd::UpdatePlayer(victom), Dest::All));
                     },
                     None => info!("And a miss!"), 
                 }
@@ -96,7 +96,7 @@ impl LifeformManSystem {
             Action::Rotate(dir) => {
                 player.orientation = dir.clone();
                 players.push(player.clone());
-                out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::All));
             },
             _ => (), 
         };

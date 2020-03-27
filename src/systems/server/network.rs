@@ -2,23 +2,23 @@ use amethyst::{
     core::{SystemDesc, bundle::SystemBundle},
     ecs::{Read, Write, System, SystemData, World, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
-    network::simulation::{DeliveryRequirement, UrgencyRequirement, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
+    network::simulation::{NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
     Result,
 };
 
 use log::{info, error};
-use crate::network::{Pack, Cmd};
+use crate::network::{Pack, Cmd, Dest};
 use crate::resources::{IO, LifeformList};
 use std::net::{SocketAddr};
 
 #[derive(Debug)]
-pub struct ServerSystemBundle;
+pub struct TcpSystemBundle;
 
-impl<'a, 'b> SystemBundle<'a, 'b> for ServerSystemBundle {
+impl<'a, 'b> SystemBundle<'a, 'b> for TcpSystemBundle {
     fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
         builder.add(
-            ServerSystemDesc::default().build(world),
-            "server_system",
+            TcpSystemDesc::default().build(world),
+            "server_tcp_system",
             &[],
         );
         Ok(())
@@ -26,29 +26,28 @@ impl<'a, 'b> SystemBundle<'a, 'b> for ServerSystemBundle {
 }
 
 #[derive(Default, Debug)]
-pub struct ServerSystemDesc;
+pub struct TcpSystemDesc;
 
-/// A simple system that receives a ton of network events.
-impl<'a, 'b> SystemDesc<'a, 'b, ServerSystem> for ServerSystemDesc {
-    fn build(self, world: &mut World) -> ServerSystem {
+impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
+    fn build(self, world: &mut World) -> TcpSystem {
         // Creates the EventChannel<NetworkEvent> managed by the ECS.
-        <ServerSystem as System<'_>>::SystemData::setup(world);
+        <TcpSystem as System<'_>>::SystemData::setup(world);
         // Fetch the change we just created and call `register_reader` to get a
         // ReaderId<NetworkEvent>. This reader id is used to fetch new events from the network event
         // channel.
         let reader = world
             .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
             .register_reader();
-        ServerSystem::new(reader)
+        TcpSystem::new(reader)
     }
 }
 
-pub struct ServerSystem {
+pub struct TcpSystem {
     reader: ReaderId<NetworkSimulationEvent>,
     clients: Vec<SocketAddr>,
 }
 
-impl ServerSystem {
+impl TcpSystem {
     pub fn new(reader: ReaderId<NetworkSimulationEvent>) -> Self {
         Self { 
             reader,
@@ -57,13 +56,13 @@ impl ServerSystem {
     }
 }
 
-impl<'a> System<'a> for ServerSystem {
+impl<'a> System<'a> for TcpSystem {
     type SystemData = (
         Write<'a, TransportResource>,
         Read<'a, NetworkSimulationTime>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
         Write <'a, IO>,
-        Write <'a, LifeformList>,
+        Write<'a, LifeformList>,
     );
 
     fn run(&mut self, (mut net, sim_time, channel, mut io, mut pl): Self::SystemData) {
@@ -72,7 +71,7 @@ impl<'a> System<'a> for ServerSystem {
                 NetworkSimulationEvent::Message(addr, payload) => {
                     info!("Package: {:?}", payload);
                     let mut pk = Pack::from_bin(payload.to_vec());
-                    pk.addr = Some(addr.clone());  // Update the client addr
+                    pk.dest= Dest::Ip(addr.clone());  // Update the client addr
                     // net.send(*addr, b"ok");        // Respond
                     io.i.push(pk);
                 }
@@ -82,12 +81,12 @@ impl<'a> System<'a> for ServerSystem {
                 } 
                 NetworkSimulationEvent::Disconnect(addr) => {
                     info!("Client Disconnected: {}", addr);
-                    self.clients.retain(|&x| x != *addr); 
-                    // Remove player from server and clinet side
+                    self.clients.retain(|&x| x != *addr);
+                    
                     if let p = pl.get_from_ip(*addr) {
-                        let id = p.unwrap().id().clone();
-                        io.i.push(Pack::new(Cmd::RemovePlayer(id), 0, None)); 
-                        io.o.push(Pack::new(Cmd::RemovePlayer(id), 0, None)); 
+                        let id = p.unwrap().id();
+                        io.i.push(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
+                        io.o.push(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
                     }
                 }
                 NetworkSimulationEvent::RecvError(e) => {
@@ -100,18 +99,21 @@ impl<'a> System<'a> for ServerSystem {
         // Send responces
         for _frame in sim_time.sim_frames_to_run() {
             for resp in io.o.pop() {
-                match resp.addr {
+                match resp.dest {
                     // Just send to one address 
-                    Some(addr) => {
-                        net.send_with_requirements(addr, &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
+                    Dest::Ip(addr) => {
+                        net.send(addr, &resp.to_bin());
                     },
                     // Broadcast message
-                    None => {
+                    Dest::All => {
                         info!("Broadcasting pack: {:?}", resp);
                         for addr in self.clients.clone() {
                             info!("Sending pack: {:?} to: {:?}", resp, addr);
-                            net.send_with_requirements(addr, &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
+                            net.send(addr, &resp.to_bin());
                         }
+                    },
+                    Dest::Room(name) => {
+                    // Find the players in that room and send the packages to them
                     }
                 }
             }

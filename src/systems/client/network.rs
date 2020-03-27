@@ -3,57 +3,60 @@ use amethyst::{
     core::{SystemDesc},
     ecs::{Read, System, SystemData, World, Write, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
-    network::simulation::{DeliveryRequirement, UrgencyRequirement, NetworkSimulationEvent, TransportResource, NetworkSimulationTime},
+    network::simulation::{NetworkSimulationEvent, NetworkSimulationTime, TransportResource}, 
     Result, 
 };
 use log::{info, error};
 
-use crate::network::{Pack, Cmd};
+use crate::network::{Pack, Cmd, Dest};
 use crate::resources::{ClientStatus, IO, AppConfig};
 
-/// A simple system that sends a ton of messages to all connections.
-/// In this case, only the server is connected.
-#[derive(Debug)]
-pub struct ClientSystemBundle;
+pub struct TcpSystemBundle;
 
-impl<'a, 'b> SystemBundle<'a, 'b> for ClientSystemBundle {
+impl<'a, 'b> SystemBundle<'a, 'b> for TcpSystemBundle {
     fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
         builder.add(
-            ClientSystemDesc::default().build(world),
-            "client_system",
-            &[],); Ok(())
+            TcpSystemDesc::default().build(world),
+            "client_tcp_system",
+            &[],
+        );
+        Ok(())
     }
 }
 
 #[derive(Default, Debug)]
-pub struct ClientSystemDesc;
+pub struct TcpSystemDesc;
 
-/// A simple system that receives a ton of network events.
-impl<'a, 'b> SystemDesc<'a, 'b, ClientSystem> for ClientSystemDesc {
-    fn build(self, world: &mut World) -> ClientSystem {
+impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
+    fn build(self, world: &mut World) -> TcpSystem {
         // Creates the EventChannel<NetworkEvent> managed by the ECS.
-        <ClientSystem as System<'_>>::SystemData::setup(world);
+        <TcpSystem as System<'_>>::SystemData::setup(world);
         // Fetch the change we just created and call `register_reader` to get a
         // ReaderId<NetworkEvent>. This reader id is used to fetch new events from the network event
         // channel.
         let reader = world
             .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
             .register_reader();
-        ClientSystem::new(reader)
+        TcpSystem::new(reader)
+        // TcpSystem
     }
 }
 
-pub struct ClientSystem {
+pub struct TcpSystem {
     reader: ReaderId<NetworkSimulationEvent>,
 }
 
-impl ClientSystem {
+impl TcpSystem {
     pub fn new(reader: ReaderId<NetworkSimulationEvent>) -> Self {
-        Self { reader }
+        Self { 
+            reader,
+        }
     }
 }
 
-impl<'a> System<'a> for ClientSystem {
+// pub struct TcpSystem;
+
+impl<'a> System<'a> for TcpSystem {
     type SystemData = (
         Write<'a, ClientStatus>, 
         Read<'a, NetworkSimulationTime>,
@@ -62,19 +65,18 @@ impl<'a> System<'a> for ClientSystem {
         Write <'a, IO>,
         Read<'a, AppConfig>,
     );
-
     fn run(&mut self, (mut status, sim_time, mut net, channel, mut io, conf): Self::SystemData) {
         if sim_time.should_send_message_now() {
             if !status.connected {
                 info!("We are not connected, ready player 1");
                 let proof = format!("{} 1580235330 SignatureHere", conf.player_name);
-                let p = Pack::new(Cmd::Connect(proof.to_string()), 0, None);  
-                net.send_with_requirements(conf.server_ip.parse().unwrap(), &p.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
+                let p = Pack::new(Cmd::Connect(proof.to_string()), Dest::All);  
+                net.send(conf.server_ip.parse().unwrap(), &p.to_bin());
                 status.connected = true;
             }
             else {
                 for resp in io.o.pop() {
-                    net.send_with_requirements(conf.server_ip.parse().unwrap(), &resp.to_bin(), DeliveryRequirement::ReliableSequenced(None), UrgencyRequirement::OnTick);
+                    net.send(conf.server_ip.parse().unwrap(), &resp.to_bin());
                 }
             }
         }
@@ -95,6 +97,9 @@ impl<'a> System<'a> for ClientSystem {
                 }
                 NetworkSimulationEvent::RecvError(e) => {
                     error!("Recv Error: {:?}", e);
+                }
+                NetworkSimulationEvent::SendError(e, msg) => {
+                    error!("Send Error: {:?}, {:?}", e, msg);
                 }
                 _ => {}
             }

@@ -9,8 +9,6 @@ Required for: Monster AI [F001] / Move Up/Down Stairs [F004]
 Related to: null?
 ```
 
-## Components Required
-
 ## Resources Required (Server)
 - TcpSystem
     - Should only broadcast to players in the room

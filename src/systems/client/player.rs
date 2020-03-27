@@ -13,7 +13,7 @@ use log::info;
 use crate::{
     components::{LifeformComponent, Action, WalkAnimation, MeleeAnimation, Move},
     map::{Room},
-    network::{Pack, Cmd},
+    network::{Pack, Cmd, Dest},
     resources::{IO, SpritesContainer, Input, Inputs},
     constants,
     mech::get_letter,
@@ -130,7 +130,7 @@ impl<'s> System<'s> for PlayerSystem {
                                 let spr = sprite_renders.get_mut(p1).unwrap();  // Get sprite 
                                 if player.update_orientation(dir) { // Update self
                                     spr.sprite_number = player.get_dir();             // Change sprite
-                                    io.o.push(Pack::new(Cmd::Action(Action::Rotate(player.orientation.clone())), 0, None));
+                                    io.o.push(Pack::new(Cmd::Action(Action::Rotate(player.orientation.clone())), Dest::All));
                                 } 
                                 player.in_front()    // Get transform of in front
                             };
@@ -155,13 +155,13 @@ impl<'s> System<'s> for PlayerSystem {
                                 walk.insert(p1, WalkAnimation::new((constants::MOVEMENT_DELAY_MS as f32) / 1000.0));
                                 moves.insert(p1, mv);
 
-                                io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), 0, None));
+                                io.o.push(Pack::new(Cmd::Action(Action::Move(player.orientation.clone())), Dest::All));
                             }
                         },
                         Inputs::Melee => {
                             info!("Punch");
                             swing.insert(p1, MeleeAnimation::new(players.get_mut(p1).unwrap()));
-                            io.o.push(Pack::new(Cmd::Action(Action::Melee), 0, None));
+                            io.o.push(Pack::new(Cmd::Action(Action::Melee), Dest::All));
                         }
                     }
                 }

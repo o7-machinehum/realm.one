@@ -59,27 +59,27 @@ impl LifeformComponent {
     }
 
     /// New Monster
-    pub fn new_monster(
-        name: String, 
-        uid: u64, 
-        loc: (f32, f32),
-        room: String,
-        skin: Outfit,
-        ) -> Self 
-    {
-        Self {
-            uid,
-            name,
-            ip: 0.0.0.0:0000,
-            room,
-            x: loc.0,
-            y: loc.1,
-            skin,
-            orientation: Orientation::North,
-            hp: 100.0,
-            kind: LifeformType::Monster,
-        }
-    }
+//    pub fn new_monster(
+//        name: String, 
+//        uid: u64, 
+//        loc: (f32, f32),
+//        room: String,
+//        skin: Outfit,
+//        ) -> Self 
+//    {
+//        Self {
+//            uid,
+//            name,
+//            ip: 0.0.0.0:0000,
+//            room,
+//            x: loc.0,
+//            y: loc.1,
+//            skin,
+//            orientation: Orientation::North,
+//            hp: 100.0,
+//            kind: LifeformType::Monster,
+//        }
+//    }
 
    pub fn update_orientation(&mut self, or: Orientation) -> bool{
        let old = self.orientation.clone(); 

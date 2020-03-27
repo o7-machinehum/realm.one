@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize};
 use bincode;
 use std::net::{SocketAddr};
+use crate::map::Room;
 
 use crate::components::{LifeformComponent, Action};
 
@@ -16,25 +17,33 @@ pub enum Cmd {
     RemovePlayer(u64),
 }
 
-/// Networking package. addr: None if a broadcast, Some(ip) if direct.
+/// Destination
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum Dest {
+    Room(String),
+    Ip(SocketAddr),
+    All,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Pack {
     pub cmd: Cmd,
-    id: u32,
-    pub addr: Option<SocketAddr>,
+    pub dest: Dest,
 }
 
 impl Pack {
-    pub fn new(cmd: Cmd, id: u32, ip: Option<SocketAddr>) -> Self {
+    pub fn new(cmd: Cmd, dest: Dest) -> Self {
         Self {
             cmd,
-            id,
-            addr: ip, 
+            dest,
         }
     }
     
     pub fn ip(&self) -> Option<SocketAddr> {
-        self.addr
+        match self.dest {
+            Dest::Ip(ip) => return Some(ip),
+            _ => return(None), // This should never get reached it's panic city
+        }
     }
 
     pub fn from_bin(bin: Vec<u8>) -> Self {
