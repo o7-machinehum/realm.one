@@ -66,12 +66,13 @@ cmd outfit nude    // Change char nude androgynous person
 
 Other outfits: bat, skeleton, slime, ghost, spider
 
-## Hitlist (In no particular order)
+## Hitlist (In order)
+* [ ] [Network Refactor](features/F005/)
 * [ ] [Monster AI](features/F001/)
+* [ ] [Move Up/Down Stairs](features/F004/)
 * [x] [Player UID](features/F002/)
 * [ ] Spritesheet should be modified to allow melee in all directions
 * [ ] [Blood Splat during combat](features/F003/)
-* [ ] Moving through different areas of the map
 * [ ] Should be able to open and close doors
 * [ ] Other player should animate (Walking and melee)
 * [ ] Controls are clunky

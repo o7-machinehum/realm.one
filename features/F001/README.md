@@ -21,6 +21,8 @@ Branch Name: AI
   - This should be refactored into "LifeformManSystem"
 
 ## Systems Required (Server)
+- AuthSystem
+  - Needs to transfer all the monsters to the player on startupkdd
 - MonsterAiSystem (new)
   - Monsters should do some action every x ms (500 or something)
   - This should push actions into the io list
@@ -37,4 +39,6 @@ Branch Name: AI
   - Refactor to RemoveLifeform
 
 - Need a database to keep all the current monsters
--
+- Should be of the form
+
+- MonsterLoc (Structure)
