@@ -14,7 +14,7 @@ use log::info;
 
 use crate::{
     components::{Action, Skins},
-    network::{Pack, Cmd},
+    network::{Pack, Cmd, Dest},
     resources::{IO, SpritesContainer},
     constants,
     mech::get_letter,
@@ -160,7 +160,7 @@ impl<'s> System<'s> for ChatSystem {
             };
             
             match act {
-                Some(a) => io.o.push(Pack::new(Cmd::Action(a), 0, None)),
+                Some(a) => io.o.push(Pack::new(Cmd::Action(a), Dest::All)),
                 None => (),
             }
             
