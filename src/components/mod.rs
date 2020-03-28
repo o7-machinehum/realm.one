@@ -1,5 +1,6 @@
 mod lifeform;
 pub use self::lifeform::LifeformComponent;
+pub use self::lifeform::LifeformType;
 pub use self::lifeform::Orientation;
 
 mod player_action;
