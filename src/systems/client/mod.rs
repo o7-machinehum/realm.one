@@ -1,18 +1,14 @@
 mod player;
 pub use self::player::PlayerSystem;
 
-mod playerman;
-pub use self::playerman::PlayerManSystem;
-
-mod network;
-pub use self::network::ClientSystem;
-pub use self::network::ClientSystemBundle;
+mod lifeform_man;
+pub use self::lifeform_man::LifeformManSystem;
 
 mod map;
 pub use self::map::MapSystem;
 
-mod tcp;
-pub use self::tcp::TcpSystemBundle;
+mod network;
+pub use self::network::TcpSystemBundle;
 
 mod chat;
 pub use self::chat::ChatSystem;

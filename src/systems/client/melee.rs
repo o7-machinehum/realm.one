@@ -1,12 +1,12 @@
 use amethyst::{
     core:: {Time, Transform, Parent},
-    ecs::{Read, System, WriteStorage, ReadStorage, Join, Entities, Entity},
+    ecs::{Read, System, WriteStorage, Join, Entities, Entity},
     renderer::SpriteRender
 };
-use log::info;
+
 
 use crate::{
-    components::{MeleeAnimation, LifeformComponent},
+    components::{MeleeAnimation},
     resources::{SpritesContainer},
 };
 

@@ -5,19 +5,19 @@ use amethyst::{
 use log::info;
 
 use crate::{
-    network::{Pack, Cmd},
+    network::{Pack, Cmd, Dest},
     components::{Action, get_outfit, LifeformComponent},
-    resources::{PlayerList, IO, MapList},
+    resources::{LifeformList, IO, MapList},
 };
 
 /// A simple system that receives a ton of network events.
 #[derive(SystemDesc)]
-pub struct PlayerManSystem;
+pub struct LifeformManSystem;
 
-impl<'a> System<'a> for PlayerManSystem {
+impl<'a> System<'a> for LifeformManSystem {
     type SystemData = (
         Write <'a, IO>,
-        Write<'a, PlayerList>,
+        Write<'a, LifeformList>,
         Read <'a, MapList>,
     );
 
@@ -49,12 +49,12 @@ impl<'a> System<'a> for PlayerManSystem {
     }
 }
 
-impl PlayerManSystem {
+impl LifeformManSystem {
     fn act(&mut self, 
            mut player: LifeformComponent, 
            act: &Action, 
            maps: &MapList, 
-           pl: &PlayerList) 
+           pl: &LifeformList) 
            -> (Vec<Pack>, Vec<LifeformComponent>) 
         {
         let mut out = Vec::<Pack>::new();
@@ -68,7 +68,8 @@ impl PlayerManSystem {
                     info!("Player Walking"); 
                     player.walk();
                     players.push(player.clone());
-                    out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+                    let rm = player.room.clone();
+                    out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
                 }
             },
             
@@ -76,7 +77,8 @@ impl PlayerManSystem {
                 player.skin = get_outfit(&skin);
                 //TODO: Make sure skin in legal!
                 players.push(player.clone());
-                out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+                let rm = player.room.clone();
+                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
             },
 
             Action::Melee => {
@@ -87,7 +89,8 @@ impl PlayerManSystem {
                         info!("Direct Hit!");
                         victom.hp(-10.0); // Oh shit
                         players.push(victom.clone());
-                        out.push(Pack::new(Cmd::UpdatePlayer(victom), 0, None));
+                        let rm = player.room.clone();
+                        out.push(Pack::new(Cmd::UpdatePlayer(victom), Dest::Room(rm)));
                     },
                     None => info!("And a miss!"), 
                 }
@@ -96,7 +99,8 @@ impl PlayerManSystem {
             Action::Rotate(dir) => {
                 player.orientation = dir.clone();
                 players.push(player.clone());
-                out.push(Pack::new(Cmd::UpdatePlayer(player), 0, None));
+                let rm = player.room.clone();
+                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
             },
             _ => (), 
         };

@@ -19,6 +19,13 @@ pub enum Orientation {
     North,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum LifeformType {
+    Player,
+    Monster,
+    NPC,
+}
+
 /// Client Side player component
 #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -32,6 +39,7 @@ pub struct LifeformComponent {
     pub skin: Outfit,
     pub orientation: Orientation,
     pub hp: f32,
+    pub kind: LifeformType,
 }
 
 impl LifeformComponent {
@@ -46,8 +54,32 @@ impl LifeformComponent {
             skin: get_outfit(&Skins::Female),
             orientation: Orientation::North,
             hp: 100.0,
+            kind: LifeformType::Player,
         }
     }
+
+    /// New Monster
+//    pub fn new_monster(
+//        name: String, 
+//        uid: u64, 
+//        loc: (f32, f32),
+//        room: String,
+//        skin: Outfit,
+//        ) -> Self 
+//    {
+//        Self {
+//            uid,
+//            name,
+//            ip: 0.0.0.0:0000,
+//            room,
+//            x: loc.0,
+//            y: loc.1,
+//            skin,
+//            orientation: Orientation::North,
+//            hp: 100.0,
+//            kind: LifeformType::Monster,
+//        }
+//    }
 
    pub fn update_orientation(&mut self, or: Orientation) -> bool{
        let old = self.orientation.clone(); 

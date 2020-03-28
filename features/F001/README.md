@@ -1,5 +1,5 @@
 # AI/Monsters 
-Server should instantiate NPC monsters into the game. These monsters are controlled through a serverside system called. The engine should treat players and monsters exactly the same, this will reduce additional required code.
+Server should instantiate NPC monsters into the game. These monsters are controlled through a serverside system called MonsterAiSystem. The engine should treat players and monsters exactly the same, this will reduce additional required code.
 
 Branch Name: AI
 
@@ -21,7 +21,10 @@ Branch Name: AI
   - This should be refactored into "LifeformManSystem"
 
 ## Systems Required (Server)
+- AuthSystem
+  - Needs to transfer all the monsters to the player on startupkdd
 - MonsterAiSystem (new)
+  - Monsters should do some action every x ms (500 or something)
   - This should push actions into the io list
   - Actions are then acted on in the playerman system
 - PlayerManSystem
@@ -34,3 +37,8 @@ Branch Name: AI
   - Refactor to UpdateLifeform
 - Cmd::RemovePlayer
   - Refactor to RemoveLifeform
+
+- Need a database to keep all the current monsters
+- Should be of the form
+
+- MonsterLoc (Structure)
