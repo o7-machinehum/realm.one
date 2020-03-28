@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.3.1" name="master16" tilewidth="16" tileheight="16" tilecount="540" columns="12">
- <image source="master16.png" width="192" height="720"/>
+<tileset version="1.2" tiledversion="1.3.3" name="master16" tilewidth="16" tileheight="16" tilecount="864" columns="12">
+ <image source="master16.png" width="192" height="1152"/>
  <tile id="0">
   <properties>
    <property name="Collision" type="bool" value="false"/>
@@ -1654,6 +1654,7 @@
  <tile id="330">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="331">
