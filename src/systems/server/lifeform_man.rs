@@ -68,7 +68,8 @@ impl LifeformManSystem {
                     info!("Player Walking"); 
                     player.walk();
                     players.push(player.clone());
-                    out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::All));
+                    let rm = player.room.clone();
+                    out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
                 }
             },
             
@@ -76,7 +77,8 @@ impl LifeformManSystem {
                 player.skin = get_outfit(&skin);
                 //TODO: Make sure skin in legal!
                 players.push(player.clone());
-                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::All));
+                let rm = player.room.clone();
+                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
             },
 
             Action::Melee => {
@@ -87,7 +89,8 @@ impl LifeformManSystem {
                         info!("Direct Hit!");
                         victom.hp(-10.0); // Oh shit
                         players.push(victom.clone());
-                        out.push(Pack::new(Cmd::UpdatePlayer(victom), Dest::All));
+                        let rm = player.room.clone();
+                        out.push(Pack::new(Cmd::UpdatePlayer(victom), Dest::Room(rm)));
                     },
                     None => info!("And a miss!"), 
                 }
@@ -96,7 +99,8 @@ impl LifeformManSystem {
             Action::Rotate(dir) => {
                 player.orientation = dir.clone();
                 players.push(player.clone());
-                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::All));
+                let rm = player.room.clone();
+                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
             },
             _ => (), 
         };
