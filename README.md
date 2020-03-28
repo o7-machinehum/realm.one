@@ -67,7 +67,7 @@ cmd outfit nude    // Change char nude androgynous person
 Other outfits: bat, skeleton, slime, ghost, spider
 
 ## Hitlist (In order)
-* [ ] [Network Refactor](features/F005/)
+* [x] [Network Refactor](features/F005/)
 * [ ] [Monster AI](features/F001/)
 * [ ] [Move Up/Down Stairs](features/F004/)
 * [x] [Player UID](features/F002/)
