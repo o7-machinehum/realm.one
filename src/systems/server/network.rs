@@ -99,23 +99,24 @@ impl<'a> System<'a> for TcpSystem {
         // Send responces
         for _frame in sim_time.sim_frames_to_run() {
             for resp in io.o.pop() {
-                match resp.dest {
+                match &resp.dest {
                     // Just send to one address 
                     Dest::Ip(addr) => {
-                        net.send(addr, &resp.to_bin());
+                        net.send(*addr, &resp.to_bin());
                     },
                     // Broadcast message
                     Dest::All => {
                         info!("Broadcasting pack: {:?}", resp);
-                        for addr in self.clients.clone() {
+                        for addr in &self.clients {
                             info!("Sending pack: {:?} to: {:?}", resp, addr);
-                            net.send(addr, &resp.to_bin());
+                            net.send(*addr, &resp.to_bin());
                         }
                     },
                     Dest::Room(name) => {
                         // Get all the ip's in the room
                         let ips = pl.ip_in_room(&name);
                         for ip in ips { 
+                            info!("Sending pack: {:?} to: {:?}", resp, ip);
                             net.send(ip, &resp.to_bin());
                         }
                     }
