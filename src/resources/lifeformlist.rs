@@ -2,7 +2,7 @@ use amethyst::{
     core::{Transform},
 };
 
-use crate::components::LifeformComponent;
+use crate::components::{LifeformComponent, LifeformType};
 use std::collections::HashMap;
 use std::net::SocketAddr;
 
@@ -18,7 +18,6 @@ impl Default for LifeformList {
     fn default() -> Self {
         LifeformList::new() 
     }
-
 }
 
 impl LifeformList {
@@ -40,6 +39,23 @@ impl LifeformList {
 
     pub fn get_from_ip(&mut self, ip: SocketAddr) -> Option<LifeformComponent> {
         self.list[*self.ips.get(&ip).unwrap()].clone()
+    }
+    
+    /// Get all the IPs in a certain room
+    pub fn ip_in_room(&mut self, room: &String) -> Vec<SocketAddr> {
+        let mut ip = Vec::<SocketAddr>::new();
+
+        for lifeform in &self.list {
+            match lifeform {
+                Some(lf) => {
+                    if lf.room == *room && lf.kind == LifeformType::Player {
+                        ip.push(lf.ip);
+                    }
+                },
+                None => {}
+            }
+        }
+        ip
     }
     
     pub fn get_from_id(&mut self, id: u64) -> Option<LifeformComponent> {

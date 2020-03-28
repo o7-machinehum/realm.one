@@ -113,7 +113,11 @@ impl<'a> System<'a> for TcpSystem {
                         }
                     },
                     Dest::Room(name) => {
-                    // Find the players in that room and send the packages to them
+                        // Get all the ip's in the room
+                        let ips = pl.ip_in_room(&name);
+                        for ip in ips { 
+                            net.send(ip, &resp.to_bin());
+                        }
                     }
                 }
             }
