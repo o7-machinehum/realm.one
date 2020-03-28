@@ -3,7 +3,7 @@ use amethyst::{
     core::transform::Transform,
 };
 
-use serde::{Serialize, Deserialize};
+
 use crate::components::{LifeformComponent};
 
 #[derive(Debug, Clone, PartialEq)]

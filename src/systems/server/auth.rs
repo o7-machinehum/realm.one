@@ -5,9 +5,9 @@ use amethyst::{
 
 use log::info;
 use crate::{
-    network::{Pack, Cmd},
+    network::{Pack, Cmd, Dest},
     components::{LifeformComponent},
-    resources::{PlayerList, IO, MapList, LifeformUID},
+    resources::{LifeformList, IO, MapList, LifeformUID},
 };
 
 use std::net::{SocketAddr};
@@ -43,7 +43,7 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String, id: u64) -> LifeformCo
 impl<'a> System<'a> for AuthSystem {
     type SystemData = (
         Write <'a, IO>,
-        Write <'a, PlayerList>,
+        Write <'a, LifeformList>,
         Read <'a, MapList>,
         Write <'a, LifeformUID>,
     );
@@ -56,13 +56,13 @@ impl<'a> System<'a> for AuthSystem {
                         Some(s) => {
                             let player = ready_player_one(element.ip(), s, id.add());
 
-                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), 0, Some(player.ip))); 
-                            io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), 0, None));
+                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip))); 
+                            io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::All));
                             
                             // Push the rest of the players
                             for p in pl.list.iter() {
                                 match p {
-                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), 0, Some(player.ip))),
+                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip))),
                                     None => (),
                                 }
                             }
