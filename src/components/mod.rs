@@ -14,6 +14,7 @@ mod outfits;
 pub use self::outfits::Skins;
 pub use self::outfits::Outfit;
 pub use self::outfits::get_outfit;
+pub use self::outfits::outfit_from_str;
 
 mod walk_animation;
 pub use self::walk_animation::WalkAnimation;
