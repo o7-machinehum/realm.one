@@ -74,7 +74,7 @@ impl LifeformComponent {
             x: monster.x,
             y: monster.y,
             skin: monster.skin.clone(),
-            orientation: Orientation::North,
+            orientation: Orientation::South,
             hp: monster.hp,
             kind: LifeformType::Monster,
         }

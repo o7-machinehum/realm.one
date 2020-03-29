@@ -4,6 +4,7 @@ use amethyst::{
 
 use crate::resources::{IO, AppConfig, MapList, LifeformList, LifeformUID};
 use crate::components::{LifeformComponent};
+use log::info;
 
 pub struct ServerState{
     pub config: AppConfig,
@@ -29,6 +30,8 @@ impl SimpleState for ServerState {
                 lifeforms.add(lf)
             }
         }
+
+        info!("{:?}", lifeforms.list);
 
         world.insert(self.config.clone());
         world.insert(io);
