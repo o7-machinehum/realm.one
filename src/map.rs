@@ -15,9 +15,9 @@ use crate::components::{Orientation, LifeformComponent, Monster};
 use crate::mech::{colision};
 use log::info;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 #[allow(dead_code)]
-enum Layers {
+pub enum Layers {
     L1 = 0,
     L2,
     L3,
