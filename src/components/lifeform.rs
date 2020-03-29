@@ -11,6 +11,7 @@ use crate::components::{Outfit, Skins, get_outfit};
 use std::net::{SocketAddr};
 use nalgebra::base::Vector3;
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Orientation {
     South,
@@ -59,27 +60,24 @@ impl LifeformComponent {
     }
 
     /// New Monster
-//    pub fn new_monster(
-//        name: String, 
-//        uid: u64, 
-//        loc: (f32, f32),
-//        room: String,
-//        skin: Outfit,
-//        ) -> Self 
-//    {
-//        Self {
-//            uid,
-//            name,
-//            ip: 0.0.0.0:0000,
-//            room,
-//            x: loc.0,
-//            y: loc.1,
-//            skin,
-//            orientation: Orientation::North,
-//            hp: 100.0,
-//            kind: LifeformType::Monster,
-//        }
-//    }
+    // pub fn new_monster(
+    //     uid: u64, 
+    //     monster: Monster, 
+    //     ) -> Self 
+    // {
+    //     Self {
+    //         uid,
+    //         name: monster.name,
+    //         ip: 0.0.0.0:0000,
+    //         room,
+    //         x: loc.0,
+    //         y: loc.1,
+    //         skin,
+    //         orientation: Orientation::North,
+    //         hp: 100.0,
+    //         kind: LifeformType::Monster,
+    //     }
+    // }
 
    pub fn update_orientation(&mut self, or: Orientation) -> bool{
        let old = self.orientation.clone(); 

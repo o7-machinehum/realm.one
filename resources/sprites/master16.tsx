@@ -1654,17 +1654,22 @@
  <tile id="330">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
    <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="331">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="332">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="333">
@@ -1715,16 +1720,22 @@
  <tile id="342">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="343">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="344">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="345">
@@ -1775,16 +1786,22 @@
  <tile id="354">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="355">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="356">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="357">
@@ -1835,16 +1852,22 @@
  <tile id="366">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="367">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="368">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="Name" value="Ghost"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="369">
