@@ -23,7 +23,7 @@ impl SimpleState for GamePlayState {
         world.register::<map::TilePosition>();
         
         let sprites = SpritesContainer::new(&world);
-        let room = map::Room::new("resources/maps/town.tmx".to_string());
+        let room = map::Room::new("resources/maps/town.tmx".to_string(), false);
         let player_list = LifeformList::new();
         let inputs = Input::new();
 
