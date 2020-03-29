@@ -10,15 +10,14 @@ use std::{
     path::Path,
 };
 
-
 use crate::constants;
-use crate::components::Orientation;
+use crate::components::{Orientation, LifeformComponent, Monster};
 use crate::mech::{colision};
+use log::info;
 
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 #[allow(dead_code)]
-enum Layers {
+pub enum Layers {
     L1 = 0,
     L2,
     L3,
@@ -34,30 +33,26 @@ pub struct Room {
     pub tile_ent: Vec<Entity>,
     pub update: bool,
     pub name: String,
+    pub monsters: Vec<Monster>,
 }
 
 impl Default for Room {
     fn default() -> Self { 
         let file_name =  "resources/maps/first.tmx".to_string();
-        let file = File::open(&Path::new(&file_name)).unwrap();
-        let reader = BufReader::new(file);
-        let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
-        
-        Self { 
-            xsize: map.layers[0].tiles[0].len() - 1,
-            map,
-            tile_ent: Vec::new(),
-            update: true,
-            name: file_name,
-        }
+        Room::new(file_name, false)
     }
 }
 
 impl Room {
-    pub fn new(file_name: String) -> Self {
+    pub fn new(file_name: String, server: bool) -> Self {
         let file = File::open(&Path::new(&file_name)).unwrap();
         let reader = BufReader::new(file);
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
+        
+        let monsters = match server {
+            true => Room::get_monsters(&map),
+            false => Vec::<Monster>::new(),
+        };
 
         Self {
             xsize: map.layers[0].tiles[0].len() - 1,
@@ -65,6 +60,7 @@ impl Room {
             tile_ent: Vec::new(),
             update: true,
             name: file_name,
+            monsters 
         }
     }
 
@@ -138,11 +134,27 @@ impl Room {
             None => None,
         }
     }
+
+    fn get_monsters(map: &tiled::Map) -> Vec<Monster> {
+        let mut monsters = Vec::<Monster>::new();
+        // let tile = self.map.layers[Layers::L7 as usize].tiles[y1 as usize][x1 as usize];
+        for (x, row) in map.layers[Layers::L7 as usize].tiles.iter().rev().enumerate() {
+            for (y, col) in row.iter().enumerate() {
+                if col.gid != 0 {
+                    let prop = map.get_tileset_by_gid(col.gid).unwrap().tiles[col.gid as usize].properties.clone();
+                    info!("{:?}", prop);
+                    monsters.push(Monster::new(prop, (x as u32 + 1, y as u32 + 1))); 
+                }
+            }
+        }
+        info!("{:?}", monsters);
+        monsters
+    }
     
     pub fn get_adj(&self, pos: &Transform) -> Adj {
         let (x, y): (i32, i32) = Room::get_pos(pos);
         
-        Adj{
+        Adj {
             cur: self.get_prop((x,y),(0,0)),
             n:   self.get_prop((x,y),(0,constants::TILE_PER_PLAYER as i32)),
             e:   self.get_prop((x,y),(constants::TILE_PER_PLAYER as i32,0)),

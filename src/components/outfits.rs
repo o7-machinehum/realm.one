@@ -1,5 +1,19 @@
 use serde::{Serialize, Deserialize};
 
+pub fn outfit_from_str(skin: String) -> Outfit {
+    match skin.as_str() {
+     "Nude"     => get_outfit(&Skins::Nude),    
+     "Male"     => get_outfit(&Skins::Male),  
+     "Female"   => get_outfit(&Skins::Female),  
+     "Skeleton" => get_outfit(&Skins::Skeleton),
+     "Slime"    => get_outfit(&Skins::Slime),
+     "Bat"      => get_outfit(&Skins::Bat), 
+     "Ghost"    => get_outfit(&Skins::Ghost),   
+     "Spider"   => get_outfit(&Skins::Spider),
+     _          => get_outfit(&Skins::Nude)
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Skins {
     Nude,
@@ -30,7 +44,7 @@ pub fn get_outfit(skin: &Skins) -> Outfit {
         Skins::Slime    => Outfit {s: 325, w: 337, e: 349, n: 361, at: AttackStance::new(skin) },
         Skins::Bat      => Outfit {s: 328, w: 340, e: 352, n: 364, at: AttackStance::new(skin) },
         Skins::Ghost    => Outfit {s: 331, w: 343, e: 355, n: 367, at: AttackStance::new(skin) },
-        Skins::Spider   => Outfit {s: 234, w: 246, e: 358, n: 370, at: AttackStance::new(skin) },
+        Skins::Spider   => Outfit {s: 334, w: 346, e: 358, n: 370, at: AttackStance::new(skin) },
     }
 }
 

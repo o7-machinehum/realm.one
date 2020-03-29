@@ -4,7 +4,7 @@ use amethyst::ecs::{Read, Write, Entities, System, SystemData, WriteStorage, Ent
 use amethyst::renderer::SpriteRender;
 
 use crate::{
-    map::{Room, TilePosition},
+    map::{Room, TilePosition, Layers},
     network::Cmd,
     resources::{IO, SpritesContainer},
 };
@@ -42,6 +42,7 @@ impl<'s> System<'s> for MapSystem{
             // Add new tiles
             let mut ent_list: Vec<Entity> = Vec::new();
             for (z, layer) in room.map.layers.iter().enumerate() {
+                if z == Layers::L7 as usize { break; }; // Monster Layer, don't draw.
                 for (x, row) in layer.tiles.iter().rev().enumerate() {
                     for (y, col) in row.iter().enumerate() {
                         if col.gid != 0 {
