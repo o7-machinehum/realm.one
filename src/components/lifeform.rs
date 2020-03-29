@@ -7,7 +7,7 @@ use amethyst::{
 
 use serde::{Serialize, Deserialize};
 use crate::{constants};
-use crate::components::{Outfit, Skins, get_outfit};
+use crate::components::{Outfit, Skins, get_outfit, Monster};
 use std::net::{SocketAddr};
 use nalgebra::base::Vector3;
 
@@ -60,24 +60,25 @@ impl LifeformComponent {
     }
 
     /// New Monster
-    // pub fn new_monster(
-    //     uid: u64, 
-    //     monster: Monster, 
-    //     ) -> Self 
-    // {
-    //     Self {
-    //         uid,
-    //         name: monster.name,
-    //         ip: 0.0.0.0:0000,
-    //         room,
-    //         x: loc.0,
-    //         y: loc.1,
-    //         skin,
-    //         orientation: Orientation::North,
-    //         hp: 100.0,
-    //         kind: LifeformType::Monster,
-    //     }
-    // }
+    pub fn new_monster(
+        uid: u64, 
+        monster: &Monster,
+        room: String,
+        ) -> Self 
+    {
+        Self {
+            uid,
+            name: monster.name.clone(),
+            ip: None,
+            room,
+            x: monster.x,
+            y: monster.y,
+            skin: monster.skin.clone(),
+            orientation: Orientation::North,
+            hp: monster.hp,
+            kind: LifeformType::Monster,
+        }
+    }
 
    pub fn update_orientation(&mut self, or: Orientation) -> bool{
        let old = self.orientation.clone(); 

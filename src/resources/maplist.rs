@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 // MapList for the server
 pub struct MapList {
-    list: HashMap<String, Room>,
+    pub list: HashMap<String, Room>,
 }
 
 impl Default for MapList {

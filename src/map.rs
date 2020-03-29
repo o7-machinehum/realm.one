@@ -33,7 +33,7 @@ pub struct Room {
     pub tile_ent: Vec<Entity>,
     pub update: bool,
     pub name: String,
-    monsters: Vec<Monster>,
+    pub monsters: Vec<Monster>,
 }
 
 impl Default for Room {
