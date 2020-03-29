@@ -33,7 +33,7 @@ pub enum LifeformType {
 pub struct LifeformComponent {
     uid: u64,
     pub name: String,
-    pub ip: SocketAddr, 
+    pub ip: Option<SocketAddr>, 
     pub room: String,
     pub x: f32,          
     pub y: f32, 
@@ -44,11 +44,11 @@ pub struct LifeformComponent {
 }
 
 impl LifeformComponent {
-    pub fn new(name: String, ip: SocketAddr, uid: u64) -> Self {
+    pub fn new_player(name: String, ip: SocketAddr, uid: u64) -> Self {
         Self {
             uid,
             name,
-            ip,
+            ip: Some(ip),
             room: "resources/maps/town.tmx".to_string(),
             x: 8.0,
             y: 8.0,
@@ -187,6 +187,8 @@ impl LifeformComponent {
     }
 
     pub fn id(&self) -> u64 { self.uid }
+    
+    pub fn ip(&self) -> SocketAddr { self.ip.unwrap() }
 }
 
 impl Component for LifeformComponent {
