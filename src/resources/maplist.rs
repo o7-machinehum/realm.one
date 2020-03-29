@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 // MapList for the server
 pub struct MapList {
-    list: HashMap<String, Room>,
+    pub list: HashMap<String, Room>,
 }
 
 impl Default for MapList {
@@ -20,7 +20,7 @@ impl MapList {
     }
     
     pub fn add(&mut self, file_name: String) {
-        self.list.insert(file_name.clone(), Room::new(file_name));
+        self.list.insert(file_name.clone(), Room::new(file_name, true));
     }
     
     pub fn get(&self, file_name: &String) -> Option<&Room> {

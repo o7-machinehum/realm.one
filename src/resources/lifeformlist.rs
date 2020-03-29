@@ -31,7 +31,11 @@ impl LifeformList {
     }
 
     pub fn add(&mut self, player: LifeformComponent) {
-        self.ips.insert(player.ip.clone(), self.index); 
+        match player.ip {
+            Some(ip) => self.ips.insert(ip, self.index),
+            None => None,
+        };
+
         self.ids.insert(player.id(), self.index); 
         self.list.push(Some(player));
         self.index += 1;
@@ -49,7 +53,7 @@ impl LifeformList {
             match lifeform {
                 Some(lf) => {
                     if lf.room == *room && lf.kind == LifeformType::Player {
-                        ip.push(lf.ip);
+                        ip.push(lf.ip());
                     }
                 },
                 None => {}

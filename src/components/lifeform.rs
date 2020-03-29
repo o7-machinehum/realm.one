@@ -7,9 +7,10 @@ use amethyst::{
 
 use serde::{Serialize, Deserialize};
 use crate::{constants};
-use crate::components::{Outfit, Skins, get_outfit};
+use crate::components::{Outfit, Skins, get_outfit, Monster};
 use std::net::{SocketAddr};
 use nalgebra::base::Vector3;
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Orientation {
@@ -32,7 +33,7 @@ pub enum LifeformType {
 pub struct LifeformComponent {
     uid: u64,
     pub name: String,
-    pub ip: SocketAddr, 
+    pub ip: Option<SocketAddr>, 
     pub room: String,
     pub x: f32,          
     pub y: f32, 
@@ -43,11 +44,11 @@ pub struct LifeformComponent {
 }
 
 impl LifeformComponent {
-    pub fn new(name: String, ip: SocketAddr, uid: u64) -> Self {
+    pub fn new_player(name: String, ip: SocketAddr, uid: u64) -> Self {
         Self {
             uid,
             name,
-            ip,
+            ip: Some(ip),
             room: "resources/maps/town.tmx".to_string(),
             x: 8.0,
             y: 8.0,
@@ -59,27 +60,25 @@ impl LifeformComponent {
     }
 
     /// New Monster
-//    pub fn new_monster(
-//        name: String, 
-//        uid: u64, 
-//        loc: (f32, f32),
-//        room: String,
-//        skin: Outfit,
-//        ) -> Self 
-//    {
-//        Self {
-//            uid,
-//            name,
-//            ip: 0.0.0.0:0000,
-//            room,
-//            x: loc.0,
-//            y: loc.1,
-//            skin,
-//            orientation: Orientation::North,
-//            hp: 100.0,
-//            kind: LifeformType::Monster,
-//        }
-//    }
+    pub fn new_monster(
+        uid: u64, 
+        monster: &Monster,
+        room: String,
+        ) -> Self 
+    {
+        Self {
+            uid,
+            name: monster.name.clone(),
+            ip: None,
+            room,
+            x: monster.x,
+            y: monster.y,
+            skin: monster.skin.clone(),
+            orientation: Orientation::South,
+            hp: monster.hp,
+            kind: LifeformType::Monster,
+        }
+    }
 
    pub fn update_orientation(&mut self, or: Orientation) -> bool{
        let old = self.orientation.clone(); 
@@ -189,6 +188,8 @@ impl LifeformComponent {
     }
 
     pub fn id(&self) -> u64 { self.uid }
+    
+    pub fn ip(&self) -> SocketAddr { self.ip.unwrap() }
 }
 
 impl Component for LifeformComponent {
