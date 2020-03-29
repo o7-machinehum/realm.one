@@ -138,12 +138,12 @@ impl Room {
     fn get_monsters(map: &tiled::Map) -> Vec<Monster> {
         let mut monsters = Vec::<Monster>::new();
         // let tile = self.map.layers[Layers::L7 as usize].tiles[y1 as usize][x1 as usize];
-        for (x, row) in map.layers[Layers::L7 as usize].tiles.iter().enumerate() {
+        for (x, row) in map.layers[Layers::L7 as usize].tiles.iter().rev().enumerate() {
             for (y, col) in row.iter().enumerate() {
                 if col.gid != 0 {
                     let prop = map.get_tileset_by_gid(col.gid).unwrap().tiles[col.gid as usize].properties.clone();
                     info!("{:?}", prop);
-                    monsters.push(Monster::new(prop, (x as u32,y as u32))); 
+                    monsters.push(Monster::new(prop, (x as u32 + 1, y as u32 + 1))); 
                 }
             }
         }

@@ -102,6 +102,7 @@ impl<'a> System<'a> for TcpSystem {
                 match &resp.dest {
                     // Just send to one address 
                     Dest::Ip(addr) => {
+                        info!("Sending pack: {:?} to: {:?}", resp, addr);
                         net.send(*addr, &resp.to_bin());
                     },
                     // Broadcast message
