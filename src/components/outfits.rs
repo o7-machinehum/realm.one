@@ -1,5 +1,12 @@
 use serde::{Serialize, Deserialize};
 
+pub fn outfit_from_str(skin: String) -> Outfit {
+    match skin.as_str() {
+        "Nude" => get_outfit(&Skins::Nude),
+        _ => get_outfit(&Skins::Nude)
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Skins {
     Nude,

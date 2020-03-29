@@ -143,6 +143,7 @@ impl Room {
                 }
             }
         }
+        info!("{:?}", monsters);
         monsters
     }
     
