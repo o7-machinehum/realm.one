@@ -25,11 +25,11 @@ pub fn get_float(keyword: String, tile: &tiled::Properties) -> Option<f32> {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Monster {
-    name: String,
-    x: f32,          
-    y: f32, 
-    skin: Outfit,
-    hp: f32,
+    pub name: String,
+    pub x: f32,          
+    pub y: f32, 
+    pub skin: Outfit,
+    pub hp: f32,
 }
 
 impl Monster {
