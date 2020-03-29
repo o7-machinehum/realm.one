@@ -20,8 +20,6 @@ impl SimpleState for ServerState {
         // Load in all the maps
         maps.add("resources/maps/town.tmx".to_string());
 
-        
-
         world.insert(self.config.clone());
         world.insert(io);
         world.insert(maps);

@@ -20,7 +20,7 @@ impl MapList {
     }
     
     pub fn add(&mut self, file_name: String) {
-        self.list.insert(file_name.clone(), Room::new(file_name));
+        self.list.insert(file_name.clone(), Room::new(file_name, true));
     }
     
     pub fn get(&self, file_name: &String) -> Option<&Room> {

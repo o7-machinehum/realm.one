@@ -39,16 +39,20 @@ pub struct Room {
 impl Default for Room {
     fn default() -> Self { 
         let file_name =  "resources/maps/first.tmx".to_string();
-        Room::new(file_name)
+        Room::new(file_name, false)
     }
 }
 
 impl Room {
-    pub fn new(file_name: String) -> Self {
+    pub fn new(file_name: String, server: bool) -> Self {
         let file = File::open(&Path::new(&file_name)).unwrap();
         let reader = BufReader::new(file);
         let map =  tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
-        let monsters = Room::get_monsters(&map);
+        
+        let monsters = match server {
+            true => Room::get_monsters(&map),
+            false => Vec::<Monster>::new(),
+        };
 
         Self {
             xsize: map.layers[0].tiles[0].len() - 1,
