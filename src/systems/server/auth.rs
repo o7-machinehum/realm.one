@@ -55,16 +55,16 @@ impl<'a, 'b> SystemDesc<'a, 'b, AuthSystem> for AuthSystemDesc {
 
 impl<'a> System<'a> for AuthSystem {
     type SystemData = (
-		Write <'a, IO>,
+        Write <'a, IO>,
         Read <'a, EventChannel<AuthEvent>>,
-		Write <'a, LifeformList>,
+        Write <'a, LifeformList>,
         Read <'a, MapList>,
         Write <'a, LifeformUID>,
     );
 
     fn run(&mut self, (mut io, mut ev, mut pl, _maps, mut id): Self::SystemData) {
-		//   println!("Received event value of: {:?}", event);
-		for event in ev.read(&mut self.event_reader) {
+        //   println!("Received event value of: {:?}", event);
+        for event in ev.read(&mut self.event_reader) {
             match event { 
                 AuthEvent::Connect(auth, ip) => {
                     match authenticate(auth.to_string()) {
