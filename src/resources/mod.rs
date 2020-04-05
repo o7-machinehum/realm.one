@@ -5,8 +5,7 @@ mod lifeformlist;
 pub use self::lifeformlist::LifeformList;
 
 mod io;
-pub use self::io::NetOutputs;
-pub use self::io::NetInputs;
+pub use self::io::IO;
 
 mod appconfig;
 pub use self::appconfig::AppConfig;
