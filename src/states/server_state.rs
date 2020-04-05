@@ -2,7 +2,7 @@ use amethyst::{
     prelude::*,
 };
 
-use crate::resources::{IO, AppConfig, MapList, LifeformList, LifeformUID};
+use crate::resources::*; 
 use crate::components::{LifeformComponent};
 use log::info;
 
@@ -13,7 +13,8 @@ pub struct ServerState{
 impl SimpleState for ServerState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
-        let io = IO::new();
+        let net_inputs = NetInputs::new();
+        let net_outputs = NetOutputs::new();
         
         let mut uid = LifeformUID::new();
 
@@ -34,7 +35,8 @@ impl SimpleState for ServerState {
         info!("{:?}", lifeforms.list);
 
         world.insert(self.config.clone());
-        world.insert(io);
+        world.insert(net_inputs);
+        world.insert(net_outputs);
         world.insert(maps);
         world.insert(lifeforms);
         world.insert(uid);
