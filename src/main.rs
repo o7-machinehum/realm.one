@@ -110,7 +110,7 @@ fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
     let game_data = GameDataBuilder::default()
         .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
         .with_bundle(systems::server::TcpSystemBundle)?
-        .with(systems::AuthSystem, "auth_system", &[])
+        .with_bundle(systems::server::AuthSystemBundle)?
         .with(systems::server::LifeformManSystem, "playerman_system", &[]);
 
     let mut game = Application::build(resources, states::ServerState{config})?
