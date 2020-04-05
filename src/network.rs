@@ -17,6 +17,18 @@ pub enum Cmd {
     RemovePlayer(u64),
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Cmdb {
+    Ping,
+    Connect,
+    TransferMap,
+    InsertPlayer, 
+    InsertPlayer1, 
+    Action,
+    UpdatePlayer,
+    RemovePlayer,
+}
+
 /// Destination
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Dest {

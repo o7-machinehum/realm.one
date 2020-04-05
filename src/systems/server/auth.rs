@@ -7,7 +7,7 @@ use log::info;
 use crate::{
     network::{Pack, Cmd, Dest},
     components::{LifeformComponent},
-    resources::{LifeformList, IO, MapList, LifeformUID},
+    resources::{LifeformList, NetInputs, NetOutputs, MapList, LifeformUID},
 };
 
 use std::net::{SocketAddr};
@@ -42,41 +42,41 @@ fn ready_player_one(ip: Option<SocketAddr>, name: String, id: u64) -> LifeformCo
 
 impl<'a> System<'a> for AuthSystem {
     type SystemData = (
-        Write <'a, IO>,
+        Write <'a, inputs>,
+        Write <'a, outputs>,
         Write <'a, LifeformList>,
         Read <'a, MapList>,
         Write <'a, LifeformUID>,
     );
 
-    fn run(&mut self, (mut io, mut pl, _maps, mut id): Self::SystemData) {
-        for element in io.i.pop() {
-            match &element.cmd {
-                Cmd::Connect(packet) => {
-                    match authenticate(packet.to_string()) {
-                        Some(s) => {
-                            let player = ready_player_one(element.ip(), s, id.add());
+    fn run(&mut self, (mut inputs, mut outputs, mut pl, _maps, mut id): Self::SystemData) {
+        for con in inputs.get(Cmdb::Connect) {
+            match con.cmd {
+                Cmd::Connect // Save this one for another day
 
-                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip()))); 
-                            io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
-                            
-                            // Push the rest of the players
-                            for p in pl.list.iter() {
-                                info!("{:?}", p);
-                                match p {
-                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
-                                    None => (),
-                                }
-                            }
-                                
-                            info!("{:?}", io.o);
-                            
-                            pl.add(player); 
-                        },
-                        None => (),
+
+            }
+            match authenticate(con.to_string()) {
+                Some(s) => {
+                    let player = ready_player_one(element.ip(), s, id.add());
+
+                    io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip()))); 
+                    io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
+                    
+                    // Push the rest of the players
+                    for p in pl.list.iter() {
+                        info!("{:?}", p);
+                        match p {
+                            Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
+                            None => (),
+                        }
                     }
+                        
+                    info!("{:?}", io.o);
+                    
+                    pl.add(player); 
                 },
-                
-                _ => (io.i.push(element)), 
+                None => (),
             }
         }
     }
