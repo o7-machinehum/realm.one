@@ -1,6 +1,9 @@
 use amethyst::{
+    core::{SystemDesc, Transform, bundle::SystemBundle},
     derive::SystemDesc,
-    ecs::{Write, Read, System, SystemData},
+    ecs::{Write, World, Read, System, SystemData, DispatcherBuilder},
+    shrev::{EventChannel, ReaderId},
+    Result, 
 };
 
 use log::info;
@@ -13,9 +16,117 @@ use crate::{
 use std::net::{SocketAddr};
 use std::iter::{Iterator};
 
-/// A simple system that receives a ton of network events.
+/// Events that pertain to the Auth System
+#[derive(Debug)]
+pub enum AuthEvent {
+    Connect( String, SocketAddr), 
+}
+
 #[derive(SystemDesc)]
-pub struct AuthSystem;
+pub struct AuthSystem {
+    event_reader: ReaderId<AuthEvent>,
+}
+
+
+pub struct AuthSystemBundle;
+impl<'a, 'b> SystemBundle<'a, 'b> for AuthSystemBundle {
+    fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
+        builder.add(
+            AuthSystemDesc::default().build(world),
+            "auth_system",
+            &[],
+        );
+        Ok(())
+    }
+}
+
+#[derive(Default, Debug)]
+pub struct AuthSystemDesc;
+
+impl<'a, 'b> SystemDesc<'a, 'b, AuthSystem> for AuthSystemDesc {
+    fn build(self, world: &mut World) -> AuthSystem {
+        <AuthSystem as System<'_>>::SystemData::setup(world);
+        let event_reader = world
+            .fetch_mut::<EventChannel<AuthEvent>>()
+            .register_reader();
+        AuthSystem{ event_reader }
+    }
+}
+
+impl<'a> System<'a> for AuthSystem {
+    type SystemData = (
+		Write <'a, IO>,
+        Read <'a, EventChannel<AuthEvent>>,
+		Write <'a, LifeformList>,
+        Read <'a, MapList>,
+        Write <'a, LifeformUID>,
+    );
+
+    fn run(&mut self, (mut io, mut ev, mut pl, _maps, mut id): Self::SystemData) {
+		//   println!("Received event value of: {:?}", event);
+		for event in ev.read(&mut self.event_reader) {
+            match event { 
+                AuthEvent::Connect(auth, ip) => {
+                    match authenticate(auth.to_string()) {
+                        Some(s) => {
+                            let player = ready_player_one(*ip, s, id.add());
+
+                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip()))); 
+                            io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
+                                
+                            // Push the rest of the players
+                            for p in pl.list.iter() {
+                                info!("{:?}", p);
+                                match p {
+                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
+                                    None => (),
+                                }
+                            }
+                                
+                            info!("{:?}", io.o);
+                            
+                            pl.add(player); 
+                        },
+                        None => (),
+                    }
+                }
+            }
+        }
+    }
+}
+
+    //    for element in io.i.pop() {
+    //        match &element.cmd {
+    //            Cmd::Connect(packet) => {
+    //                match authenticate(packet.to_string()) {
+    //                    Some(s) => {
+    //                        let player = ready_player_one(element.ip(), s, id.add());
+
+    //                        io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip()))); 
+    //                        io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
+    //                        
+    //                        // Push the rest of the players
+    //                        for p in pl.list.iter() {
+    //                            info!("{:?}", p);
+    //                            match p {
+    //                                Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
+    //                                None => (),
+    //                            }
+    //                        }
+    //                            
+    //                        info!("{:?}", io.o);
+    //                        
+    //                        pl.add(player); 
+    //                    },
+    //                    None => (),
+    //                }
+    //            },
+    //            
+    //            _ => (io.i.push(element)), 
+    //        }
+    //    }
+//    }
+//}
 
 fn authenticate(proof: String) -> Option<String> {
     let v: Vec<&str> = proof.rsplit(' ').collect();
@@ -33,51 +144,9 @@ fn authenticate(proof: String) -> Option<String> {
     Some(v[2].to_string())
 }
 
-fn ready_player_one(ip: Option<SocketAddr>, name: String, id: u64) -> LifeformComponent {
+fn ready_player_one(ip: SocketAddr, name: String, id: u64) -> LifeformComponent {
     info!("Inserting player 1 ({})", name);
    
     // Dig through database to find the correct player by name = name 
-    LifeformComponent::new_player(name, ip.unwrap(), id)
-}
-
-impl<'a> System<'a> for AuthSystem {
-    type SystemData = (
-        Write <'a, IO>,
-        Write <'a, LifeformList>,
-        Read <'a, MapList>,
-        Write <'a, LifeformUID>,
-    );
-
-    fn run(&mut self, (mut io, mut pl, _maps, mut id): Self::SystemData) {
-        for element in io.i.pop() {
-            match &element.cmd {
-                Cmd::Connect(packet) => {
-                    match authenticate(packet.to_string()) {
-                        Some(s) => {
-                            let player = ready_player_one(element.ip(), s, id.add());
-
-                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip()))); 
-                            io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
-                            
-                            // Push the rest of the players
-                            for p in pl.list.iter() {
-                                info!("{:?}", p);
-                                match p {
-                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
-                                    None => (),
-                                }
-                            }
-                                
-                            info!("{:?}", io.o);
-                            
-                            pl.add(player); 
-                        },
-                        None => (),
-                    }
-                },
-                
-                _ => (io.i.push(element)), 
-            }
-        }
-    }
+    LifeformComponent::new_player(name, ip, id)
 }
