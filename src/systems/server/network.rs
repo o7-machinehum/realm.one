@@ -123,7 +123,6 @@ impl<'a> System<'a> for TcpSystem {
                     },
                     // Broadcast message
                     Dest::All => {
-                        info!("Broadcasting pack: {:?}", resp);
                         for addr in &self.clients {
                             info!("Sending pack: {:?} to: {:?}", resp, addr);
                             net.send(*addr, &resp.to_bin());
@@ -151,7 +150,6 @@ impl<'a> System<'a> for TcpSystem {
                 },
                 // Broadcast message
                 Dest::All => {
-                    info!("Broadcasting pack: {:?}", pack);
                     for addr in &self.clients {
                         info!("Sending pack: {:?} to: {:?}", pack, addr);
                         net.send(*addr, &pack.to_bin());
