@@ -55,6 +55,7 @@ impl<'a, 'b> SystemDesc<'a, 'b, AuthSystem> for AuthSystemDesc {
 
 impl<'a> System<'a> for AuthSystem {
     type SystemData = (
+        Write<'a, EventChannel<Pack>>,
         Write <'a, IO>,
         Read <'a, EventChannel<AuthEvent>>,
         Write <'a, LifeformList>,
@@ -62,7 +63,7 @@ impl<'a> System<'a> for AuthSystem {
         Write <'a, LifeformUID>,
     );
 
-    fn run(&mut self, (mut io, mut ev, mut pl, _maps, mut id): Self::SystemData) {
+    fn run(&mut self, (mut cmd_out, mut io, mut ev, mut pl, _maps, mut id): Self::SystemData) {
         //   println!("Received event value of: {:?}", event);
         for event in ev.read(&mut self.event_reader) {
             match event { 
@@ -71,14 +72,18 @@ impl<'a> System<'a> for AuthSystem {
                         Some(s) => {
                             let player = ready_player_one(*ip, s, id.add());
 
-                            io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip()))); 
-                            io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
+                            cmd_out.single_write(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip())));
+                            cmd_out.single_write(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
+                            
+                            // io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip()))); 
+                            // io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
                                 
                             // Push the rest of the players
                             for p in pl.list.iter() {
                                 info!("{:?}", p);
                                 match p {
-                                    Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
+                                    // Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
+                                    Some(p) => cmd_out.single_write(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
                                     None => (),
                                 }
                             }
@@ -94,39 +99,6 @@ impl<'a> System<'a> for AuthSystem {
         }
     }
 }
-
-    //    for element in io.i.pop() {
-    //        match &element.cmd {
-    //            Cmd::Connect(packet) => {
-    //                match authenticate(packet.to_string()) {
-    //                    Some(s) => {
-    //                        let player = ready_player_one(element.ip(), s, id.add());
-
-    //                        io.o.push(Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip()))); 
-    //                        io.o.push(Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
-    //                        
-    //                        // Push the rest of the players
-    //                        for p in pl.list.iter() {
-    //                            info!("{:?}", p);
-    //                            match p {
-    //                                Some(p) => io.o.push(Pack::new(Cmd::InsertPlayer(p.clone()), Dest::Ip(player.ip()))),
-    //                                None => (),
-    //                            }
-    //                        }
-    //                            
-    //                        info!("{:?}", io.o);
-    //                        
-    //                        pl.add(player); 
-    //                    },
-    //                    None => (),
-    //                }
-    //            },
-    //            
-    //            _ => (io.i.push(element)), 
-    //        }
-    //    }
-//    }
-//}
 
 fn authenticate(proof: String) -> Option<String> {
     let v: Vec<&str> = proof.rsplit(' ').collect();
