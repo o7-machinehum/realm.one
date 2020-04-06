@@ -32,8 +32,6 @@ impl SimpleState for ServerState {
                 lifeforms.add(lf)
             }
         }
-
-        info!("{:?}", lifeforms.list);
         
         // Create all the channels
         let mut auth_channel = EventChannel::<AuthEvent>::new();

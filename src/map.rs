@@ -142,12 +142,10 @@ impl Room {
             for (y, col) in row.iter().enumerate() {
                 if col.gid != 0 {
                     let prop = map.get_tileset_by_gid(col.gid).unwrap().tiles[col.gid as usize].properties.clone();
-                    info!("{:?}", prop);
                     monsters.push(Monster::new(prop, (x as u32 + 1, y as u32 + 1))); 
                 }
             }
         }
-        info!("{:?}", monsters);
         monsters
     }
     
