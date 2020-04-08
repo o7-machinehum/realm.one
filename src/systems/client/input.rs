@@ -86,10 +86,15 @@ impl<'s> System<'s> for InputSystem {
             (ActionBinding::Melee, Some(Inputs::Melee), action_delay),
         ];
         for c in commands {
+            let input_action = c.0.clone();
             if input.action_is_down(&c.0).unwrap() {
                 if self.try_latch(c.0, t + c.2 as f64) {
                     if let Some(command) = c.1 {
+                        log::info!("cmd: {:?}", command);
                         input_res.add(command);
+                    } else if input_action == ActionBinding::TypingMode {
+                        self.typing_mode = !self.typing_mode;
+                        log::info!("cmd: TypingMode {}", self.typing_mode);
                     }
                 }
             }
