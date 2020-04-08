@@ -5,9 +5,11 @@ authors = ["Team Awesome"]
 edition = "2018"
 
 [dependencies]
-amethyst = { git = "https://github.com/machine-hum/amethyst" }
+# amethyst = { git = "https://github.com/machine-hum/amethyst" }
 # amethyst = { git = "https://github.com/amethyst/amethyst" }
 # amethyst = { path = "../amethyst" }
+
+amethyst = "0.15.0"
 log = { version = "0.4.8", features = ["serde"] }
 tiled = { git = "https://github.com/mattyhall/rs-tiled" }
 serde = { version = "1", features = ["derive"] }
@@ -22,4 +24,4 @@ default = ["metal"] # For osx
 empty = ["amethyst/empty"]
 metal = ["amethyst/metal"]
 vulkan = ["amethyst/vulkan"]
-nightly = ["amethyst/nightly"]
+# nightly = ["amethyst/nightly"]
