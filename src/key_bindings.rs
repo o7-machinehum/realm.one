@@ -1,7 +1,7 @@
-use std::fmt::{self, Display};
-
+use crate::components::Orientation;
 use amethyst::input::BindingTypes;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::fmt::{self, Display};
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AxisBinding {
@@ -11,7 +11,9 @@ pub enum AxisBinding {
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ActionBinding {
+    Move(Orientation),
     Melee,
+    TypingMode,
 }
 
 impl Display for AxisBinding {
@@ -33,4 +35,3 @@ impl BindingTypes for MovementBindingTypes {
     type Axis = AxisBinding;
     type Action = ActionBinding;
 }
-
