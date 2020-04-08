@@ -113,59 +113,59 @@ impl<'a> System<'a> for TcpSystem {
         }
 
         // Send responces
-        //for _frame in sim_time.sim_frames_to_run() {
-        //    for resp in io.o.pop() {
-        //        match &resp.dest {
-        //            // Just send to one address 
-        //            Dest::Ip(addr) => {
-        //                info!("Sending pack: {:?} to: {:?}", resp, addr);
-        //                net.send(*addr, &resp.to_bin());
-        //            },
-        //            // Broadcast message
-        //            Dest::All => {
-        //                for addr in &self.clients {
-        //                    info!("Sending pack: {:?} to: {:?}", resp, addr);
-        //                    net.send(*addr, &resp.to_bin());
-        //                }
-        //            },
-        //            Dest::Room(name) => {
-        //                // Get all the ip's in the room
-        //                let ips = pl.ip_in_room(&name);
-        //                for ip in ips { 
-        //                    info!("Sending pack: {:?} to: {:?}", resp, ip);
-        //                    net.send(ip, &resp.to_bin());
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        // This is the new way!
         for _frame in sim_time.sim_frames_to_run() {
-            for pack in in_packs.read(&mut self.event_reader) {
-                match &pack.dest {
+            for resp in io.o.pop() {
+                match &resp.dest {
                     // Just send to one address 
                     Dest::Ip(addr) => {
-                        info!("Sending pack: {:?} to: {:?}", pack, addr);
-                        net.send(*addr, &pack.to_bin());
+                        info!("Sending pack: {:?} to: {:?}", resp, addr);
+                        net.send(*addr, &resp.to_bin());
                     },
                     // Broadcast message
                     Dest::All => {
                         for addr in &self.clients {
-                            info!("Sending pack: {:?} to: {:?}", pack, addr);
-                            net.send(*addr, &pack.to_bin());
+                            info!("Sending pack: {:?} to: {:?}", resp, addr);
+                            net.send(*addr, &resp.to_bin());
                         }
                     },
                     Dest::Room(name) => {
                         // Get all the ip's in the room
                         let ips = pl.ip_in_room(&name);
                         for ip in ips { 
-                            info!("Sending pack: {:?} to: {:?}", pack, ip);
-                            net.send(ip, &pack.to_bin());
+                            info!("Sending pack: {:?} to: {:?}", resp, ip);
+                            net.send(ip, &resp.to_bin());
                         }
                     }
                 }
             }
         }
+
+        // This is the new way!
+        //for _frame in sim_time.sim_frames_to_run() {
+        //    for pack in in_packs.read(&mut self.event_reader) {
+        //        match &pack.dest {
+        //            // Just send to one address 
+        //            Dest::Ip(addr) => {
+        //                info!("Sending pack: {:?} to: {:?}", pack, addr);
+        //                net.send(*addr, &pack.to_bin());
+        //            },
+        //            // Broadcast message
+        //            Dest::All => {
+        //                for addr in &self.clients {
+        //                    info!("Sending pack: {:?} to: {:?}", pack, addr);
+        //                    net.send(*addr, &pack.to_bin());
+        //                }
+        //            },
+        //            Dest::Room(name) => {
+        //                // Get all the ip's in the room
+        //                let ips = pl.ip_in_room(&name);
+        //                for ip in ips { 
+        //                    info!("Sending pack: {:?} to: {:?}", pack, ip);
+        //                    net.send(ip, &pack.to_bin());
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
