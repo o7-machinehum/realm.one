@@ -1,31 +1,50 @@
-use amethyst::{
-    derive::SystemDesc,
-    ecs::{Read, Write, System, SystemData},
-    input::InputHandler,
-};
-
-
-
-
 use crate::{
-    components::{Orientation},
-    key_bindings::{MovementBindingTypes, AxisBinding, ActionBinding},
-    resources::{Inputs, Input},
+    components::Orientation,
+    constants,
+    key_bindings::{ActionBinding, MovementBindingTypes},
+    resources::{Input, Inputs},
+};
+use amethyst::{
+    core::timing::Time,
+    derive::SystemDesc,
+    ecs::{Read, System, SystemData, Write},
+    input::InputHandler,
 };
 
 #[derive(SystemDesc)]
 pub struct InputSystem {
-    mv_h_latch: bool,
-    mv_v_latch: bool,
-    melee_latch: bool,
-} 
+    latched_actions: Vec<(ActionBinding, f64)>, //expiry time in f64
+    typing_mode: bool,
+}
 
 impl InputSystem {
-    pub fn new() -> Self {
+    ///Iterates on latched_actions & removes any expired action
+    fn remove_expired_latches(&mut self, current_time: f64) {
+        self.latched_actions.retain(|(_action, expiry_time)| {
+            return current_time < *expiry_time;
+        });
+    }
+    /// 1. Checks if the key is down
+    /// 2. Checks that an action of the same type does not exist in latched_actions.
+    /// 3. If new action is unique, pushes into latched_actions
+    fn try_latch(&mut self, action: ActionBinding, expiry_time: f64) -> bool {
+        let mut can_latch = !self.latched_actions.iter().any(|a| a.0 == action);
+        //When vec is empty, the closure above will return false
+        if self.latched_actions.len() == 0 {
+            can_latch = true;
+        }
+        if can_latch {
+            self.latched_actions.push((action, expiry_time));
+        }
+        return can_latch;
+    }
+}
+
+impl Default for InputSystem {
+    fn default() -> Self {
         Self {
-            mv_h_latch: false,
-            mv_v_latch: false,
-            melee_latch: false,
+            latched_actions: Vec::new(),
+            typing_mode: false,
         }
     }
 }
@@ -33,61 +52,47 @@ impl InputSystem {
 impl<'s> System<'s> for InputSystem {
     type SystemData = (
         Read<'s, InputHandler<MovementBindingTypes>>,
+        Read<'s, Time>,
         Write<'s, Input>,
-    );
- 
-    fn run(&mut self, ( input, mut input_res): Self::SystemData) {
-        match input.axis_value(&AxisBinding::Horizontal) {
-            Some(value) => {
-                if value > 0.0 && !self.mv_h_latch {
-                    input_res.add(Inputs::Move(Orientation::East));
-                    self.mv_h_latch = true;
-                }
+    ); //, Write<'s, Input>);
 
-                if value < 0.0 && !self.mv_h_latch {
-                    input_res.add(Inputs::Move(Orientation::West));
-                    self.mv_h_latch = true;
+    fn run(&mut self, (input, time, mut input_res): Self::SystemData) {
+        let t = time.absolute_real_time().as_secs_f64();
+        self.remove_expired_latches(t);
+        let action_delay = constants::MOVEMENT_DELAY_MS as f64 / 1000.; // should this really be action_delay?
+        let typing_delay = constants::TYPING_DELAY_MS as f64 / 1000.;
+        let commands = vec![
+            (ActionBinding::TypingMode, None, action_delay),
+            (
+                ActionBinding::Move(Orientation::North),
+                Some(Inputs::Move(Orientation::North)),
+                action_delay,
+            ),
+            (
+                ActionBinding::Move(Orientation::East),
+                Some(Inputs::Move(Orientation::East)),
+                action_delay,
+            ),
+            (
+                ActionBinding::Move(Orientation::South),
+                Some(Inputs::Move(Orientation::South)),
+                action_delay,
+            ),
+            (
+                ActionBinding::Move(Orientation::West),
+                Some(Inputs::Move(Orientation::West)),
+                action_delay,
+            ),
+            (ActionBinding::Melee, Some(Inputs::Melee), action_delay),
+        ];
+        for c in commands {
+            if input.action_is_down(&c.0).unwrap() {
+                if self.try_latch(c.0, t + c.2 as f64) {
+                    if let Some(command) = c.1 {
+                        input_res.add(command);
+                    }
                 }
-                
-                if value == 0.0 {
-                    self.mv_h_latch = false;
-                }
-
-            },
-            None => (),
-        }
-        
-        match input.axis_value(&AxisBinding::Vertical) {
-            Some(value) => {
-                if value > 0.0 && !self.mv_v_latch {
-                    input_res.add(Inputs::Move(Orientation::North));
-                    self.mv_v_latch = true;
-                }
-
-                if value < 0.0 && !self.mv_v_latch {
-                    input_res.add(Inputs::Move(Orientation::South));
-                    self.mv_v_latch = true;
-                }
-                
-                if value == 0.0 {
-                    self.mv_v_latch = false;
-                }
-
-            },
-            None => (),
-        }
-
-        match input.action_is_down(&ActionBinding::Melee) {
-            Some(value) => {
-                if value == true && !self.melee_latch {
-                    input_res.add(Inputs::Melee);
-                    self.melee_latch = true;
-                }
-                if value == false {
-                    self.melee_latch = false;
-                }
-            },
-            None => (),
+            }
         }
     }
 }

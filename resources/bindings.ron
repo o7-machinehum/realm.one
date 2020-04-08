@@ -1,9 +1,14 @@
 (
     axes: {
-        Vertical: Emulated(pos: Key(W), neg: Key(S)),
-        Horizontal: Emulated(pos: Key(D), neg: Key(A)),
+        Vertical: Emulated(pos: Key(Q), neg: Key(R)),
+        Horizontal: Emulated(pos: Key(Z), neg: Key(X)),
     },
     actions: {
+        Move(North):[[Key(W)]],
+        Move(East):[[Key(D)]],
+        Move(South):[[Key(S)]],
+        Move(West):[[Key(A)]],
         Melee: [[Key(Space)]],
+        TypingMode: [[Key(Grave)]],
     },
 )
