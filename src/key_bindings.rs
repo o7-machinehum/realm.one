@@ -1,4 +1,5 @@
 use crate::components::Orientation;
+use crate::resources::Inputs;
 use amethyst::input::BindingTypes;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
@@ -9,20 +10,7 @@ pub enum AxisBinding {
     Vertical,
 }
 
-#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub enum ActionBinding {
-    Move(Orientation),
-    Melee,
-    TypingMode,
-}
-
 impl Display for AxisBinding {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl Display for ActionBinding {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
     }
@@ -33,5 +21,5 @@ pub struct MovementBindingTypes;
 
 impl BindingTypes for MovementBindingTypes {
     type Axis = AxisBinding;
-    type Action = ActionBinding;
+    type Action = Inputs;
 }
