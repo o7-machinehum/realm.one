@@ -15,7 +15,7 @@ use crate::{
     map::Room,
     mech::get_letter,
     network::{Cmd, Dest, Pack},
-    resources::{Input, Inputs, SpritesContainer, IO},
+    resources::{Command, CommandQueue, SpritesContainer, IO},
 };
 
 #[derive(SystemDesc)]
@@ -38,7 +38,7 @@ impl<'s> System<'s> for PlayerSystem {
         Write<'s, IO>,
         Write<'s, Room>,
         Entities<'s>,
-        Write<'s, Input>,
+        Write<'s, CommandQueue>,
         Read<'s, SpritesContainer>,
     );
 
@@ -56,7 +56,7 @@ impl<'s> System<'s> for PlayerSystem {
             mut io,
             room,
             entities,
-            mut input,
+            mut command_queue,
             s,
         ): Self::SystemData,
     ) {
@@ -122,10 +122,10 @@ impl<'s> System<'s> for PlayerSystem {
             let p1 = self.p1.unwrap();
             if now.duration_since(self.timer.unwrap()).as_millis() >= constants::MOVEMENT_DELAY_MS {
                 self.timer = Some(now.clone());
-                let inp = input.get(); // Get the move
-                if inp.is_some() {
-                    match inp.unwrap() {
-                        Inputs::Move(dir) => {
+                let cmd = command_queue.get(); // Get the move
+                if cmd.is_some() {
+                    match cmd.unwrap() {
+                        Command::Move(dir) => {
                             // Get player and transform component of yourself
                             let adj_player_tr = {
                                 let player = players.get_mut(p1).unwrap(); // Get yourself
@@ -176,7 +176,7 @@ impl<'s> System<'s> for PlayerSystem {
                                 ));
                             }
                         }
-                        Inputs::Melee => {
+                        Command::Melee => {
                             info!("Punch");
                             swing.insert(p1, MeleeAnimation::new(players.get_mut(p1).unwrap()));
                             io.o.push(Pack::new(Cmd::Action(Action::Melee), Dest::All));
