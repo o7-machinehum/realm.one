@@ -16,9 +16,9 @@ pub use self::maplist::MapList;
 mod spritescontainer;
 pub use self::spritescontainer::SpritesContainer;
 
-mod input;
-pub use self::input::Input;
-pub use self::input::Inputs;
+mod command;
+pub use self::command::Command;
+pub use self::command::CommandQueue;
 
 mod lifeform_uid;
 pub use self::lifeform_uid::LifeformUID;
