@@ -1,5 +1,5 @@
 use crate::components::Orientation;
-use crate::resources::Inputs;
+use crate::resources::Command;
 use amethyst::input::BindingTypes;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
@@ -21,5 +21,5 @@ pub struct MovementBindingTypes;
 
 impl BindingTypes for MovementBindingTypes {
     type Axis = AxisBinding;
-    type Action = Inputs;
+    type Action = Command;
 }

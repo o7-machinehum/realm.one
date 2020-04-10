@@ -74,7 +74,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with_bundle(input_bundle)?
         .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 2048))?
         .with_bundle(systems::client::TcpSystemBundle)?
-        .with_bundle(systems::ChatSystemBundle)?
+        //.with_bundle(systems::ChatSystemBundle)?
         .with(
             systems::PlayerSystem::new(config.player_name.clone()),
             "player_system",

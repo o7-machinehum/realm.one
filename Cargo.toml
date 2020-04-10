@@ -18,9 +18,13 @@ nalgebra = "0.19.0"
 
 [features]
 default = ["vulkan"]
+#default = ["metal"]
 
 vulkan = ["amethyst/vulkan"]
+metal = ["amethyst/metal"]
 
+
+#profile is set to the --release profile
 [profile.dev]
 opt-level = 3
 debug = false

@@ -2,7 +2,7 @@ use crate::{
     components::Orientation,
     constants,
     key_bindings::MovementBindingTypes,
-    resources::{Input, Inputs},
+    resources::{Command, CommandQueue},
 };
 use amethyst::{
     core::{bundle::SystemBundle, timing::Time, SystemDesc},
@@ -15,7 +15,7 @@ use amethyst::{
 
 #[derive(Debug, SystemDesc)]
 pub struct InputSystem {
-    latched_actions: Vec<(Inputs, f64)>,        //expiry time in f64
+    latched_actions: Vec<(Command, f64)>,       //expiry time in f64
     latched_typing: Vec<(VirtualKeyCode, f64)>, //expiry time in f64
     typing_mode: bool,
     typed_input: Vec<char>,
@@ -42,7 +42,7 @@ impl InputSystem {
     /// 1. Checks if the key is down
     /// 2. Checks that an action of the same type does not exist in latched_actions.
     /// 3. If new action is unique, pushes into latched_actions
-    fn try_latch_action(&mut self, action: Inputs, expiry_time: f64) -> bool {
+    fn try_latch_action(&mut self, action: Command, expiry_time: f64) -> bool {
         let mut can_latch = !self.latched_actions.iter().any(|a| a.0 == action);
         //When vec is empty, the closure above will return false
         if self.latched_actions.len() == 0 {
@@ -71,23 +71,22 @@ impl<'s> System<'s> for InputSystem {
     type SystemData = (
         Read<'s, InputHandler<MovementBindingTypes>>,
         Read<'s, Time>,
-        Write<'s, Input>,
-        Read<'s, EventChannel<Event>>,
-    ); //, Write<'s, Input>);
+        Write<'s, CommandQueue>,
+    );
 
-    fn run(&mut self, (input, time, mut input_res, events): Self::SystemData) {
+    fn run(&mut self, (input, time, mut command_queue): Self::SystemData) {
         let t = time.absolute_real_time().as_secs_f64();
         self.remove_expired_latches(t);
         let action_delay = constants::MOVEMENT_DELAY_MS as f64 / 1000.; // should this really be ACTION_DELAY?
         let typing_delay = constants::TYPING_DELAY_MS as f64 / 1000.;
         let commands = vec![
             //Command, send_command_to_resource, delay)
-            (Inputs::TypingMode, false, action_delay),
-            (Inputs::Move(Orientation::North), true, action_delay),
-            (Inputs::Move(Orientation::East), true, action_delay),
-            (Inputs::Move(Orientation::South), true, action_delay),
-            (Inputs::Move(Orientation::West), true, action_delay),
-            (Inputs::Melee, true, action_delay),
+            (Command::TypingMode, false, action_delay),
+            (Command::Move(Orientation::North), true, action_delay),
+            (Command::Move(Orientation::East), true, action_delay),
+            (Command::Move(Orientation::South), true, action_delay),
+            (Command::Move(Orientation::West), true, action_delay),
+            (Command::Melee, true, action_delay),
         ];
         if self.typing_mode {
             let keys: Vec<VirtualKeyCode> = input.keys_that_are_down().collect();
@@ -98,16 +97,14 @@ impl<'s> System<'s> for InputSystem {
                 if self.try_latch_key(key, t + typing_delay) {
                     match key {
                         VirtualKeyCode::Return => {
-                            log::info!(
-                                "Command: TypedData({:?})",
-                                self.typed_input.iter().collect::<String>()
-                            );
-                            input_res.add(Inputs::TypedData(
-                                self.typed_input.iter().collect::<String>(),
-                            ));
+                            let data = self.typed_input.iter().collect::<String>();
+                            if (data.len() > 0) {
+                                log::info!("Command: TypedData({:?})", data);
+                                command_queue.add(Command::TypedData(data));
+                            }
                             self.typed_input = Vec::new();
                             self.typing_mode = false;
-                            self.try_latch_action(Inputs::TypingMode, t + action_delay);
+                            self.try_latch_action(Command::TypingMode, t + action_delay);
                             log::info!("TypingMode {}", self.typing_mode);
                         }
                         VirtualKeyCode::Back => {
@@ -132,8 +129,8 @@ impl<'s> System<'s> for InputSystem {
                     if self.try_latch_action(input_action.clone(), t + expiry_delay as f64) {
                         if send_command {
                             log::info!("Command: {:?}", input_action);
-                            input_res.add(input_action.clone());
-                        } else if input_action == Inputs::TypingMode {
+                            command_queue.add(input_action.clone());
+                        } else if input_action == Command::TypingMode {
                             self.typing_mode = !self.typing_mode;
                             self.try_latch_key(VirtualKeyCode::Return, t + typing_delay); // ensure latched to prevent runaway entry
                             log::info!("TypingMode {}", self.typing_mode);
