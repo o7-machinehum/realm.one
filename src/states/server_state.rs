@@ -6,7 +6,7 @@ use amethyst::{
 use crate::resources::{IO, AppConfig, MapList, LifeformList, LifeformUID};
 use crate::components::{LifeformComponent};
 use crate::systems::server::AuthEvent;
-use log::info;
+
 
 pub struct ServerState{
     pub config: AppConfig,
@@ -34,7 +34,7 @@ impl SimpleState for ServerState {
         }
         
         // Create all the channels
-        let mut auth_channel = EventChannel::<AuthEvent>::new();
+        let _auth_channel = EventChannel::<AuthEvent>::new();
 
         world.insert(self.config.clone());
         world.insert(io);

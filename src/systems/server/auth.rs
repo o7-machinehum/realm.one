@@ -1,5 +1,5 @@
 use amethyst::{
-    core::{SystemDesc, Transform, bundle::SystemBundle},
+    core::{SystemDesc, bundle::SystemBundle},
     derive::SystemDesc,
     ecs::{Write, World, Read, System, SystemData, DispatcherBuilder},
     shrev::{EventChannel, ReaderId},
@@ -62,7 +62,7 @@ impl<'a> System<'a> for AuthSystem {
         Write <'a, LifeformUID>,
     );
 
-    fn run(&mut self, (mut cmd_out, mut ev, mut pl, _maps, mut id): Self::SystemData) {
+    fn run(&mut self, (mut cmd_out, ev, mut pl, _maps, mut id): Self::SystemData) {
         //   println!("Received event value of: {:?}", event);
         for event in ev.read(&mut self.event_reader) {
             match event { 

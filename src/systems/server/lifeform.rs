@@ -1,5 +1,5 @@
 use amethyst::{
-    core::{SystemDesc, Transform, bundle::SystemBundle},
+    core::{SystemDesc, bundle::SystemBundle},
     derive::SystemDesc,
     ecs::{Write, Read, World, System, SystemData, DispatcherBuilder},
     shrev::{EventChannel, ReaderId},
@@ -10,7 +10,7 @@ use log::info;
 use crate::{
     network::{Pack, Cmd, Dest},
     components::{Action, get_outfit, LifeformComponent},
-    resources::{LifeformList, IO, MapList},
+    resources::{LifeformList, MapList},
 };
 use std::net::{SocketAddr};
 

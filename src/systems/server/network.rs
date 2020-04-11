@@ -6,9 +6,9 @@ use amethyst::{
     Result,
 };
 
-use log::{info, error};
+use log::{info, warn, error};
 use crate::network::{Pack, Cmd, Dest};
-use crate::resources::{IO, LifeformList};
+use crate::resources::{LifeformList};
 use crate::systems::server::{AuthEvent, LifeformEvent};
 use std::net::{SocketAddr};
 
@@ -38,18 +38,14 @@ impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
         let event_reader = world
             .fetch_mut::<EventChannel<Pack>>()
             .register_reader();
-        let lifeform_reader = world
-            .fetch_mut::<EventChannel<LifeformEvent>>()
-            .register_reader();
 
-        TcpSystem::new(net_reader, event_reader, lifeform_reader)
+        TcpSystem::new(net_reader, event_reader)
     }
 }
 
 pub struct TcpSystem {
     net_reader: ReaderId<NetworkSimulationEvent>,
     event_reader: ReaderId<Pack>,
-    lifeform_reader: ReaderId<LifeformEvent>,
     clients: Vec<SocketAddr>,
 }
 
@@ -57,13 +53,11 @@ impl TcpSystem {
     pub fn new(
         net_reader: ReaderId<NetworkSimulationEvent>, 
         event_reader: ReaderId<Pack>, 
-        lifeform_reader: ReaderId<LifeformEvent>
     ) -> Self 
     {
         Self { 
             net_reader,
             event_reader,
-            lifeform_reader,
             clients: Vec::<SocketAddr>::new(),
         }
     }
@@ -98,12 +92,21 @@ impl<'a> System<'a> for TcpSystem {
                 NetworkSimulationEvent::Disconnect(addr) => {
                     info!("Client Disconnected: {}", addr);
                     self.clients.retain(|&x| x != *addr);
-                    
-                    if let p = pl.get_from_ip(*addr) {
-                        let id = p.unwrap().id();
-                        lf.single_write(LifeformEvent::RemovePlayer(id));
-                        in_packs.single_write(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
+                   
+                    match pl.get_from_ip(*addr) {
+                        Some(player) => {
+                            let id = player.id();
+                            lf.single_write(LifeformEvent::RemovePlayer(id));
+                            in_packs.single_write(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
+                        },
+                        None => warn!("Player disconnected that was not on the playerlist"),
                     }
+                    
+                    // if let p = pl.get_from_ip(*addr) {
+                    //     let id = p.unwrap().id();
+                    //     lf.single_write(LifeformEvent::RemovePlayer(id));
+                    //     in_packs.single_write(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
+                    // }
                 }
                 NetworkSimulationEvent::RecvError(e) => {
                     error!("Recv Error: {:?}", e);

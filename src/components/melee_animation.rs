@@ -46,7 +46,6 @@ impl MeleeAnimation {
         else {
             return Some(self.at_stance);
         }
-        None
     }
 
     pub fn delete(&self) -> bool {
