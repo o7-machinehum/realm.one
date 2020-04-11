@@ -53,12 +53,14 @@ fn main() -> amethyst::Result<()> {
     };
     info!("{:?}", config);
 
-    if args[1].starts_with("s") {
+    if args.len() < 2 || args[1].starts_with("c") {
+        info!("Starting the client");
+        rtn = client(resources, config);
+    } else if args[1].starts_with("s") {
         info!("Starting the server!");
         rtn = server(resources, config);
     } else {
-        info!("Starting the client");
-        rtn = client(resources, config);
+        panic!("Invalid command line args. Use 's' for server or 'c' for client");
     }
     rtn
 }
