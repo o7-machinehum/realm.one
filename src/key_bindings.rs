@@ -1,4 +1,3 @@
-use crate::components::Orientation;
 use crate::resources::Command;
 use amethyst::input::BindingTypes;
 use serde::{Deserialize, Serialize};

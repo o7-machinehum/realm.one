@@ -28,8 +28,8 @@ impl CommandQueue {
             list: Vec::<Command>::new(),
         }
     }
-    pub fn add(&mut self, CommandQueue: Command) {
-        self.list.push(CommandQueue);
+    pub fn add(&mut self, command: Command) {
+        self.list.push(command);
     }
     pub fn get(&mut self) -> Option<Command> {
         self.list.pop()
