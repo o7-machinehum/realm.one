@@ -1,40 +1,44 @@
+// #![allow(
+//     non_snake_case,
+//     unused_must_use,
+//     dead_code,
+//     irrefutable_let_patterns,
+//     unreachable_code
+// )]
 use amethyst::{
     core::{frame_limiter::FrameRateLimitStrategy, transform::TransformBundle},
+    input::InputBundle,
+    network::simulation::tcp::TcpNetworkBundle,
     prelude::*,
     renderer::{
         plugins::{RenderFlat2D, RenderToWindow},
         types::DefaultBackend,
         RenderingBundle,
     },
-    input::InputBundle,
     utils::application_root_dir,
-    network::simulation::{tcp::TcpNetworkBundle},
 };
-use std::{
-   net::TcpListener,
-   fs::File,
-};
+use std::{fs::File, net::TcpListener};
 
-use ron::de::from_reader;
-use crate::resources::{AppConfig};
-use std::env; 
-use log::info;
+use crate::resources::AppConfig;
 use core::time::Duration;
+use log::info;
+use ron::de::from_reader;
+use std::env;
 
-mod map;
-mod key_bindings;
-mod states;
 mod components;
-mod systems;
 mod constants;
+mod key_bindings;
+mod map;
 mod mech;
 mod network;
 mod resources;
+mod states;
+mod systems;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
     let args: Vec<String> = env::args().collect();
-    let rtn: amethyst::Result<()>; 
+    let rtn: amethyst::Result<()>;
     let app_root = application_root_dir()?;
     let resources = app_root.join("resources");
 
@@ -45,30 +49,27 @@ fn main() -> amethyst::Result<()> {
         Err(e) => {
             println!("Failed to load config: {}, using default!", e);
             AppConfig::default()
-        } 
+        }
     };
     info!("{:?}", config);
 
-    if args[1].starts_with("s") {
-        info!("Starting the server!");
-        rtn = server(resources, config);
-    }
-
-    else {
+    if args.len() < 2 || args[1].starts_with("c") {
         info!("Starting the client");
         rtn = client(resources, config);
+    } else if args[1].starts_with("s") {
+        info!("Starting the server!");
+        rtn = server(resources, config);
+    } else {
+        panic!("Invalid command line args. Use 's' for server or 'c' for client");
     }
-    
     rtn
 }
 
 fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<()> {
     let display_config = resources.join("display_config.ron");
     let key_bindings_config_path = resources.join("bindings.ron");
-    
     let input_bundle = InputBundle::<key_bindings::MovementBindingTypes>::new()
         .with_bindings_from_file(key_bindings_config_path)?;
-    
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(
@@ -79,20 +80,22 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?
-        .with_bundle(input_bundle)? 
+        .with_bundle(input_bundle)?
         .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 2048))?
         .with_bundle(systems::client::TcpSystemBundle)?
-        .with_bundle(systems::ChatSystemBundle)?
-        .with(systems::PlayerSystem::new(config.player_name.clone()), "player_system", &["input_system"])
+        .with(
+            systems::PlayerSystem::new(config.player_name.clone()),
+            "player_system",
+            &["input_system"],
+        )
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::LifeformManSystem, "pm_system", &[])
         .with(systems::WalkAnimationSystem::new(), "anim_system", &[])
-        .with(systems::InputSystem::new(), "in_system", &[])
+        .with_bundle(systems::InputSystemBundle)?
         .with(systems::MoveSystem::new(), "move_system", &[])
         .with(systems::MeleeAnimationSystem::new(), "melee_system", &[]);
 
-    
-    let mut game = Application::build(resources, states::GamePlayState{config})?
+    let mut game = Application::build(resources, states::GamePlayState { config })?
         .with_frame_limit(
             FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
             144,
@@ -106,14 +109,13 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
 fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<()> {
     let listener = TcpListener::bind(config.server_ip.clone())?;
     listener.set_nonblocking(true)?;
-        
     let game_data = GameDataBuilder::default()
         .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
         .with_bundle(systems::server::TcpSystemBundle)?
         .with_bundle(systems::server::AuthSystemBundle)?
         .with(systems::server::LifeformManSystem, "playerman_system", &[]);
 
-    let mut game = Application::build(resources, states::ServerState{config})?
+    let mut game = Application::build(resources, states::ServerState { config })?
         .with_frame_limit(
             FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
             144,
