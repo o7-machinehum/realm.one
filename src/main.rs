@@ -1,3 +1,10 @@
+// #![allow(
+//     non_snake_case,
+//     unused_must_use,
+//     dead_code,
+//     irrefutable_let_patterns,
+//     unreachable_code
+// )]
 use amethyst::{
     core::{frame_limiter::FrameRateLimitStrategy, transform::TransformBundle},
     input::InputBundle,
@@ -46,12 +53,14 @@ fn main() -> amethyst::Result<()> {
     };
     info!("{:?}", config);
 
-    if args[1].starts_with("s") {
+    if args.len() < 2 || args[1].starts_with("c") {
+        info!("Starting the client");
+        rtn = client(resources, config);
+    } else if args[1].starts_with("s") {
         info!("Starting the server!");
         rtn = server(resources, config);
     } else {
-        info!("Starting the client");
-        rtn = client(resources, config);
+        panic!("Invalid command line args. Use 's' for server or 'c' for client");
     }
     rtn
 }
@@ -74,7 +83,6 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with_bundle(input_bundle)?
         .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 2048))?
         .with_bundle(systems::client::TcpSystemBundle)?
-        //.with_bundle(systems::ChatSystemBundle)?
         .with(
             systems::PlayerSystem::new(config.player_name.clone()),
             "player_system",
@@ -83,7 +91,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with(systems::MapSystem, "map_system", &[])
         .with(systems::client::LifeformManSystem, "pm_system", &[])
         .with(systems::WalkAnimationSystem::new(), "anim_system", &[])
-        .with(systems::InputSystem::new(), "in_system", &[])
+        .with_bundle(systems::InputSystemBundle)?
         .with(systems::MoveSystem::new(), "move_system", &[])
         .with(systems::MeleeAnimationSystem::new(), "melee_system", &[]);
 

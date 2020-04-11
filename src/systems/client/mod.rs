@@ -10,10 +10,6 @@ pub use self::map::MapSystem;
 mod network;
 pub use self::network::TcpSystemBundle;
 
-mod chat;
-pub use self::chat::ChatSystem;
-pub use self::chat::ChatSystemBundle;
-
 mod walk;
 pub use self::walk::WalkAnimationSystem;
 
@@ -25,3 +21,4 @@ pub use self::movement::MoveSystem;
 
 mod input;
 pub use self::input::InputSystem;
+pub use self::input::InputSystemBundle;
