@@ -1,6 +1,9 @@
 use amethyst::{
+    core::{SystemDesc, Transform, bundle::SystemBundle},
     derive::SystemDesc,
-    ecs::{Write, Read, System, SystemData},
+    ecs::{Write, Read, World, System, SystemData, DispatcherBuilder},
+    shrev::{EventChannel, ReaderId},
+    Result, 
 };
 use log::info;
 
@@ -9,31 +12,66 @@ use crate::{
     components::{Action, get_outfit, LifeformComponent},
     resources::{LifeformList, IO, MapList},
 };
+use std::net::{SocketAddr};
 
-/// A simple system that receives a ton of network events.
+#[derive(Debug)]
+pub enum LifeformEvent {
+    RemovePlayer(u64),
+    Action(Action, SocketAddr),
+}
+
+/// Lifeform manager system.
 #[derive(SystemDesc)]
-pub struct LifeformManSystem;
+pub struct LifeformSystem {
+    event_reader: ReaderId<LifeformEvent>,
+}
 
-impl<'a> System<'a> for LifeformManSystem {
+pub struct LifeformSystemBundle;
+impl<'a, 'b> SystemBundle<'a, 'b> for LifeformSystemBundle {
+    fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
+        builder.add(
+            LifeformSystemDesc::default().build(world),
+            "lifeform_man_system",
+            &[],
+        );
+        Ok(())
+    }
+}
+
+#[derive(Default, Debug)]
+pub struct LifeformSystemDesc;
+
+impl<'a, 'b> SystemDesc<'a, 'b, LifeformSystem> for LifeformSystemDesc {
+    fn build(self, world: &mut World) -> LifeformSystem {
+        <LifeformSystem as System<'_>>::SystemData::setup(world);
+        let event_reader = world
+            .fetch_mut::<EventChannel<LifeformEvent>>()
+            .register_reader();
+        LifeformSystem{ event_reader }
+    }
+}
+
+impl<'a> System<'a> for LifeformSystem {
     type SystemData = (
-        Write <'a, IO>,
+        Write<'a, EventChannel<Pack>>,
+        Read<'a, EventChannel<LifeformEvent>>,
         Write<'a, LifeformList>,
         Read <'a, MapList>,
     );
 
-    fn run(&mut self, (mut io, mut pl, maps): Self::SystemData) {
-        for element in io.i.pop() {
-            match &element.cmd {
-                Cmd::Action(act) => {
-                    info!("Action from Address: {:?}, Action: {:?}", element.ip(), element.cmd);
-                    let acting_player = pl.get_from_ip(element.ip().unwrap()).unwrap(); 
+    fn run(&mut self, (mut cmd_out, events, mut pl, maps): Self::SystemData) {
+        for event in events.read(&mut self.event_reader) {
+           match &event {
+                LifeformEvent::Action(act, ip) => {
+                    info!("Action from Address: {:?}, Action: {:?}", ip, act);
+                    let acting_player = pl.get_from_ip(*ip).unwrap(); 
                     info!("player gotten from IP is: {:?}", acting_player);
                     let packs_players = self.act(acting_player, act, &maps, &pl);
                     
                     // If packs come out of the action
                     for pack in packs_players.0 {
                         info!("{:?}", pack);
-                        io.o.push(pack) 
+                        cmd_out.single_write(pack)
                     }
 
                     // If a player needs to be replacd  
@@ -42,14 +80,13 @@ impl<'a> System<'a> for LifeformManSystem {
                         pl.replace(player); 
                     }
                 },
-                Cmd::RemovePlayer(uid) => pl.remove_with_id(*uid), 
-                _ => (io.i.push(element)), 
+                LifeformEvent::RemovePlayer(uid) => pl.remove_with_id(*uid), 
             }
         }
     }
 }
 
-impl LifeformManSystem {
+impl LifeformSystem {
     fn act(&mut self, 
            mut player: LifeformComponent, 
            act: &Action, 
