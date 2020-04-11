@@ -1,33 +1,33 @@
-use crate::components::{Skins, Outfit, get_outfit, outfit_from_str};
+use crate::components::{outfit_from_str, Outfit};
 
 extern crate tiled;
 
 /// This should be moved somewhere else in the future
 pub fn get_string(keyword: String, tile: &tiled::Properties) -> Option<String> {
     match tile.get(&keyword) {
-            Some(value) => match value {
-                tiled::PropertyValue::StringValue(val) => return Some(val.to_string()), 
-                _ => None
-            },
-            None => None
+        Some(value) => match value {
+            tiled::PropertyValue::StringValue(val) => return Some(val.to_string()),
+            _ => None,
+        },
+        None => None,
     }
 }
 
 pub fn get_float(keyword: String, tile: &tiled::Properties) -> Option<f32> {
     match tile.get(&keyword) {
-            Some(value) => match value {
-                tiled::PropertyValue::FloatValue(val) => return Some(*val), 
-                _ => None
-            },
-            None => None
+        Some(value) => match value {
+            tiled::PropertyValue::FloatValue(val) => return Some(*val),
+            _ => None,
+        },
+        None => None,
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Monster {
     pub name: String,
-    pub x: f32,          
-    pub y: f32, 
+    pub x: f32,
+    pub y: f32,
     pub skin: Outfit,
     pub hp: f32,
 }
@@ -37,7 +37,7 @@ impl Monster {
         Self {
             name: get_string("Name".to_string(), &prop).unwrap(),
             x: (pos.1 as f32) * 8.0,
-            y: (pos.0 as f32) * 8.0, 
+            y: (pos.0 as f32) * 8.0,
             skin: outfit_from_str(get_string("Skin".to_string(), &prop).unwrap()),
             hp: get_float("HP".to_string(), &prop).unwrap(),
         }
