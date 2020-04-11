@@ -9,6 +9,6 @@
         Move(South):[[Key(S)]],
         Move(West):[[Key(A)]],
         Melee: [[Key(Space)]],
-        TypingMode: [[Key(Return)],[Key(Slash)]],
+        TypingMode: [[Key(Return)]],
     },
 )

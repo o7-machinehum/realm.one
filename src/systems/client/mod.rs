@@ -25,3 +25,4 @@ pub use self::movement::MoveSystem;
 
 mod input;
 pub use self::input::InputSystem;
+pub use self::input::InputSystemBundle;

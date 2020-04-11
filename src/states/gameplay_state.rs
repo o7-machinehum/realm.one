@@ -4,9 +4,7 @@ use amethyst::{
 
 use crate::components::LifeformComponent;
 use crate::map;
-use crate::resources::{
-    AppConfig, ClientStatus, Command, CommandQueue, LifeformList, SpritesContainer, IO,
-};
+use crate::resources::{AppConfig, ClientStatus, CommandQueue, LifeformList, SpritesContainer, IO};
 use log::info;
 
 pub struct GamePlayState {
