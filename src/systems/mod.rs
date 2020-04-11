@@ -1,6 +1,4 @@
 pub mod client;
-pub use self::client::ChatSystem;
-pub use self::client::ChatSystemBundle;
 pub use self::client::InputSystem;
 pub use self::client::InputSystemBundle;
 pub use self::client::MapSystem;

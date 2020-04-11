@@ -41,7 +41,7 @@ impl<'a, 'b> SystemDesc<'a, 'b, InputSystem> for InputSystemDesc {
 pub struct InputSystem {
     reader: ReaderId<InputEvent<MovementBindingTypes>>,
     latched_actions: Vec<(Command, f64)>, //expiry time in f64
-    latched_typing: Vec<(VirtualKeyCode, f64)>, //expiry time in f64
+    latched_keys: Vec<(VirtualKeyCode, f64)>, //expiry time in f64
     typing_mode: bool,
     typed_input: Vec<char>,
 }
@@ -50,7 +50,7 @@ impl InputSystem {
     pub fn new(reader: ReaderId<InputEvent<MovementBindingTypes>>) -> Self {
         Self {
             latched_actions: Vec::new(),
-            latched_typing: Vec::new(),
+            latched_keys: Vec::new(),
             typing_mode: false,
             typed_input: Vec::new(),
             reader,
@@ -61,7 +61,7 @@ impl InputSystem {
         self.latched_actions.retain(|(_action, expiry_time)| {
             return current_time < *expiry_time;
         });
-        self.latched_typing.retain(|(_action, expiry_time)| {
+        self.latched_keys.retain(|(_action, expiry_time)| {
             return current_time < *expiry_time;
         });
     }
@@ -77,17 +77,18 @@ impl<'s> System<'s> for InputSystem {
 
     fn run(&mut self, (input, time, input_event_channel, mut command_queue): Self::SystemData) {
         let t = time.absolute_real_time().as_secs_f64();
+        let action_expiry = t + constants::ACTION_DELAY_MS as f64 / 1000.;
+        let typing_expiry = t + constants::TYPING_DELAY_MS as f64 / 1000.;
         self.remove_expired_latches(t);
-        let action_delay = constants::ACTION_DELAY_MS as f64 / 1000.;
-        let typing_delay = constants::TYPING_DELAY_MS as f64 / 1000.;
+
         let commands = vec![
-            //Command, send_command_to_queue?, delay)
-            (Command::TypingMode, false, action_delay),
-            (Command::Move(Orientation::North), true, action_delay),
-            (Command::Move(Orientation::East), true, action_delay),
-            (Command::Move(Orientation::South), true, action_delay),
-            (Command::Move(Orientation::West), true, action_delay),
-            (Command::Melee, true, action_delay),
+            //Command, send_command_to_queue?)
+            (Command::TypingMode, false),
+            (Command::Move(Orientation::North), true),
+            (Command::Move(Orientation::East), true),
+            (Command::Move(Orientation::South), true),
+            (Command::Move(Orientation::West), true),
+            (Command::Melee, true),
         ];
 
         let input_events = input_event_channel.read(&mut self.reader);
@@ -111,7 +112,7 @@ impl<'s> System<'s> for InputSystem {
                             try_latch(
                                 Command::TypingMode,
                                 &mut self.latched_actions,
-                                t + action_delay,
+                                action_expiry,
                             );
                         } else if key == &escape_key {
                             self.typing_mode = false;
@@ -131,12 +132,11 @@ impl<'s> System<'s> for InputSystem {
             for c in commands {
                 let input_action = c.0;
                 let send_command = c.1;
-                let expiry_delay = c.2;
                 if input.action_is_down(&input_action).unwrap() {
                     if try_latch(
                         input_action.clone(),
                         &mut self.latched_actions,
-                        t + expiry_delay as f64,
+                        action_expiry,
                     ) {
                         if send_command {
                             log::info!("Command: {:?}", input_action);
@@ -145,8 +145,8 @@ impl<'s> System<'s> for InputSystem {
                             self.typing_mode = !self.typing_mode;
                             try_latch(
                                 VirtualKeyCode::Return,
-                                &mut self.latched_typing,
-                                t + typing_delay,
+                                &mut self.latched_keys,
+                                typing_expiry,
                             ); // ensure latched to prevent runaway entry
                             log::info!("TypingMode {}", self.typing_mode);
                         }
@@ -167,7 +167,7 @@ fn try_latch<I: PartialEq>(val: I, vec: &mut Vec<(I, f64)>, expiry_time: f64) ->
     }
     if can_latch {
         vec.push((val, expiry_time));
-        //self.latched_typing.push((key, expiry_time));
+        //self.latched_keys.push((key, expiry_time));
     }
     return can_latch;
 }
