@@ -9,7 +9,7 @@ use amethyst::{
 use log::{info, error};
 use crate::network::{Pack, Cmd, Dest};
 use crate::resources::{IO, LifeformList};
-use crate::systems::server::{AuthEvent};
+use crate::systems::server::{AuthEvent, LifeformEvent};
 use std::net::{SocketAddr};
 
 #[derive(Debug)]
@@ -35,27 +35,35 @@ impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
         let net_reader = world
             .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
             .register_reader();
-        
-        
         let event_reader = world
             .fetch_mut::<EventChannel<Pack>>()
             .register_reader();
+        let lifeform_reader = world
+            .fetch_mut::<EventChannel<LifeformEvent>>()
+            .register_reader();
 
-        TcpSystem::new(net_reader, event_reader)
+        TcpSystem::new(net_reader, event_reader, lifeform_reader)
     }
 }
 
 pub struct TcpSystem {
     net_reader: ReaderId<NetworkSimulationEvent>,
     event_reader: ReaderId<Pack>,
+    lifeform_reader: ReaderId<LifeformEvent>,
     clients: Vec<SocketAddr>,
 }
 
 impl TcpSystem {
-    pub fn new(net_reader: ReaderId<NetworkSimulationEvent>, event_reader: ReaderId<Pack>) -> Self {
+    pub fn new(
+        net_reader: ReaderId<NetworkSimulationEvent>, 
+        event_reader: ReaderId<Pack>, 
+        lifeform_reader: ReaderId<LifeformEvent>
+    ) -> Self 
+    {
         Self { 
             net_reader,
             event_reader,
+            lifeform_reader,
             clients: Vec::<SocketAddr>::new(),
         }
     }
@@ -63,16 +71,16 @@ impl TcpSystem {
 
 impl<'a> System<'a> for TcpSystem {
     type SystemData = (
-        Read<'a, EventChannel<Pack>>,
+        Write<'a, EventChannel<Pack>>,
+        Write<'a, EventChannel<LifeformEvent>>,
         Write<'a, EventChannel<AuthEvent>>,
         Write<'a, TransportResource>,
         Read<'a, NetworkSimulationTime>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
-        Write <'a, IO>,
         Write<'a, LifeformList>,
     );
 
-    fn run(&mut self, (in_packs, mut auth, mut net, sim_time, channel, mut io, mut pl): Self::SystemData) {
+    fn run(&mut self, (mut in_packs, mut lf, mut auth, mut net, sim_time, channel, mut pl): Self::SystemData) {
         let mut packs = Vec::<Pack>::new();
         // First we get the Events
         for event in channel.read(&mut self.net_reader) {
@@ -86,15 +94,15 @@ impl<'a> System<'a> for TcpSystem {
                 NetworkSimulationEvent::Connect(addr) => {
                     info!("New client connection: {}", addr);
                     self.clients.push(*addr);
-                } 
+                }
                 NetworkSimulationEvent::Disconnect(addr) => {
                     info!("Client Disconnected: {}", addr);
                     self.clients.retain(|&x| x != *addr);
                     
                     if let p = pl.get_from_ip(*addr) {
                         let id = p.unwrap().id();
-                        io.i.push(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
-                        io.o.push(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
+                        lf.single_write(LifeformEvent::RemovePlayer(id));
+                        in_packs.single_write(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
                     }
                 }
                 NetworkSimulationEvent::RecvError(e) => {
@@ -108,35 +116,9 @@ impl<'a> System<'a> for TcpSystem {
         for pack in packs {
             match &pack.cmd {
                 Cmd::Connect(s) => auth.single_write(AuthEvent::Connect(s.to_string(), pack.ip().unwrap())),
+                Cmd::Action(act) => lf.single_write(LifeformEvent::Action(act.clone(), pack.ip().unwrap())),
+                Cmd::RemovePlayer(uid) => lf.single_write(LifeformEvent::RemovePlayer(*uid)),
                 _ => (),
-            }
-        }
-
-        // Send responces
-        for _frame in sim_time.sim_frames_to_run() {
-            for resp in io.o.pop() {
-                match &resp.dest {
-                    // Just send to one address 
-                    Dest::Ip(addr) => {
-                        info!("Sending pack: {:?} to: {:?}", resp, addr);
-                        net.send(*addr, &resp.to_bin());
-                    },
-                    // Broadcast message
-                    Dest::All => {
-                        for addr in &self.clients {
-                            info!("Sending pack: {:?} to: {:?}", resp, addr);
-                            net.send(*addr, &resp.to_bin());
-                        }
-                    },
-                    Dest::Room(name) => {
-                        // Get all the ip's in the room
-                        let ips = pl.ip_in_room(&name);
-                        for ip in ips { 
-                            info!("Sending pack: {:?} to: {:?}", resp, ip);
-                            net.send(ip, &resp.to_bin());
-                        }
-                    }
-                }
             }
         }
 
@@ -162,6 +144,14 @@ impl<'a> System<'a> for TcpSystem {
                         for ip in ips { 
                             info!("Sending pack: {:?} to: {:?}", pack, ip);
                             net.send(ip, &pack.to_bin());
+                        }
+                    },
+                    Dest::AllExcept(ip) => {
+                        for addr in &self.clients {
+                            if addr != ip {
+                                info!("Sending pack: {:?} to: {:?}", pack, addr);
+                                net.send(*addr, &pack.to_bin());
+                            }
                         }
                     }
                 }

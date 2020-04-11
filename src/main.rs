@@ -113,7 +113,7 @@ fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
         .with_bundle(systems::server::TcpSystemBundle)?
         .with_bundle(systems::server::AuthSystemBundle)?
-        .with(systems::server::LifeformManSystem, "playerman_system", &[]);
+        .with_bundle(systems::server::LifeformSystemBundle)?;
 
     let mut game = Application::build(resources, states::ServerState { config })?
         .with_frame_limit(

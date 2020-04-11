@@ -10,7 +10,7 @@ use log::info;
 use crate::{
     network::{Pack, Cmd, Dest},
     components::{LifeformComponent},
-    resources::{LifeformList, IO, MapList, LifeformUID},
+    resources::{LifeformList, MapList, LifeformUID},
 };
 
 use std::net::{SocketAddr};
@@ -73,7 +73,10 @@ impl<'a> System<'a> for AuthSystem {
 
                             cmd_out.single_write(
                                 Pack::new(Cmd::InsertPlayer1(player.clone()), Dest::Ip(player.ip())));
-
+    
+                            cmd_out.single_write(
+                                Pack::new(Cmd::InsertPlayer(player.clone()), Dest::AllExcept(player.ip())));
+                            
                             cmd_out.single_write(
                                 Pack::new(Cmd::TransferMap(player.room.clone()), Dest::Ip(player.ip())));
                             
