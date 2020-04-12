@@ -2,7 +2,8 @@ mod player;
 pub use self::player::PlayerSystem;
 
 mod lifeform;
-pub use self::lifeform::LifeformManSystem;
+pub use self::lifeform::LifeformSystemBundle;
+pub use self::lifeform::LifeformEvent;
 
 mod map;
 pub use self::map::MapSystem;
