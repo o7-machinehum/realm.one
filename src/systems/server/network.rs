@@ -6,9 +6,10 @@ use amethyst::{
     Result,
 };
 
-use log::{info, error};
+use log::{info, warn, error};
 use crate::network::{Pack, Cmd, Dest};
-use crate::resources::{IO, LifeformList};
+use crate::resources::{LifeformList};
+use crate::systems::server::{AuthEvent, LifeformEvent};
 use std::net::{SocketAddr};
 
 #[derive(Debug)]
@@ -30,27 +31,33 @@ pub struct TcpSystemDesc;
 
 impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
     fn build(self, world: &mut World) -> TcpSystem {
-        // Creates the EventChannel<NetworkEvent> managed by the ECS.
         <TcpSystem as System<'_>>::SystemData::setup(world);
-        // Fetch the change we just created and call `register_reader` to get a
-        // ReaderId<NetworkEvent>. This reader id is used to fetch new events from the network event
-        // channel.
-        let reader = world
+        let net_reader = world
             .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
             .register_reader();
-        TcpSystem::new(reader)
+        let event_reader = world
+            .fetch_mut::<EventChannel<Pack>>()
+            .register_reader();
+
+        TcpSystem::new(net_reader, event_reader)
     }
 }
 
 pub struct TcpSystem {
-    reader: ReaderId<NetworkSimulationEvent>,
+    net_reader: ReaderId<NetworkSimulationEvent>,
+    event_reader: ReaderId<Pack>,
     clients: Vec<SocketAddr>,
 }
 
 impl TcpSystem {
-    pub fn new(reader: ReaderId<NetworkSimulationEvent>) -> Self {
+    pub fn new(
+        net_reader: ReaderId<NetworkSimulationEvent>, 
+        event_reader: ReaderId<Pack>, 
+    ) -> Self 
+    {
         Self { 
-            reader,
+            net_reader,
+            event_reader,
             clients: Vec::<SocketAddr>::new(),
         }
     }
@@ -58,36 +65,48 @@ impl TcpSystem {
 
 impl<'a> System<'a> for TcpSystem {
     type SystemData = (
+        Write<'a, EventChannel<Pack>>,
+        Write<'a, EventChannel<LifeformEvent>>,
+        Write<'a, EventChannel<AuthEvent>>,
         Write<'a, TransportResource>,
         Read<'a, NetworkSimulationTime>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
-        Write <'a, IO>,
         Write<'a, LifeformList>,
     );
 
-    fn run(&mut self, (mut net, sim_time, channel, mut io, mut pl): Self::SystemData) {
-        for event in channel.read(&mut self.reader) {
+    fn run(&mut self, (mut in_packs, mut lf, mut auth, mut net, sim_time, channel, mut pl): Self::SystemData) {
+        let mut packs = Vec::<Pack>::new();
+        // First we get the Events
+        for event in channel.read(&mut self.net_reader) {
             match event {
                 NetworkSimulationEvent::Message(addr, payload) => {
                     info!("Package: {:?}", payload);
                     let mut pk = Pack::from_bin(payload.to_vec());
-                    pk.dest= Dest::Ip(addr.clone());  // Update the client addr
-                    // net.send(*addr, b"ok");        // Respond
-                    io.i.push(pk);
+                    pk.dest = Dest::Ip(addr.clone());  // Update the client addr
+                    packs.push(pk);
                 }
                 NetworkSimulationEvent::Connect(addr) => {
                     info!("New client connection: {}", addr);
                     self.clients.push(*addr);
-                } 
+                }
                 NetworkSimulationEvent::Disconnect(addr) => {
                     info!("Client Disconnected: {}", addr);
                     self.clients.retain(|&x| x != *addr);
-                    
-                    if let p = pl.get_from_ip(*addr) {
-                        let id = p.unwrap().id();
-                        io.i.push(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
-                        io.o.push(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
+                   
+                    match pl.get_from_ip(*addr) {
+                        Some(player) => {
+                            let id = player.id();
+                            lf.single_write(LifeformEvent::RemovePlayer(id));
+                            in_packs.single_write(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
+                        },
+                        None => warn!("Player disconnected that was not on the playerlist"),
                     }
+                    
+                    // if let p = pl.get_from_ip(*addr) {
+                    //     let id = p.unwrap().id();
+                    //     lf.single_write(LifeformEvent::RemovePlayer(id));
+                    //     in_packs.single_write(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
+                    // }
                 }
                 NetworkSimulationEvent::RecvError(e) => {
                     error!("Recv Error: {:?}", e);
@@ -96,29 +115,46 @@ impl<'a> System<'a> for TcpSystem {
             }
         }
         
-        // Send responces
+        // Then we process the Events
+        for pack in packs {
+            match &pack.cmd {
+                Cmd::Connect(s) => auth.single_write(AuthEvent::Connect(s.to_string(), pack.ip().unwrap())),
+                Cmd::Action(act) => lf.single_write(LifeformEvent::Action(act.clone(), pack.ip().unwrap())),
+                Cmd::RemovePlayer(uid) => lf.single_write(LifeformEvent::RemovePlayer(*uid)),
+                _ => (),
+            }
+        }
+
+        // This is the new way!
         for _frame in sim_time.sim_frames_to_run() {
-            for resp in io.o.pop() {
-                match &resp.dest {
+            for pack in in_packs.read(&mut self.event_reader) {
+                match &pack.dest {
                     // Just send to one address 
                     Dest::Ip(addr) => {
-                        info!("Sending pack: {:?} to: {:?}", resp, addr);
-                        net.send(*addr, &resp.to_bin());
+                        info!("Sending pack: {:?} to: {:?}", pack, addr);
+                        net.send(*addr, &pack.to_bin());
                     },
                     // Broadcast message
                     Dest::All => {
-                        info!("Broadcasting pack: {:?}", resp);
                         for addr in &self.clients {
-                            info!("Sending pack: {:?} to: {:?}", resp, addr);
-                            net.send(*addr, &resp.to_bin());
+                            info!("Sending pack: {:?} to: {:?}", pack, addr);
+                            net.send(*addr, &pack.to_bin());
                         }
                     },
                     Dest::Room(name) => {
                         // Get all the ip's in the room
                         let ips = pl.ip_in_room(&name);
                         for ip in ips { 
-                            info!("Sending pack: {:?} to: {:?}", resp, ip);
-                            net.send(ip, &resp.to_bin());
+                            info!("Sending pack: {:?} to: {:?}", pack, ip);
+                            net.send(ip, &pack.to_bin());
+                        }
+                    },
+                    Dest::AllExcept(ip) => {
+                        for addr in &self.clients {
+                            if addr != ip {
+                                info!("Sending pack: {:?} to: {:?}", pack, addr);
+                                net.send(*addr, &pack.to_bin());
+                            }
                         }
                     }
                 }

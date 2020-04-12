@@ -21,6 +21,7 @@ pub enum Cmd {
 pub enum Dest {
     Room(String),
     Ip(SocketAddr),
+    AllExcept(SocketAddr),
     All,
 }
 

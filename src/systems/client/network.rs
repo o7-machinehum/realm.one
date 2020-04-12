@@ -29,16 +29,11 @@ pub struct TcpSystemDesc;
 
 impl<'a, 'b> SystemDesc<'a, 'b, TcpSystem> for TcpSystemDesc {
     fn build(self, world: &mut World) -> TcpSystem {
-        // Creates the EventChannel<NetworkEvent> managed by the ECS.
         <TcpSystem as System<'_>>::SystemData::setup(world);
-        // Fetch the change we just created and call `register_reader` to get a
-        // ReaderId<NetworkEvent>. This reader id is used to fetch new events from the network event
-        // channel.
         let reader = world
             .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
             .register_reader();
         TcpSystem::new(reader)
-        // TcpSystem
     }
 }
 
@@ -85,6 +80,7 @@ impl<'a> System<'a> for TcpSystem {
         for event in channel.read(&mut self.reader) {
             match event {
                 NetworkSimulationEvent::Message(_addr, payload) => {
+                    info!("Payload: {:?}", payload);
                     if *payload != b"ok".to_vec() {
                         let pl =  Pack::from_bin(payload.to_vec());
                         info!("Payload: {:?}", pl);

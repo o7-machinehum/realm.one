@@ -22,7 +22,6 @@ use crate::{
 pub struct PlayerSystem {
     p1: Option<Entity>,
     timer: Option<Instant>,
-    p1_name: String,
 }
 
 impl<'s> System<'s> for PlayerSystem {
@@ -167,8 +166,8 @@ impl<'s> System<'s> for PlayerSystem {
                                     WalkAnimation::new(
                                         (constants::ACTION_DELAY_MS as f32) / 1000.0,
                                     ),
-                                );
-                                moves.insert(p1, mv);
+                                ).expect("Could not insert walk entity!");
+                                moves.insert(p1, mv).expect("Cannot insert player");
 
                                 io.o.push(Pack::new(
                                     Cmd::Action(Action::Move(player.orientation.clone())),
@@ -178,7 +177,8 @@ impl<'s> System<'s> for PlayerSystem {
                         }
                         Command::Melee => {
                             info!("Punch");
-                            swing.insert(p1, MeleeAnimation::new(players.get_mut(p1).unwrap()));
+                            swing.insert(p1, MeleeAnimation::new(players.get_mut(p1).unwrap()))
+                                .expect("Could not insert player!");
                             io.o.push(Pack::new(Cmd::Action(Action::Melee), Dest::All));
                         }
                         _ => {}
@@ -190,11 +190,10 @@ impl<'s> System<'s> for PlayerSystem {
 }
 
 impl PlayerSystem {
-    pub fn new(name: String) -> Self {
+    pub fn new() -> Self {
         Self {
             p1: None,
             timer: None,
-            p1_name: name,
         }
     }
 }

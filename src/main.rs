@@ -84,7 +84,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 2048))?
         .with_bundle(systems::client::TcpSystemBundle)?
         .with(
-            systems::PlayerSystem::new(config.player_name.clone()),
+            systems::PlayerSystem::new(),
             "player_system",
             &["input_system"],
         )
@@ -112,8 +112,8 @@ fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
     let game_data = GameDataBuilder::default()
         .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
         .with_bundle(systems::server::TcpSystemBundle)?
-        .with(systems::AuthSystem, "auth_system", &[])
-        .with(systems::server::LifeformManSystem, "playerman_system", &[]);
+        .with_bundle(systems::server::AuthSystemBundle)?
+        .with_bundle(systems::server::LifeformSystemBundle)?;
 
     let mut game = Application::build(resources, states::ServerState { config })?
         .with_frame_limit(

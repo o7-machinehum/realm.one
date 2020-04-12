@@ -4,7 +4,6 @@ use amethyst::{
     renderer::SpriteRender
 };
 
-
 use crate::{
     components::{MeleeAnimation},
     resources::{SpritesContainer},
@@ -12,16 +11,12 @@ use crate::{
 
 pub struct MeleeAnimationSystem {
     delete_list : Vec::<Entity>,
-    ent: Option<Entity>,
-    com: Option<MeleeAnimation>,
 }
 
 impl MeleeAnimationSystem {
     pub fn new() -> Self {
         Self {
             delete_list: Vec::<Entity>::new(),
-            ent: None,
-            com: None,
         }
     }
 }
@@ -56,7 +51,7 @@ impl<'s> System<'s> for MeleeAnimationSystem {
 
             if anim.delete() {
                 // Delete the sword entity
-                entities.delete(anim.sword.unwrap().clone());
+                entities.delete(anim.sword.unwrap().clone()).expect("Could not delete entity!");
                 self.delete_list.push(e.clone());
             }
 
