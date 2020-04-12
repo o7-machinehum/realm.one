@@ -7,17 +7,21 @@ use amethyst::{
 };
 
 use log::info;
+use std::time::Instant;
 use std::{thread, time};
 
 use crate::{
     resources::{LifeformList},
+    components::{LifeformType, Action, Orientation},
     systems::server::{LifeformEvent},
 };
 
 /// Events that pertain to the Ai System
 
 #[derive(SystemDesc)]
-pub struct AiSystem; 
+pub struct AiSystem {
+    timer: Instant,
+}
 
 pub struct AiSystemBundle;
 impl<'a, 'b> SystemBundle<'a, 'b> for AiSystemBundle {
@@ -37,7 +41,7 @@ pub struct AiSystemDesc;
 impl<'a, 'b> SystemDesc<'a, 'b, AiSystem> for AiSystemDesc {
     fn build(self, world: &mut World) -> AiSystem {
         <AiSystem as System<'_>>::SystemData::setup(world);
-        AiSystem
+        AiSystem { timer: Instant::now(), }
     }
 }
 
@@ -48,9 +52,24 @@ impl<'a> System<'a> for AiSystem {
     );
 
     fn run(&mut self, (mut actions, lifeforms): Self::SystemData) {
+        let now = Instant::now();
+        if now.duration_since(self.timer).as_millis() >= 5000 {
+            self.timer = now.clone();
+            for lifeform in &lifeforms.list  {
+                if let Some(lf) = lifeform {
+                    if lf.kind == LifeformType::Monster {
+                        actions.single_write(
+                            LifeformEvent::Action(
+                                Action::Move(Orientation::North),
+                                lf.clone() 
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
         //thread::sleep(time::Duration::from_millis(500));  
-        //for lifeform in &lifeforms.list  {
-        //   info!("{:?}", lifeform); 
-        //}
+        
     }
 }
