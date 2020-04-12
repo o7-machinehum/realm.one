@@ -1,9 +1,6 @@
 mod lifeformlist;
 pub use self::lifeformlist::LifeformList;
 
-mod io;
-pub use self::io::IO;
-
 mod appconfig;
 pub use self::appconfig::AppConfig;
 

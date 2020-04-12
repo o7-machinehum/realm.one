@@ -68,7 +68,7 @@ Other outfits: bat, skeleton, slime, ghost, spider
 
 ## Hitlist (In order)
 * [x] [Network Refactor](features/F005/)
-* [ ] [IO Refactor](features/F006/)
+* [x] [IO Refactor](features/F006/)
 * [ ] [Monster AI](features/F001/)
 * [ ] [Move Up/Down Stairs](features/F004/)
 * [x] [Player UID](features/F002/)

@@ -1,9 +1,11 @@
 use amethyst::{
-    core::{Parent, Transform},
+    core::{Parent, Transform, SystemDesc, bundle::SystemBundle},
     derive::SystemDesc,
-    ecs::{Entities, Entity, Join, Read, System, SystemData, Write, WriteStorage},
+    ecs::{World, Entities, Entity, Join, Read, System, SystemData, Write, WriteStorage, DispatcherBuilder},
     renderer::resources::Tint,
     renderer::SpriteRender,
+    shrev::{EventChannel, ReaderId},
+    Result, 
 };
 
 use log::info;
@@ -15,17 +17,61 @@ use crate::{
     map::Room,
     mech::get_letter,
     network::{Cmd, Dest, Pack},
-    resources::{Command, CommandQueue, SpritesContainer, IO},
+    resources::{Command, CommandQueue, SpritesContainer},
 };
+
+pub enum PlayerEvent {
+    InsertPlayer(LifeformComponent),
+    InsertPlayer1(LifeformComponent),
+}
 
 #[derive(SystemDesc)]
 pub struct PlayerSystem {
     p1: Option<Entity>,
     timer: Option<Instant>,
+    event_reader: ReaderId<PlayerEvent>,
+}
+
+
+pub struct PlayerSystemBundle;
+impl<'a, 'b> SystemBundle<'a, 'b> for PlayerSystemBundle {
+    fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
+        builder.add(
+            PlayerSystemDesc::default().build(world),
+            "player_system",
+            &[],
+        );
+        Ok(())
+    }
+}
+
+#[derive(Default, Debug)]
+pub struct PlayerSystemDesc;
+
+impl<'a, 'b> SystemDesc<'a, 'b, PlayerSystem> for PlayerSystemDesc {
+    fn build(self, world: &mut World) -> PlayerSystem {
+        <PlayerSystem as System<'_>>::SystemData::setup(world);
+        let event_reader = world
+            .fetch_mut::<EventChannel<PlayerEvent>>()
+            .register_reader();
+        PlayerSystem::new( event_reader )
+    }
+}
+
+impl PlayerSystem {
+    pub fn new(event_reader: ReaderId<PlayerEvent>) -> Self {
+        Self {
+            p1: None,
+            timer: None,
+            event_reader,
+        }
+    }
 }
 
 impl<'s> System<'s> for PlayerSystem {
     type SystemData = (
+        Write <'s, EventChannel<Pack>>,
+        Read <'s, EventChannel<PlayerEvent>>,
         WriteStorage<'s, Move>,
         WriteStorage<'s, WalkAnimation>,
         WriteStorage<'s, MeleeAnimation>,
@@ -34,7 +80,6 @@ impl<'s> System<'s> for PlayerSystem {
         WriteStorage<'s, Parent>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Tint>,
-        Write<'s, IO>,
         Write<'s, Room>,
         Entities<'s>,
         Write<'s, CommandQueue>,
@@ -44,6 +89,8 @@ impl<'s> System<'s> for PlayerSystem {
     fn run(
         &mut self,
         (
+            mut cmd_out,
+            events,
             mut moves,
             mut walk,
             mut swing,
@@ -52,16 +99,15 @@ impl<'s> System<'s> for PlayerSystem {
             mut parents,
             mut sprite_renders,
             mut tints,
-            mut io,
             room,
             entities,
             mut command_queue,
             s,
         ): Self::SystemData,
     ) {
-        for element in io.i.pop() {
-            match &element.cmd {
-                Cmd::InsertPlayer(play) => {
+        for event in events.read(&mut self.event_reader) {
+            match &event {
+                PlayerEvent::InsertPlayer(play) => {
                     let e = Some(
                         entities
                             .build_entity()
@@ -84,7 +130,7 @@ impl<'s> System<'s> for PlayerSystem {
                         letter_trans.move_right(8.0);
                     }
                 }
-                Cmd::InsertPlayer1(play) => {
+                PlayerEvent::InsertPlayer1(play) => {
                     let e = Some(
                         entities
                             .build_entity()
@@ -113,7 +159,6 @@ impl<'s> System<'s> for PlayerSystem {
                         self.timer = Some(Instant::now());
                     }
                 }
-                _ => io.i.push(element),
             }
         }
         if self.p1.is_some() {
@@ -132,7 +177,7 @@ impl<'s> System<'s> for PlayerSystem {
                                 if player.update_orientation(dir) {
                                     // Update self
                                     spr.sprite_number = player.get_dir(); // Change sprite
-                                    io.o.push(Pack::new(
+                                    cmd_out.single_write(Pack::new(
                                         Cmd::Action(Action::Rotate(player.orientation.clone())),
                                         Dest::All,
                                     ));
@@ -169,7 +214,7 @@ impl<'s> System<'s> for PlayerSystem {
                                 ).expect("Could not insert walk entity!");
                                 moves.insert(p1, mv).expect("Cannot insert player");
 
-                                io.o.push(Pack::new(
+                                cmd_out.single_write(Pack::new(
                                     Cmd::Action(Action::Move(player.orientation.clone())),
                                     Dest::All,
                                 ));
@@ -179,21 +224,12 @@ impl<'s> System<'s> for PlayerSystem {
                             info!("Punch");
                             swing.insert(p1, MeleeAnimation::new(players.get_mut(p1).unwrap()))
                                 .expect("Could not insert player!");
-                            io.o.push(Pack::new(Cmd::Action(Action::Melee), Dest::All));
+                            cmd_out.single_write(Pack::new(Cmd::Action(Action::Melee), Dest::All));
                         }
                         _ => {}
                     }
                 }
             }
-        }
-    }
-}
-
-impl PlayerSystem {
-    pub fn new() -> Self {
-        Self {
-            p1: None,
-            timer: None,
         }
     }
 }
