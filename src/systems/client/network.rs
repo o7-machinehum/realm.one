@@ -10,7 +10,7 @@ use log::{info, error};
 
 use crate::network::{Pack, Cmd, Dest};
 use crate::resources::{AppConfig};
-use crate::systems::client::{LifeformEvent};
+use crate::systems::client::{LifeformEvent, PlayerEvent, MapEvent};
 
 pub struct TcpSystemBundle;
 
@@ -62,12 +62,14 @@ impl<'a> System<'a> for TcpSystem {
     type SystemData = (
         Read<'a, EventChannel<Pack>>,
         Write<'a, EventChannel<LifeformEvent>>,
+        Write<'a, EventChannel<PlayerEvent>>,
+        Write<'a, EventChannel<MapEvent>>,
         Read<'a, NetworkSimulationTime>,
         Write<'a, TransportResource>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
         Read<'a, AppConfig>,
     );
-    fn run(&mut self, (in_packs, mut lf_events, sim_time, mut net, channel, conf): Self::SystemData) {
+    fn run(&mut self, (in_packs, mut lf_events, mut pl_events, mut map_events, sim_time, mut net, channel, conf): Self::SystemData) {
         if sim_time.should_send_message_now() {
             if !self.connected {
                 info!("We are not connected, ready player 1");
@@ -92,7 +94,7 @@ impl<'a> System<'a> for TcpSystem {
                     if *payload != b"ok".to_vec() {
                         let pl =  Pack::from_bin(payload.to_vec());
                         info!("Payload: {:?}", pl);
-                        packs.push(pl); // Add the pack to the IO vector
+                        packs.push(pl);
                     }
                 }
                 NetworkSimulationEvent::Connect(addr) => info!("New client connection: {}", addr),
@@ -113,6 +115,9 @@ impl<'a> System<'a> for TcpSystem {
             match pack.cmd {
                 Cmd::UpdatePlayer(pl) => lf_events.single_write(LifeformEvent::UpdatePlayer(pl)),
                 Cmd::RemovePlayer(u64) => lf_events.single_write(LifeformEvent::RemovePlayer(u64)),
+                Cmd::InsertPlayer(pl) => pl_events.single_write(PlayerEvent::InsertPlayer(pl)),
+                Cmd::InsertPlayer1(pl) => pl_events.single_write(PlayerEvent::InsertPlayer1(pl)),
+                Cmd::TransferMap(map) => map_events.single_write(MapEvent::TransferMap(map)),
                 _ => ()
             }
         }
