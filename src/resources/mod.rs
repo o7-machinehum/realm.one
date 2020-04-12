@@ -1,11 +1,5 @@
-mod client_status;
-pub use self::client_status::ClientStatus;
-
 mod lifeformlist;
 pub use self::lifeformlist::LifeformList;
-
-mod io;
-pub use self::io::IO;
 
 mod appconfig;
 pub use self::appconfig::AppConfig;

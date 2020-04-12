@@ -1,35 +1,71 @@
-use amethyst::core::{Transform};
-use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Read, Write, Entities, System, SystemData, WriteStorage, Entity};
-use amethyst::renderer::SpriteRender;
+use amethyst::{
+    core::{SystemDesc, bundle::SystemBundle, Transform},
+    derive::SystemDesc,
+    ecs::{Write, World, Read, System, SystemData, DispatcherBuilder, WriteStorage, Entity, Entities},
+    renderer::SpriteRender,
+    shrev::{EventChannel, ReaderId},
+    Result, 
+};
 
 use crate::{
     map::{Room, TilePosition, Layers},
-    network::Cmd,
-    resources::{IO, SpritesContainer},
+    resources::{SpritesContainer},
 };
 
+/// Events that pertain to the Auth System
+#[derive(Debug)]
+pub enum MapEvent {
+    TransferMap( String ), 
+}
+
 #[derive(SystemDesc)]
-pub struct MapSystem ;
+pub struct MapSystem {
+    event_reader: ReaderId<MapEvent>,
+}
+
+
+pub struct MapSystemBundle;
+impl<'a, 'b> SystemBundle<'a, 'b> for MapSystemBundle {
+    fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
+        builder.add(
+            MapSystemDesc::default().build(world),
+            "map_system",
+            &[],
+        );
+        Ok(())
+    }
+}
+
+#[derive(Default, Debug)]
+pub struct MapSystemDesc;
+
+impl<'a, 'b> SystemDesc<'a, 'b, MapSystem> for MapSystemDesc {
+    fn build(self, world: &mut World) -> MapSystem {
+        <MapSystem as System<'_>>::SystemData::setup(world);
+        let event_reader = world
+            .fetch_mut::<EventChannel<MapEvent>>()
+            .register_reader();
+        MapSystem{ event_reader }
+    }
+}
 
 impl<'s> System<'s> for MapSystem{
     type SystemData = (
+        Read <'s, EventChannel<MapEvent>>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, TilePosition>,
         Write<'s, Room>,
-        Write<'s, IO>,
         Read<'s, SpritesContainer>,
         Entities<'s>,
     );
     
     /// Should ONLY be called in a re-draw event of the map
     /// Resource room should be updated with the newest room
-    fn run(&mut self, (mut transforms, mut sprite_renders, mut tiles_pos, mut room, mut io, container, entities): Self::SystemData) {
-        for element in io.i.pop() {
-            match &element.cmd {
-                Cmd::TransferMap(name) => room.change(name.to_string()),
-                _ => io.i.push(element), 
+    fn run(&mut self, (ev, mut transforms, mut sprite_renders, mut tiles_pos, mut room, container, entities): Self::SystemData) {
+        for event in ev.read(&mut self.event_reader) {
+            match event{
+                MapEvent::TransferMap(name) => room.change(name.to_string()),
             }
         }
         

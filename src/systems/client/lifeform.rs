@@ -1,35 +1,68 @@
 use amethyst::{ 
-    core::{Transform},
+    core::{Transform, SystemDesc, bundle::SystemBundle},
     derive::SystemDesc,
-    ecs::{Write, System, SystemData, WriteStorage, Join, Entities},
+    ecs::{WriteStorage, Entities, World, Read, System, SystemData, DispatcherBuilder, Join},
     renderer::{SpriteRender, resources::Tint},
+    shrev::{EventChannel, ReaderId},
+    Result, 
 };
 
 use log::info;
 
 use crate::{ 
     components::{LifeformComponent},
-    network::Cmd,
-    resources::{IO},
 };
 
-#[derive(SystemDesc)]
-pub struct LifeformManSystem; 
+pub enum LifeformEvent {
+    UpdatePlayer(LifeformComponent),
+    RemovePlayer(u64),
+}
 
-impl<'s> System<'s> for LifeformManSystem{
+#[derive(SystemDesc)]
+pub struct LifeformSystem {
+    event_reader: ReaderId<LifeformEvent>,
+}
+
+
+pub struct LifeformSystemBundle;
+impl<'a, 'b> SystemBundle<'a, 'b> for LifeformSystemBundle {
+    fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
+        builder.add(
+            LifeformSystemDesc::default().build(world),
+            "lifeform_system",
+            &[],
+        );
+        Ok(())
+    }
+}
+
+#[derive(Default, Debug)]
+pub struct LifeformSystemDesc;
+
+impl<'a, 'b> SystemDesc<'a, 'b, LifeformSystem> for LifeformSystemDesc {
+    fn build(self, world: &mut World) -> LifeformSystem {
+        <LifeformSystem as System<'_>>::SystemData::setup(world);
+        let event_reader = world
+            .fetch_mut::<EventChannel<LifeformEvent>>()
+            .register_reader();
+        LifeformSystem{ event_reader }
+    }
+}
+
+impl<'s> System<'s> for LifeformSystem {
     type SystemData = (
+        Read <'s, EventChannel<LifeformEvent>>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, LifeformComponent>,
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Tint>,
-        Write<'s, IO>,
         Entities<'s>,
     );
  
-    fn run(&mut self, (mut transforms, mut players, mut sprite_renders, mut tints, mut io, entities): Self::SystemData) {
-        for element in io.i.pop() {
-            match element.cmd {
-                Cmd::UpdatePlayer(new) => {
+    fn run(&mut self, (events, mut transforms, mut players, mut sprite_renders, mut tints, entities): Self::SystemData) {
+        for event in events.read(&mut self.event_reader) {
+            match event{
+                LifeformEvent::UpdatePlayer(new) => {
                     for (transform, player, sprite_render, tint) in (&mut transforms, &mut players, &mut sprite_renders, &mut tints).join() { 
                         if player.id() == new.id() {
                             info!("Updating Player: {:?}", player);
@@ -51,15 +84,14 @@ impl<'s> System<'s> for LifeformManSystem{
                         }
                     }        
                 }, 
-                Cmd::RemovePlayer(uid) => {
+                LifeformEvent::RemovePlayer(uid) => {
                     info!("Removing Player of id: {}", uid);
                     for (e, player) in (&*entities, &mut players).join() { 
-                        if player.id() == uid {
+                        if player.id() == *uid {
                             entities.delete(e).expect("Failed to delete old player entities");
                         }
                     } 
-                }, 
-                _ => io.i.push(element), 
+                } 
             }
         }
     }
