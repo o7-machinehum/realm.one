@@ -141,7 +141,6 @@ impl Room {
                 }
             }
         }
-        info!("{:?}", monsters);
         monsters
     }
     pub fn get_adj(&self, pos: &Transform) -> Adj {

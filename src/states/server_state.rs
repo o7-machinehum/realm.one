@@ -1,10 +1,12 @@
 use amethyst::{
     prelude::*,
+    shrev::{EventChannel}, 
 };
 
 use crate::resources::{IO, AppConfig, MapList, LifeformList, LifeformUID};
 use crate::components::{LifeformComponent};
-use log::info;
+use crate::systems::server::AuthEvent;
+
 
 pub struct ServerState{
     pub config: AppConfig,
@@ -30,8 +32,9 @@ impl SimpleState for ServerState {
                 lifeforms.add(lf)
             }
         }
-
-        info!("{:?}", lifeforms.list);
+        
+        // Create all the channels
+        let _auth_channel = EventChannel::<AuthEvent>::new();
 
         world.insert(self.config.clone());
         world.insert(io);

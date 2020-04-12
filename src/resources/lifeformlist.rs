@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use amethyst::{
     core::{Transform},
 };
