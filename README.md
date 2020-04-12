@@ -69,17 +69,18 @@ Other outfits: bat, skeleton, slime, ghost, spider
 ## Hitlist (In order)
 * [x] [F005 - Network Refactor](features/F005/)
 * [x] [F006 - IO Refactor](features/F006/)
-* [ ] [F001 - Monster AI](features/F001/)
-* [ ] [F004 - Move Up/Down Stairs](features/F004/)
+* [x] [F001 - Monster Instantiation](features/F001/)
+* [ ] [F015 - Monster AI](features/F015/)
+* [ ] [F003 - Blood Splat during combat](features/F003/)
+* [ ] F009 - Other player actions should be visable 
+* [ ] F014 - lil guy should have a health bar (Zelda Style hearts)
 * [x] [F002 - Player UID](features/F002/)
 * [x] F007 - Spritesheet should be modified to allow melee in all directions
-* [ ] [F003 - Blood Splat during combat](features/F003/)
+* [ ] [F004 - Move Up/Down Stairs](features/F004/)
 * [ ] F008 - Should be able to open and close doors
-* [ ] F009 - Other player should animate (Walking and melee)
 * [ ] F010 - Controls are clunky
 * [ ] F011 - Serverside database
 * [ ] F012 - Proper player authentication
 * [ ] F013 - Build more maps
-* [ ] F014 - lil guy should have a health bar (Zelda Style hearts)
 * [ ] Gameplay ideas
 * [ ] A story lol
