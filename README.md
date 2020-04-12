@@ -72,7 +72,7 @@ Other outfits: bat, skeleton, slime, ghost, spider
 * [ ] [F001 - Monster AI](features/F001/)
 * [ ] [F004 - Move Up/Down Stairs](features/F004/)
 * [x] [F002 - Player UID](features/F002/)
-* [ ] F007 - Spritesheet should be modified to allow melee in all directions
+* [x] F007 - Spritesheet should be modified to allow melee in all directions
 * [ ] [F003 - Blood Splat during combat](features/F003/)
 * [ ] F008 - Should be able to open and close doors
 * [ ] F009 - Other player should animate (Walking and melee)

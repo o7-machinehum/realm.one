@@ -63,7 +63,7 @@ pub struct AttackStance {
 impl AttackStance {
     pub fn new(skin: &Skins) -> Self {
         match skin {
-            _ => AttackStance {n: 580, e: 614, s: 640, w: 614, s_n: 587, s_e: 615, s_s: 652, s_w: 615}
+            _ => AttackStance {n: 651, e: 616, s: 640, w: 613, s_n: 639, s_e: 617, s_s: 652, s_w: 612}
             // Skins::Nude     => Outfit {s: 277, w: 289, e: 301, n: 313 },
             // Skins::Male     => Outfit {s: 280, w: 292, e: 304, n: 316 },
             // Skins::Female   => Outfit {s: 283, w: 295, e: 307, n: 319 },

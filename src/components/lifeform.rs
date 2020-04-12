@@ -51,7 +51,7 @@ impl LifeformComponent {
             room: "resources/maps/town.tmx".to_string(),
             x: 8.0,
             y: 8.0,
-            skin: get_outfit(&Skins::Female),
+            skin: get_outfit(&Skins::Male),
             orientation: Orientation::North,
             hp: 100.0,
             kind: LifeformType::Player,
@@ -164,8 +164,8 @@ impl LifeformComponent {
     /// Get the positions of the sword in space
     pub fn get_sword_pos(&self) -> Transform {
         match self.orientation {
-            Orientation::North => Transform::default().move_forward(16.0).clone(),
-            Orientation::South => Transform::default().move_backward(16.0).clone(),
+            Orientation::North => Transform::default().move_up(16.0).clone(),
+            Orientation::South => Transform::default().move_down(16.0).clone(),
             Orientation::East => Transform::default().move_right(16.0).clone(),
             Orientation::West => Transform::default().move_left(16.0).clone(),
         }
