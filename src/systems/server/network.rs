@@ -113,7 +113,14 @@ impl<'a> System<'a> for TcpSystem {
         for pack in packs {
             match &pack.cmd {
                 Cmd::Connect(s) => auth.single_write(AuthEvent::Connect(s.to_string(), pack.ip().unwrap())),
-                Cmd::Action(act) => lf.single_write(LifeformEvent::Action(act.clone(), pack.ip().unwrap())),
+                Cmd::Action(act) => {
+                    if let Some(player) = pl.get_from_ip(pack.ip().unwrap()) {
+                        lf.single_write(LifeformEvent::Action(act.clone(), player));
+                    }
+                    else {
+                        warn!("Pack from someone not on the playerlist!");
+                    }
+                },
                 Cmd::RemovePlayer(uid) => lf.single_write(LifeformEvent::RemovePlayer(*uid)),
                 _ => (),
             }

@@ -7,6 +7,8 @@ use amethyst::{
 };
 
 use log::info;
+use std::{thread, time};
+
 use crate::{
     resources::{LifeformList},
     systems::server::{LifeformEvent},
@@ -22,7 +24,7 @@ impl<'a, 'b> SystemBundle<'a, 'b> for AiSystemBundle {
     fn build(self, world: &mut World, builder: &mut DispatcherBuilder<'a, 'b>) -> Result<()> {
         builder.add(
             AiSystemDesc::default().build(world),
-            "auth_system",
+            "ai_system",
             &[],
         );
         Ok(())
@@ -46,6 +48,9 @@ impl<'a> System<'a> for AiSystem {
     );
 
     fn run(&mut self, (mut actions, lifeforms): Self::SystemData) {
-         
+        //thread::sleep(time::Duration::from_millis(500));  
+        //for lifeform in &lifeforms.list  {
+        //   info!("{:?}", lifeform); 
+        //}
     }
 }

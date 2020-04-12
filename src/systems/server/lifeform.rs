@@ -12,12 +12,11 @@ use crate::{
     components::{Action, get_outfit, LifeformComponent},
     resources::{LifeformList, MapList},
 };
-use std::net::{SocketAddr};
 
 #[derive(Debug)]
 pub enum LifeformEvent {
     RemovePlayer(u64),
-    Action(Action, SocketAddr),
+    Action(Action, LifeformComponent),
 }
 
 /// Lifeform manager system.
@@ -62,11 +61,9 @@ impl<'a> System<'a> for LifeformSystem {
     fn run(&mut self, (mut cmd_out, events, mut pl, maps): Self::SystemData) {
         for event in events.read(&mut self.event_reader) {
            match &event {
-                LifeformEvent::Action(act, ip) => {
-                    info!("Action from Address: {:?}, Action: {:?}", ip, act);
-                    let acting_player = pl.get_from_ip(*ip).unwrap(); 
-                    info!("player gotten from IP is: {:?}", acting_player);
-                    let packs_players = self.act(acting_player, act, &maps, &pl);
+                LifeformEvent::Action(act, player_acting) => {
+                    info!("Action from Player: {:?}, Action: {:?}", player_acting, act);
+                    let packs_players = self.act(player_acting.clone(), act, &maps, &pl);
                     
                     // If packs come out of the action
                     for pack in packs_players.0 {
@@ -89,10 +86,10 @@ impl<'a> System<'a> for LifeformSystem {
 impl LifeformSystem {
     fn act(&mut self, 
            mut player: LifeformComponent, 
-           act: &Action, 
-           maps: &MapList, 
-           pl: &LifeformList) 
-           -> (Vec<Pack>, Vec<LifeformComponent>) 
+           act: &Action,
+           maps: &MapList,
+           pl: &LifeformList,
+           )-> (Vec<Pack>, Vec<LifeformComponent>) 
         {
         let mut out = Vec::<Pack>::new();
         let mut players = Vec::<LifeformComponent>::new();
@@ -141,6 +138,7 @@ impl LifeformSystem {
             },
             _ => (), 
         };
+
         (out, players)
     }
 }
