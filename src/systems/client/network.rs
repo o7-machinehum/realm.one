@@ -10,6 +10,7 @@ use log::{info, error};
 
 use crate::network::{Pack, Cmd, Dest};
 use crate::resources::{AppConfig};
+use crate::systems::client::{LifeformEvent};
 
 pub struct TcpSystemBundle;
 
@@ -60,12 +61,13 @@ impl TcpSystem {
 impl<'a> System<'a> for TcpSystem {
     type SystemData = (
         Read<'a, EventChannel<Pack>>,
+        Write<'a, EventChannel<LifeformEvent>>,
         Read<'a, NetworkSimulationTime>,
         Write<'a, TransportResource>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
         Read<'a, AppConfig>,
     );
-    fn run(&mut self, (in_packs, sim_time, mut net, channel, conf): Self::SystemData) {
+    fn run(&mut self, (in_packs, mut lf_events, sim_time, mut net, channel, conf): Self::SystemData) {
         if sim_time.should_send_message_now() {
             if !self.connected {
                 info!("We are not connected, ready player 1");
@@ -106,7 +108,13 @@ impl<'a> System<'a> for TcpSystem {
                 _ => {}
             }
         }
-
-        // Now take packs and send them off to the correct systems.
+        
+        for pack in packs.pop() {
+            match pack.cmd {
+                Cmd::UpdatePlayer(pl) => lf_events.single_write(LifeformEvent::UpdatePlayer(pl)),
+                Cmd::RemovePlayer(u64) => lf_events.single_write(LifeformEvent::RemovePlayer(u64)),
+                _ => ()
+            }
+        }
     }
 }
