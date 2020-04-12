@@ -1,8 +1,8 @@
 mod player;
 pub use self::player::PlayerSystem;
 
-mod lifeform_man;
-pub use self::lifeform_man::LifeformManSystem;
+mod lifeform;
+pub use self::lifeform::LifeformManSystem;
 
 mod map;
 pub use self::map::MapSystem;
