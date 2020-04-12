@@ -16,3 +16,13 @@ Depends On: nil
 Required for: nil 
 Related to: null?
 ```
+
+Systems on the client side to change.
+    - lifeform_man
+        - Enum: update player, remove player
+    - map
+        - Enum: Transfer Map
+    - network
+        - Enum<Pack>
+    - player
+        - Enum: Insert Playeer, Insert Player 1
