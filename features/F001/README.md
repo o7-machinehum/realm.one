@@ -1,7 +1,7 @@
-# AI/Monsters 
-Server should instantiate NPC monsters into the game. These monsters are controlled through a serverside system called MonsterAiSystem. The engine should treat players and monsters exactly the same, this will reduce additional required code.
-
-Branch Name: AI_real
+# Monsters 
+Server should instantiate NPC monsters into the game. The engine should
+treat players and monsters exactly the same, this will reduce additional
+required code.
 
 ## Components Required
 ( Monster Entity )
