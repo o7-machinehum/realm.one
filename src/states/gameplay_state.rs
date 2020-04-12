@@ -4,7 +4,7 @@ use amethyst::{
 
 use crate::components::LifeformComponent;
 use crate::map;
-use crate::resources::{AppConfig, ClientStatus, CommandQueue, LifeformList, SpritesContainer, IO};
+use crate::resources::{AppConfig, CommandQueue, LifeformList, SpritesContainer, IO};
 use log::info;
 
 pub struct GamePlayState {
@@ -22,12 +22,9 @@ impl SimpleState for GamePlayState {
         let player_list = LifeformList::new();
         let command_queue = CommandQueue::new();
 
-        let status = ClientStatus::new();
-
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
         world.insert(self.config.clone());
-        world.insert(status);
         world.insert(sprites);
         world.insert(room);
         world.insert(player_list);

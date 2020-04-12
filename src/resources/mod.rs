@@ -1,6 +1,3 @@
-mod client_status;
-pub use self::client_status::ClientStatus;
-
 mod lifeformlist;
 pub use self::lifeformlist::LifeformList;
 
