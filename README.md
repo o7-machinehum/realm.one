@@ -67,19 +67,19 @@ cmd outfit nude    // Change char nude androgynous person
 Other outfits: bat, skeleton, slime, ghost, spider
 
 ## Hitlist (In order)
-* [x] [Network Refactor](features/F005/)
-* [ ] [IO Refactor](features/F006/)
-* [ ] [Monster AI](features/F001/)
-* [ ] [Move Up/Down Stairs](features/F004/)
-* [x] [Player UID](features/F002/)
-* [ ] Spritesheet should be modified to allow melee in all directions
-* [ ] [Blood Splat during combat](features/F003/)
-* [ ] Should be able to open and close doors
-* [ ] Other player should animate (Walking and melee)
-* [ ] Controls are clunky
-* [ ] Serverside database
-* [ ] Proper player authentication
-* [ ] Build more maps
-* [ ] lil guy should have a health bar (Zelda Style hearts)
+* [x] [F005 - Network Refactor](features/F005/)
+* [ ] [F006 - IO Refactor](features/F006/)
+* [ ] [F001 - Monster AI](features/F001/)
+* [ ] [F004 - Move Up/Down Stairs](features/F004/)
+* [x] [F002 - Player UID](features/F002/)
+* [ ] F007 - Spritesheet should be modified to allow melee in all directions
+* [ ] [F003 - Blood Splat during combat](features/F003/)
+* [ ] F008 - Should be able to open and close doors
+* [ ] F009 - Other player should animate (Walking and melee)
+* [ ] F010 - Controls are clunky
+* [ ] F011 - Serverside database
+* [ ] F012 - Proper player authentication
+* [ ] F013 - Build more maps
+* [ ] F014 - lil guy should have a health bar (Zelda Style hearts)
 * [ ] Gameplay ideas
 * [ ] A story lol
