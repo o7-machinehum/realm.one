@@ -3,7 +3,7 @@ use amethyst::{
     shrev::{EventChannel}, 
 };
 
-use crate::resources::{IO, AppConfig, MapList, LifeformList, LifeformUID};
+use crate::resources::{AppConfig, MapList, LifeformList, LifeformUID};
 use crate::components::{LifeformComponent};
 use crate::systems::server::AuthEvent;
 
@@ -15,7 +15,6 @@ pub struct ServerState{
 impl SimpleState for ServerState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
-        let io = IO::new();
         
         let mut uid = LifeformUID::new();
 
@@ -37,7 +36,6 @@ impl SimpleState for ServerState {
         let _auth_channel = EventChannel::<AuthEvent>::new();
 
         world.insert(self.config.clone());
-        world.insert(io);
         world.insert(maps);
         world.insert(lifeforms);
         world.insert(uid);

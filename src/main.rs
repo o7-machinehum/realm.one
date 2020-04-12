@@ -83,13 +83,9 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with_bundle(input_bundle)?
         .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 2048))?
         .with_bundle(systems::client::TcpSystemBundle)?
-        .with(
-            systems::PlayerSystem::new(),
-            "player_system",
-            &["input_system"],
-        )
-        .with(systems::MapSystem, "map_system", &[])
-        .with(systems::client::LifeformManSystem, "pm_system", &[])
+        .with_bundle(systems::client::LifeformSystemBundle)?
+        .with_bundle(systems::client::PlayerSystemBundle)?
+        .with_bundle(systems::client::MapSystemBundle)?
         .with(systems::WalkAnimationSystem::new(), "anim_system", &[])
         .with_bundle(systems::InputSystemBundle)?
         .with(systems::MoveSystem::new(), "move_system", &[])

@@ -1,11 +1,14 @@
 mod player;
-pub use self::player::PlayerSystem;
+pub use self::player::PlayerSystemBundle;
+pub use self::player::PlayerEvent;
 
-mod lifeform_man;
-pub use self::lifeform_man::LifeformManSystem;
+mod lifeform;
+pub use self::lifeform::LifeformSystemBundle;
+pub use self::lifeform::LifeformEvent;
 
 mod map;
-pub use self::map::MapSystem;
+pub use self::map::MapSystemBundle;
+pub use self::map::MapEvent;
 
 mod network;
 pub use self::network::TcpSystemBundle;

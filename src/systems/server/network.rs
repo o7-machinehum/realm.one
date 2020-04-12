@@ -101,12 +101,6 @@ impl<'a> System<'a> for TcpSystem {
                         },
                         None => warn!("Player disconnected that was not on the playerlist"),
                     }
-                    
-                    // if let p = pl.get_from_ip(*addr) {
-                    //     let id = p.unwrap().id();
-                    //     lf.single_write(LifeformEvent::RemovePlayer(id));
-                    //     in_packs.single_write(Pack::new(Cmd::RemovePlayer(id), Dest::All)); 
-                    // }
                 }
                 NetworkSimulationEvent::RecvError(e) => {
                     error!("Recv Error: {:?}", e);
