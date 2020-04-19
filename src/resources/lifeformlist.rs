@@ -70,7 +70,19 @@ impl LifeformList {
         self.list.push(Some(lifeform));
         self.index += 1;
     }
+    
+    fn remove(&mut self, slice: usize) {
+        self.list[slice] = None;
+    }
+    
+    pub fn remove_with_ip(&mut self, ip: SocketAddr) {
+        self.remove(*self.ips.get(&ip).unwrap()); 
+    }
 
+    pub fn remove_with_id(&mut self, id: u64) {
+        self.remove(*self.ids.get(&id).unwrap()); 
+    }
+    
     pub fn get_from_ip(&mut self, ip: SocketAddr) -> Option<LifeformComponent> {
         self.list[*self.ips.get(&ip).unwrap()].clone()
     }
@@ -105,13 +117,7 @@ impl LifeformList {
         self.list[*self.ids.get(&id).unwrap()].clone()
     }
 
-    pub fn remove_with_ip(&mut self, ip: SocketAddr) {
-        self.list[*self.ips.get(&ip).unwrap()] = None; 
-    }
-
-    pub fn remove_with_id(&mut self, id: u64) {
-        self.list[*self.ids.get(&id).unwrap()] = None; 
-    }
+    
 
     pub fn replace(&mut self, player: LifeformComponent) {
         let id = player.id(); 

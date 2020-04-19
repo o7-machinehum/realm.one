@@ -11,7 +11,7 @@ use std::time::Instant;
 
 use crate::{
     resources::{LifeformList, MapList},
-    components::{LifeformType, Action, Orientation, LifeformComponent},
+    components::{LifeformType, Action, Orientation, LifeformComponent, get_rand_orientation},
     systems::server::{LifeformEvent},
 };
 
@@ -52,11 +52,40 @@ impl AiSystem {
         lf: &LifeformList
     ) -> Option<LifeformEvent>
     {
-        Some(LifeformEvent::Action(
-            Action::Move(
-                Orientation::North),
-                monster.clone() 
-        ))
+        for p in players.iter() {
+            if let Some(player) = lf.get_from_id(*p) {
+                if monster.in_range(&player) {
+                    //if monster.is_facing(&player) {
+                    //    // Attack
+                    //}
+                    //
+                    //else if monster.is_adjasent(&player) {
+                    //    // Rotate
+                    //}
+
+                    //else {
+                    //    // Walk Towards
+                    //}
+
+                    // return None;
+                }
+                
+                // If Player is monster radius
+                    // If monster facing player
+                        // Attack
+                    // If monster next to player
+                        // Rotate towars player
+                    // Else
+                        // Walk towards player
+
+                // Else
+                    // Randomly Walk
+
+            }
+        }
+        
+        // If nothing else, just randomly wander around
+        Some(LifeformEvent::Action(Action::Move(get_rand_orientation()), monster.clone()))
     }
 
     fn get_all_monster_actions(
@@ -97,25 +126,17 @@ impl<'a> System<'a> for AiSystem {
                 let monsters = lifeforms.in_room(map, LifeformType::Monster);
                 
                 if players.is_some() && monsters.is_some() {
-                    let events = self.get_all_monster_actions(monsters.unwrap(), players.unwrap(), &lifeforms);
+                    let events = self.get_all_monster_actions(
+                        monsters.unwrap(), 
+                        players.unwrap(), 
+                        &lifeforms
+                    );
+                    
                     for event in events {
                         actions.single_write(event); 
                     }
                 }
             }
-
-            // for lifeform in &lifeforms.list  {
-            //     if let Some(lf) = lifeform {
-            //         if lf.kind == LifeformType::Monster {
-            //             //if let Some(act) = self.monster_action(lf){
-            //             //    actions.single_write(act); 
-            //             //}
-            //         }
-            //     }
-            // }
         }
-
-        //thread::sleep(time::Duration::from_millis(500));  
-        
     }
 }
