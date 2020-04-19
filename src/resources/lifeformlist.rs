@@ -12,8 +12,8 @@ pub struct LifeformList {
     pub list: Vec<Option<LifeformComponent>>,
     ips: HashMap<SocketAddr, usize>,
     ids: HashMap<u64, usize>,
-    players: HashMap<String, Vec<usize>>,  // Players in a room
-    monsters: HashMap<String, Vec<usize>>, // Monsters in a room
+    players: HashMap<String, Vec<u64>>,  // Players in a room
+    monsters: HashMap<String, Vec<u64>>, // Monsters in a room
     index: usize,
 }
 
@@ -29,8 +29,8 @@ impl LifeformList {
             list: Vec::<Option<LifeformComponent>>::new(),
             ips: HashMap::<SocketAddr, usize>::new(),
             ids: HashMap::<u64, usize>::new(),
-            players: HashMap::<String, Vec<usize>>::new(),  // Players in a room
-            monsters: HashMap::<String, Vec<usize>>::new(), // Monsters in a room
+            players: HashMap::<String, Vec<u64>>::new(),  // Players in a room
+            monsters: HashMap::<String, Vec<u64>>::new(), // Monsters in a room
             index: 0 as usize, 
         }
     }
@@ -45,20 +45,20 @@ impl LifeformList {
         match lifeform.kind {
             LifeformType::Player  => {
                 match self.players.get_mut(&lifeform.room) {
-                    Some(vec) => vec.push(self.index),
+                    Some(vec) => vec.push(lifeform.id()),
                     None => {
-                        let mut new_room = Vec::<usize>::new();
-                        new_room.push(self.index);
+                        let mut new_room = Vec::<u64>::new();
+                        new_room.push(lifeform.id());
                         self.players.insert(lifeform.room.clone(), new_room);
                     }
                 };
             },
             LifeformType::Monster=> {
                 match self.monsters.get_mut(&lifeform.room) {
-                    Some(vec) => vec.push(self.index),
+                    Some(vec) => vec.push(lifeform.id()),
                     None => {
-                        let mut new_room = Vec::<usize>::new();
-                        new_room.push(self.index);
+                        let mut new_room = Vec::<u64>::new();
+                        new_room.push(lifeform.id());
                         self.monsters.insert(lifeform.room.clone(), new_room);
                     }
                 };
@@ -93,7 +93,7 @@ impl LifeformList {
     }
     
     /// Get all the players in a room
-    pub fn lifeforms_in_room(&self, room: &String, kind: LifeformType) -> Option<&Vec<usize>> {
+    pub fn in_room(&self, room: &String, kind: LifeformType) -> Option<&Vec<u64>> {
         match kind {
             LifeformType::Player  => self.players.get(room),
             LifeformType::Monster => self.monsters.get(room),
@@ -101,7 +101,7 @@ impl LifeformList {
         }
     }
    
-    pub fn get_from_id(&mut self, id: u64) -> Option<LifeformComponent> {
+    pub fn get_from_id(&self, id: u64) -> Option<LifeformComponent> {
         self.list[*self.ids.get(&id).unwrap()].clone()
     }
 

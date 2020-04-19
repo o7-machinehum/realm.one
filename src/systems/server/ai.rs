@@ -10,7 +10,7 @@ use log::info;
 use std::time::Instant;
 
 use crate::{
-    resources::{LifeformList},
+    resources::{LifeformList, MapList},
     components::{LifeformType, Action, Orientation, LifeformComponent},
     systems::server::{LifeformEvent},
 };
@@ -45,10 +45,11 @@ impl<'a, 'b> SystemDesc<'a, 'b, AiSystem> for AiSystemDesc {
 }
 
 impl AiSystem {
-    fn monster_action(
+    fn get_monster_action(
         &self, 
-        monster: &LifeformComponent, 
-        players: &Vec<LifeformComponent>,
+        monster: LifeformComponent, 
+        players: &Vec<u64>,
+        lf: &LifeformList
     ) -> Option<LifeformEvent>
     {
         Some(LifeformEvent::Action(
@@ -57,28 +58,61 @@ impl AiSystem {
                 monster.clone() 
         ))
     }
+
+    fn get_all_monster_actions(
+        &self, 
+        monsters: &Vec<u64>, 
+        players: &Vec<u64>,
+        lf: &LifeformList
+    ) -> Vec<LifeformEvent>
+    {
+        let mut events = Vec::<LifeformEvent>::new();
+
+        for monster in monsters {
+            match self.get_monster_action(lf.get_from_id(*monster).unwrap(), players, lf) {
+                Some(act) => events.push(act),
+                None => (),
+            }
+        }
+        
+        events
+    }
 }
 
 impl<'a> System<'a> for AiSystem {
     type SystemData = (
         Write<'a, EventChannel<LifeformEvent>>,
+        Read <'a, MapList>,
         Read <'a, LifeformList>,
     );
 
-    fn run(&mut self, (mut actions, lifeforms): Self::SystemData) {
+    fn run(&mut self, (mut actions, maps, lifeforms): Self::SystemData) {
         let now = Instant::now();
 
         if now.duration_since(self.timer).as_millis() >= 5000 {
             self.timer = now.clone();
-            for lifeform in &lifeforms.list  {
-                if let Some(lf) = lifeform {
-                    if lf.kind == LifeformType::Monster {
-                        //if let Some(act) = self.monster_action(lf){
-                        //    actions.single_write(act); 
-                        //}
+
+            for map in maps.get_rooms().iter() {
+                let players = lifeforms.in_room(map, LifeformType::Player);
+                let monsters = lifeforms.in_room(map, LifeformType::Monster);
+                
+                if players.is_some() && monsters.is_some() {
+                    let events = self.get_all_monster_actions(monsters.unwrap(), players.unwrap(), &lifeforms);
+                    for event in events {
+                        actions.single_write(event); 
                     }
                 }
             }
+
+            // for lifeform in &lifeforms.list  {
+            //     if let Some(lf) = lifeform {
+            //         if lf.kind == LifeformType::Monster {
+            //             //if let Some(act) = self.monster_action(lf){
+            //             //    actions.single_write(act); 
+            //             //}
+            //         }
+            //     }
+            // }
         }
 
         //thread::sleep(time::Duration::from_millis(500));  

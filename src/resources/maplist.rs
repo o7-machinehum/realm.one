@@ -30,7 +30,7 @@ impl MapList {
         self.list.get(file_name)
     }
 
-    fn get_rooms(&self) -> Vec<String> {
+    pub fn get_rooms(&self) -> Vec<String> {
         let mut maps = Vec::<String>::new();
 
         for map in self.maps.iter() {
