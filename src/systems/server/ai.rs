@@ -8,11 +8,10 @@ use amethyst::{
 
 use log::info;
 use std::time::Instant;
-use std::{thread, time};
 
 use crate::{
     resources::{LifeformList},
-    components::{LifeformType, Action, Orientation},
+    components::{LifeformType, Action, Orientation, LifeformComponent},
     systems::server::{LifeformEvent},
 };
 
@@ -45,6 +44,21 @@ impl<'a, 'b> SystemDesc<'a, 'b, AiSystem> for AiSystemDesc {
     }
 }
 
+impl AiSystem {
+    fn monster_action(
+        &self, 
+        monster: &LifeformComponent, 
+        players: &Vec<LifeformComponent>,
+    ) -> Option<LifeformEvent>
+    {
+        Some(LifeformEvent::Action(
+            Action::Move(
+                Orientation::North),
+                monster.clone() 
+        ))
+    }
+}
+
 impl<'a> System<'a> for AiSystem {
     type SystemData = (
         Write<'a, EventChannel<LifeformEvent>>,
@@ -53,17 +67,15 @@ impl<'a> System<'a> for AiSystem {
 
     fn run(&mut self, (mut actions, lifeforms): Self::SystemData) {
         let now = Instant::now();
+
         if now.duration_since(self.timer).as_millis() >= 5000 {
             self.timer = now.clone();
             for lifeform in &lifeforms.list  {
                 if let Some(lf) = lifeform {
                     if lf.kind == LifeformType::Monster {
-                        actions.single_write(
-                            LifeformEvent::Action(
-                                Action::Move(Orientation::North),
-                                lf.clone() 
-                            )
-                        )
+                        //if let Some(act) = self.monster_action(lf){
+                        //    actions.single_write(act); 
+                        //}
                     }
                 }
             }

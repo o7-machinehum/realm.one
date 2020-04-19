@@ -12,6 +12,8 @@ pub struct LifeformList {
     pub list: Vec<Option<LifeformComponent>>,
     ips: HashMap<SocketAddr, usize>,
     ids: HashMap<u64, usize>,
+    players: HashMap<String, Vec<usize>>,  // Players in a room
+    monsters: HashMap<String, Vec<usize>>, // Monsters in a room
     index: usize,
 }
 
@@ -27,18 +29,45 @@ impl LifeformList {
             list: Vec::<Option<LifeformComponent>>::new(),
             ips: HashMap::<SocketAddr, usize>::new(),
             ids: HashMap::<u64, usize>::new(),
+            players: HashMap::<String, Vec<usize>>::new(),  // Players in a room
+            monsters: HashMap::<String, Vec<usize>>::new(), // Monsters in a room
             index: 0 as usize, 
         }
     }
 
-    pub fn add(&mut self, player: LifeformComponent) {
-        match player.ip {
+    pub fn add(&mut self, lifeform: LifeformComponent) {
+        match lifeform.ip {
             Some(ip) => self.ips.insert(ip, self.index),
             None => None,
         };
 
-        self.ids.insert(player.id(), self.index); 
-        self.list.push(Some(player));
+        // Add the index to the hashmaps for room lookup
+        match lifeform.kind {
+            LifeformType::Player  => {
+                match self.players.get_mut(&lifeform.room) {
+                    Some(vec) => vec.push(self.index),
+                    None => {
+                        let mut new_room = Vec::<usize>::new();
+                        new_room.push(self.index);
+                        self.players.insert(lifeform.room.clone(), new_room);
+                    }
+                };
+            },
+            LifeformType::Monster=> {
+                match self.monsters.get_mut(&lifeform.room) {
+                    Some(vec) => vec.push(self.index),
+                    None => {
+                        let mut new_room = Vec::<usize>::new();
+                        new_room.push(self.index);
+                        self.monsters.insert(lifeform.room.clone(), new_room);
+                    }
+                };
+            },
+            _ => (),
+        }
+
+        self.ids.insert(lifeform.id(), self.index); 
+        self.list.push(Some(lifeform));
         self.index += 1;
     }
 
@@ -63,6 +92,15 @@ impl LifeformList {
         ip
     }
     
+    /// Get all the players in a room
+    pub fn lifeforms_in_room(&self, room: &String, kind: LifeformType) -> Option<&Vec<usize>> {
+        match kind {
+            LifeformType::Player  => self.players.get(room),
+            LifeformType::Monster => self.monsters.get(room),
+            _ => None,
+        }
+    }
+   
     pub fn get_from_id(&mut self, id: u64) -> Option<LifeformComponent> {
         self.list[*self.ids.get(&id).unwrap()].clone()
     }

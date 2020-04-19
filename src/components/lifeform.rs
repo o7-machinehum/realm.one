@@ -7,7 +7,7 @@ use amethyst::{
 
 use crate::components::{get_outfit, Monster, Outfit, Skins};
 use crate::constants;
-use nalgebra::base::Vector3;
+use nalgebra::base::{Vector3, Vector2};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
@@ -102,6 +102,7 @@ impl LifeformComponent {
         };
         tr
     }
+
     pub fn x(&self) -> f32 {
         self.x
     }
@@ -118,6 +119,10 @@ impl LifeformComponent {
         Vector3::new(self.x, self.y, self.z())
     }
 
+    pub fn xy(&self) -> Vector2<f32> {
+        Vector2::new(self.x, self.y)
+    }
+    
     pub fn hp(&mut self, amt: f32) {
         self.hp += amt;
     }
@@ -127,6 +132,7 @@ impl LifeformComponent {
         tr.set_translation_xyz(self.x(), self.y(), self.z());
         tr
     }
+
     pub fn get_orientated(&self, sprites: &Vec<SpriteRender>) -> SpriteRender {
         match self.orientation {
             Orientation::North => return sprites[self.skin.n].clone(),
@@ -144,6 +150,7 @@ impl LifeformComponent {
             Orientation::West => self.skin.w,
         }
     }
+
     pub fn get_at(&self) -> usize {
         match self.orientation {
             Orientation::North => self.skin.at.n,
@@ -161,6 +168,7 @@ impl LifeformComponent {
             Orientation::West => self.skin.at.s_w,
         }
     }
+
     /// Get the positions of the sword in space
     pub fn get_sword_pos(&self) -> Transform {
         match self.orientation {
@@ -170,6 +178,7 @@ impl LifeformComponent {
             Orientation::West => Transform::default().move_left(16.0).clone(),
         }
     }
+
     pub fn tint(&self) -> Srgba {
         Srgba::new((100.0 - self.hp) * 0.05 + 1.0, 1.0, 1.0, 1.0)
     }
