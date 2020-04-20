@@ -2622,6 +2622,7 @@ dependencies = [
  "bincode",
  "log",
  "nalgebra",
+ "rand 0.7.3",
  "ron",
  "serde",
  "stringreader",

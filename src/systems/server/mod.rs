@@ -9,3 +9,6 @@ pub use self::lifeform::LifeformEvent;
 
 mod network;
 pub use self::network::{TcpSystemBundle};
+
+mod ai;
+pub use self::ai::{AiSystemBundle};

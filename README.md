@@ -66,11 +66,13 @@ cmd outfit nude    // Change char nude androgynous person
 
 Other outfits: bat, skeleton, slime, ghost, spider
 
+
 ## Hitlist (In order)
 * [x] [F005 - Network Refactor](features/F005/)
 * [x] [F006 - IO Refactor](features/F006/)
 * [x] [F001 - Monster Instantiation](features/F001/)
-* [ ] [F015 - Monster AI](features/F015/)
+* [x] [F015 - Monster AI](features/F015/)
+* [ ] The Lifeformlist needs to remove ids from players and monsters when remove() is called.
 * [ ] [F003 - Blood Splat during combat](features/F003/)
 * [ ] F009 - Other player actions should be visable 
 * [ ] F014 - lil guy should have a health bar (Zelda Style hearts)
