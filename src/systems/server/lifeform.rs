@@ -62,18 +62,18 @@ impl<'a> System<'a> for LifeformSystem {
         for event in events.read(&mut self.event_reader) {
            match &event {
                 LifeformEvent::Action(act, player_acting) => {
-                    info!("Action from Player: {:?}, Action: {:?}", player_acting, act);
+                    // info!("Action from Player: {:?}, Action: {:?}", player_acting, act);
                     let packs_players = self.act(player_acting.clone(), act, &maps, &pl);
                     
                     // If packs come out of the action
                     for pack in packs_players.0 {
-                        info!("{:?}", pack);
+                        // info!("{:?}", pack);
                         cmd_out.single_write(pack)
                     }
 
                     // If a player needs to be replacd  
                     for player in packs_players.1 {
-                        info!("{:?}", player);
+                        // info!("{:?}", player);
                         pl.replace(player); 
                     }
                 },
@@ -97,9 +97,9 @@ impl LifeformSystem {
         match act {
             Action::Move(dir) => {
                 player.orientation = dir.clone();
-                info!("Checking to see if walk is allowed"); 
+                // info!("Checking to see if walk is allowed"); 
                 if maps.get(&player.room).unwrap().allowed_move(&player.trans(), &player.orientation) {
-                    info!("Player Walking"); 
+                    // info!("Player Walking"); 
                     player.walk();
                     players.push(player.clone());
                     let rm = player.room.clone();

@@ -90,10 +90,10 @@ impl<'a> System<'a> for TcpSystem {
         for event in channel.read(&mut self.net_reader) {
             match event {
                 NetworkSimulationEvent::Message(_addr, payload) => {
-                    info!("Payload: {:?}", payload);
+                    // info!("Payload: {:?}", payload);
                     if *payload != b"ok".to_vec() {
                         let pl =  Pack::from_bin(payload.to_vec());
-                        info!("Payload: {:?}", pl);
+                        // info!("Payload: {:?}", pl);
                         packs.push(pl);
                     }
                 }

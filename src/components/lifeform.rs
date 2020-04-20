@@ -79,7 +79,7 @@ impl LifeformComponent {
         Self {
             uid,
             name,
-            vision: 50.0,
+            vision: 100.0,
             ip: Some(ip),
             room: "resources/maps/town.tmx".to_string(),
             x: 8.0,
@@ -214,7 +214,7 @@ impl LifeformComponent {
     }
 
     pub fn in_range(&self, lifeform: &LifeformComponent) -> bool {
-        if distance(&self.xy(), &lifeform.xy()) > self.vision {
+        if distance(&self.xy(), &lifeform.xy()) < self.vision {
             return true;
         }
         false
@@ -222,9 +222,36 @@ impl LifeformComponent {
 
     pub fn is_adjasent(&self, lifeform: &LifeformComponent) -> bool {
         if distance(&self.xy(), &lifeform.xy()) == 16.0 {
-            return true;
+            return false;
         }
         false
+    }
+    
+    pub fn is_facing(&self, lifeform: &LifeformComponent) -> bool {
+        false
+    }
+    
+    pub fn direction_towards(&self, lifeform: &LifeformComponent) -> Orientation{
+        let vector = self.xy() - lifeform.xy();
+        
+        if vector.data[0] < 0.0 {
+            info!("East");
+            return Orientation::East
+        }
+        
+        else if vector.data[0] > 0.0 {
+            info!("West");
+            return Orientation::West
+        }
+
+        else if vector.data[1] < 0.0 {
+            info!("North");
+            return Orientation::North
+        }
+        else {
+            info!("South");
+            return Orientation::South
+        }
     }
     
     pub fn tint(&self) -> Srgba {

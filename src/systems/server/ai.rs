@@ -55,33 +55,27 @@ impl AiSystem {
         for p in players.iter() {
             if let Some(player) = lf.get_from_id(*p) {
                 if monster.in_range(&player) {
-                    //if monster.is_facing(&player) {
-                    //    // Attack
-                    //}
-                    //
-                    //else if monster.is_adjasent(&player) {
-                    //    // Rotate
-                    //}
+                    if monster.is_facing(&player) {
+                        // Attack
+                    }
+                    
+                    else if monster.is_adjasent(&player) {
+                        // Rotate
+                    }
 
-                    //else {
-                    //    // Walk Towards
-                    //}
+                    else {
+                        // Walk Towards
+                        return Some(LifeformEvent::Action(
+                            Action::Move(
+                                monster.direction_towards(&player)),
+                                monster.clone()
+                            )
+                        )
+                    }
 
-                    // return None;
                 }
                 
-                // If Player is monster radius
-                    // If monster facing player
-                        // Attack
-                    // If monster next to player
-                        // Rotate towars player
-                    // Else
-                        // Walk towards player
-
-                // Else
-                    // Randomly Walk
-
-            }
+                            }
         }
         
         // If nothing else, just randomly wander around
@@ -118,7 +112,7 @@ impl<'a> System<'a> for AiSystem {
     fn run(&mut self, (mut actions, maps, lifeforms): Self::SystemData) {
         let now = Instant::now();
 
-        if now.duration_since(self.timer).as_millis() >= 5000 {
+        if now.duration_since(self.timer).as_millis() >= 1000 {
             self.timer = now.clone();
 
             for map in maps.get_rooms().iter() {

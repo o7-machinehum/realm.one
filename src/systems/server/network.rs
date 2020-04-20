@@ -132,13 +132,13 @@ impl<'a> System<'a> for TcpSystem {
                 match &pack.dest {
                     // Just send to one address 
                     Dest::Ip(addr) => {
-                        info!("Sending pack: {:?} to: {:?}", pack, addr);
+                        // info!("Sending pack: {:?} to: {:?}", pack, addr);
                         net.send(*addr, &pack.to_bin());
                     },
                     // Broadcast message
                     Dest::All => {
                         for addr in &self.clients {
-                            info!("Sending pack: {:?} to: {:?}", pack, addr);
+                            // info!("Sending pack: {:?} to: {:?}", pack, addr);
                             net.send(*addr, &pack.to_bin());
                         }
                     },
@@ -146,14 +146,14 @@ impl<'a> System<'a> for TcpSystem {
                         // Get all the ip's in the room
                         let ips = pl.ip_in_room(&name);
                         for ip in ips { 
-                            info!("Sending pack: {:?} to: {:?}", pack, ip);
+                            // info!("Sending pack: {:?} to: {:?}", pack, ip);
                             net.send(ip, &pack.to_bin());
                         }
                     },
                     Dest::AllExcept(ip) => {
                         for addr in &self.clients {
                             if addr != ip {
-                                info!("Sending pack: {:?} to: {:?}", pack, addr);
+                                // info!("Sending pack: {:?} to: {:?}", pack, addr);
                                 net.send(*addr, &pack.to_bin());
                             }
                         }
