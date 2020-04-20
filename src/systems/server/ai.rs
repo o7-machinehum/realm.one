@@ -55,31 +55,35 @@ impl AiSystem {
         for p in players.iter() {
             if let Some(player) = lf.get_from_id(*p) {
                 if monster.in_range(&player) {
+                   
+                    // If in front, attack
                     if monster.is_in_front(&player) {
                         return Some(LifeformEvent::Action(
                             Action::Melee,
                             monster.clone()
                             )
                         )
-                        // Attack
                     }
                     
-                    else if monster.is_adjasent(&player) {
-                        // Rotate
-                    }
-
-                    else {
-                        // Walk Towards
-                        return Some(LifeformEvent::Action(
-                            Action::Move(
-                                monster.direction_towards(&player)),
+                    // If adjasent, rotate
+                    match monster.is_adjasent(&player) {
+                        Some(direction) => {
+                            return Some(LifeformEvent::Action(
+                                Action::Rotate(direction), 
                                 monster.clone()
+                                )
                             )
-                        )
+                        },
+                        None =>()
                     }
-
+                    
+                    // If just in range, walk towards
+                    return Some(LifeformEvent::Action(
+                        Action::Move(monster.direction_towards(&player)),
+                        monster.clone()
+                        )
+                    )
                 }
-                
             }
         }
         

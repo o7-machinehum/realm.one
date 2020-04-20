@@ -233,11 +233,11 @@ impl LifeformComponent {
     }
     
     /// Is lifeform in an adjasent block
-    pub fn is_adjasent(&self, lifeform: &LifeformComponent) -> bool {
+    pub fn is_adjasent(&self, lifeform: &LifeformComponent) -> Option<Orientation> {
         if distance(&self.xy(), &lifeform.xy()) == constants::PLAYER_MOVE {
-            return true;
+            return Some(self.direction_towards(lifeform));
         }
-        false
+        None 
     }
     
     /// Get the direction you need to move to get to lifeform
