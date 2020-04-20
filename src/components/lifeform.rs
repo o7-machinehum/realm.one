@@ -193,7 +193,8 @@ impl LifeformComponent {
             Orientation::West => self.skin.at.w,
         }
     }
-
+    
+    /// Get the slice for the sword
     pub fn get_sword(&self) -> usize {
         match self.orientation {
             Orientation::North => self.skin.at.s_n,
@@ -204,34 +205,43 @@ impl LifeformComponent {
     }
 
     /// Get the positions of the sword in space
+    /// Since this is being inserted as a child to the player
+    /// entity it already has all the player transforms.
     pub fn get_sword_pos(&self) -> Transform {
         match self.orientation {
             Orientation::North => Transform::default().move_up(16.0).clone(),
             Orientation::South => Transform::default().move_down(16.0).clone(),
             Orientation::East => Transform::default().move_right(16.0).clone(),
             Orientation::West => Transform::default().move_left(16.0).clone(),
-        }
+       }
     }
 
+    /// Is lifeform in range of your vision
     pub fn in_range(&self, lifeform: &LifeformComponent) -> bool {
         if distance(&self.xy(), &lifeform.xy()) < self.vision {
             return true;
         }
         false
     }
-
-    pub fn is_adjasent(&self, lifeform: &LifeformComponent) -> bool {
-        if distance(&self.xy(), &lifeform.xy()) == 16.0 {
-            return false;
+    
+    /// Is lifeform in front of you
+    pub fn is_in_front(&self, lifeform: &LifeformComponent) -> bool {
+        if  &self.in_front() == &lifeform.trans() {
+            return true;
         }
         false
     }
     
-    pub fn is_facing(&self, lifeform: &LifeformComponent) -> bool {
+    /// Is lifeform in an adjasent block
+    pub fn is_adjasent(&self, lifeform: &LifeformComponent) -> bool {
+        if distance(&self.xy(), &lifeform.xy()) == constants::PLAYER_MOVE {
+            return true;
+        }
         false
     }
     
-    pub fn direction_towards(&self, lifeform: &LifeformComponent) -> Orientation{
+    /// Get the direction you need to move to get to lifeform
+    pub fn direction_towards(&self, lifeform: &LifeformComponent) -> Orientation {
         let vector = self.xy() - lifeform.xy();
         
         if vector.data[0] < 0.0 {

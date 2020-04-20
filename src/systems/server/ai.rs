@@ -55,7 +55,12 @@ impl AiSystem {
         for p in players.iter() {
             if let Some(player) = lf.get_from_id(*p) {
                 if monster.in_range(&player) {
-                    if monster.is_facing(&player) {
+                    if monster.is_in_front(&player) {
+                        return Some(LifeformEvent::Action(
+                            Action::Melee,
+                            monster.clone()
+                            )
+                        )
                         // Attack
                     }
                     
@@ -75,7 +80,7 @@ impl AiSystem {
 
                 }
                 
-                            }
+            }
         }
         
         // If nothing else, just randomly wander around
