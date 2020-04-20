@@ -9,7 +9,7 @@ use log::info;
 
 use crate::{
     network::{Pack, Cmd, Dest},
-    components::{Action, get_outfit, LifeformComponent},
+    components::{Action, get_outfit, LifeformComponent, LifeformType},
     resources::{LifeformList, MapList},
 };
 
@@ -91,28 +91,52 @@ impl LifeformSystem {
            pl: &LifeformList,
            )-> (Vec<Pack>, Vec<LifeformComponent>) 
         {
-        let mut out = Vec::<Pack>::new();
-        let mut players = Vec::<LifeformComponent>::new();
+        let mut pack_out = Vec::<Pack>::new();
+        let mut players_out = Vec::<LifeformComponent>::new();
 
         match act {
             Action::Move(dir) => {
                 player.orientation = dir.clone();
-                // info!("Checking to see if walk is allowed"); 
+                let next_step = player.in_front();
+                
+                // First check for a player colision
+                if let Some(players) = pl.in_room(&player.room, LifeformType::Player) {
+                    for player_id in players {
+                        if let Some(player) = pl.get_from_id(*player_id) {
+                            if player.trans() == next_step { 
+                                return (pack_out, players_out)
+                            }
+                        }
+                    }
+                }
+                
+                // Then check for a monster colision
+                if let Some(monsters) = pl.in_room(&player.room, LifeformType::Monster) {
+                    for monster_id in monsters {
+                        if let Some(monster) = pl.get_from_id(*monster_id) {
+                            if monster.trans() == next_step { 
+                                return (pack_out, players_out)
+                            }
+                        }
+                    }
+                }
+                
+                // Then check for a building colision
                 if maps.get(&player.room).unwrap().allowed_move(&player.trans(), &player.orientation) {
                     // info!("Player Walking"); 
                     player.walk();
-                    players.push(player.clone());
-                    let rm = player.room.clone();
-                    out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
+                    players_out.push(player.clone());
+                    let room = player.room.clone();
+                    pack_out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(room)));
                 }
             },
             
             Action::ChangeOutfit(skin) => {
                 player.skin = get_outfit(&skin);
                 //TODO: Make sure skin in legal!
-                players.push(player.clone());
+                players_out.push(player.clone());
                 let rm = player.room.clone();
-                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
+                pack_out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
             },
 
             Action::Melee => {
@@ -122,9 +146,9 @@ impl LifeformSystem {
                     Some(mut victom) => {
                         info!("Direct Hit!");
                         victom.hp(-10.0); // Oh shit
-                        players.push(victom.clone());
+                        players_out.push(victom.clone());
                         let rm = player.room.clone();
-                        out.push(Pack::new(Cmd::UpdatePlayer(victom), Dest::Room(rm)));
+                        pack_out.push(Pack::new(Cmd::UpdatePlayer(victom), Dest::Room(rm)));
                     },
                     None => info!("And a miss!"), 
                 }
@@ -132,13 +156,13 @@ impl LifeformSystem {
             
             Action::Rotate(dir) => {
                 player.orientation = dir.clone();
-                players.push(player.clone());
+                players_out.push(player.clone());
                 let rm = player.room.clone();
-                out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
+                pack_out.push(Pack::new(Cmd::UpdatePlayer(player), Dest::Room(rm)));
             },
             _ => (), 
         };
 
-        (out, players)
+        (pack_out, players_out)
     }
 }
