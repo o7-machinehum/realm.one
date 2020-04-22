@@ -72,9 +72,9 @@ Other outfits: bat, skeleton, slime, ghost, spider
 * [x] [F006 - IO Refactor](features/F006/)
 * [x] [F001 - Monster Instantiation](features/F001/)
 * [x] [F015 - Monster AI](features/F015/)
-* [ ] The Lifeformlist needs to remove ids from players and monsters when remove() is called.
 * [ ] [F003 - Blood Splat during combat](features/F003/)
-* [ ] F009 - Other player actions should be visable 
+* [ ] [F009 - Other player actions should be visable](features/F009) 
+* [ ] (machinehum) The Lifeformlist needs to remove ids from players and monsters when remove() is called.
 * [ ] F014 - lil guy should have a health bar (Zelda Style hearts)
 * [x] [F002 - Player UID](features/F002/)
 * [x] F007 - Spritesheet should be modified to allow melee in all directions
