@@ -51,7 +51,7 @@ impl SpritesContainer {
             sprites: load(world,
                           "sprites/master16.png".to_string(), 
                           "sprites/master16.ron".to_string(),
-                          864),
+                          1068),
             text: load(world,
                        "fonts/text.png".to_string(),
                        "fonts/text.ron".to_string(),

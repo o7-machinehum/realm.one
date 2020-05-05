@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.3" orientation="orthogonal" renderorder="right-up" compressionlevel="0" width="96" height="96" tilewidth="8" tileheight="8" infinite="0" nextlayerid="13" nextobjectid="1">
+<map version="1.2" tiledversion="1.3.3" orientation="orthogonal" renderorder="right-up" compressionlevel="0" width="96" height="96" tilewidth="8" tileheight="8" infinite="0" nextlayerid="14" nextobjectid="1">
  <tileset firstgid="1" source="../sprites/master16.tsx"/>
  <layer id="1" name="L1_Ground" width="96" height="96">
   <data encoding="base64" compression="zlib">
@@ -28,7 +28,7 @@
  </layer>
  <layer id="11" name="L6_Tp" width="96" height="96">
   <data encoding="base64" compression="zlib">
-   eAHt0jEKACAIBVBP2N5Bo+u1u1tIz+0jqDyMUAQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgTqBWb9Chs+FHj1VyNZ55zaIgECBAgQIECAQJHALpprLAECBAgQIECgq8Dqeri7CRAgQIAAAQIECBAgQIDARYEDOe4Cuw==
+   eAHt1DEKgDAMAMCCTi7+zN3v+QcRcXb0C77F2VKRDrWD1y1tSMJREoJDgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgTyBLo2L192nkDPNw/sg+yp+aCJFgQIECBQRWB92fHby3uVoTUlUFDgKPznx4KzK/1fgVr/aojI4zh6FiYE9oedcz7cJ0q4IkCAAAECBAiEhQEBAgQIECBAgMBNYL5FAgIECBAgQIAAAQIECBAgQCAlcAHveQd0
   </data>
  </layer>
  <layer id="9" name="L7_Monsters" width="96" height="96">

@@ -68,6 +68,7 @@ impl Room {
         self.map = map;
         self.update = true;
     }
+
     // Convert world coordinates to tiled coordinates
     fn world_2_tiled(&self, (x, y): (i32, i32)) -> (i32, i32) {
         (x, (self.map.height as i32 - 1) - y)
@@ -101,6 +102,7 @@ impl Room {
 
         !north && !east && !south && !west
     }
+    
     fn get_prop(&self, (x, y): (i32, i32), (xoff, yoff): (i32, i32)) -> Option<tiled::Properties> {
         // Bottom left
         if (x == 0 && xoff <= -1) || (y == 0 && yoff <= -1) {

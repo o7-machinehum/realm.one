@@ -2,8 +2,8 @@
 
 #![enable(implicit_some)]
 Grid((
-	  texture_width: 225,
-	  texture_height: 135,
+    texture_width: 225,
+    texture_height: 135,
     columns: 25,
     rows: 9,
 ))
