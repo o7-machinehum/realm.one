@@ -13,6 +13,9 @@ pub use self::map::MapEvent;
 mod network;
 pub use self::network::TcpSystemBundle;
 
+mod wallet;
+pub use self::wallet::WalletSystemBundle;
+
 mod walk;
 pub use self::walk::WalkAnimationSystem;
 
