@@ -1,3 +1,5 @@
+![Rust](https://github.com/maikwoehl/realm.one/workflows/Rust/badge.svg)
+
 # realm.one
 ![alt text](resources/img/screen3.png)
 
@@ -20,7 +22,7 @@ cd realm.one
 ```
 
 Setup the config file resources/config.ron, public server is **18.223.212.117:3457** right now 
-```
+```rust 
 AppConfig(
     server_ip: "18.220.126.218:3457",
     client_ip: "Depricated, Can be blank",
@@ -28,7 +30,7 @@ AppConfig(
 )
 ```
 
-```bash
+```console
 cargo run --release client 
 ```
 
@@ -40,7 +42,7 @@ cd realm.one
 ```
 
 Setup the config file resources/config.ron 
-```
+```rust
 AppConfig(
     server_ip: "YourIP",
     client_ip: "",

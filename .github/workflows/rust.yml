@@ -1,0 +1,21 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install ALSA
+      run: sudo apt-get install alsa-utils alsa-tools libasound2 libasound2-dev libx11-xcb-dev libxcb1-dev libxcb-render-util0-dev libxcb-shape0-dev libxcb-xfixes0-dev gcc pkg-config openssl libasound2-dev cmake build-essential python3 libfreetype6-dev libexpat1-dev libxcb-composite0-dev libssl-dev libx11-dev
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose

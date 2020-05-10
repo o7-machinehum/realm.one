@@ -58,10 +58,7 @@ impl WalkAnimation {
     }
 
     pub fn delete(&self) -> bool {
-        if self.pec >= 1.0 {
-            return true
-        }
-        false
+        self.pec >= 1.0
     }
 }
 
