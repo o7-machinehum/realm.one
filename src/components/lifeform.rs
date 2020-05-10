@@ -112,10 +112,7 @@ impl LifeformComponent {
         let old = self.orientation.clone();
         self.orientation = or;
 
-        if old == self.orientation {
-            return false;
-        }
-        true
+        old == self.orientation
     }
     pub fn walk(&mut self) {
         match self.orientation {
@@ -226,24 +223,21 @@ impl LifeformComponent {
     
     /// Is lifeform in front of you
     pub fn is_in_front(&self, lifeform: &LifeformComponent) -> bool {
-        if  &self.in_front() == &lifeform.trans() {
-            return true;
-        }
-        false
+        (&self.in_front() == &lifeform.trans())
     }
     
     /// Is lifeform in an adjasent block
     pub fn is_adjasent(&self, lifeform: &LifeformComponent) -> Option<Orientation> {
-        if distance(&self.xy(), &lifeform.xy()) == constants::PLAYER_MOVE {
-            return Some(self.direction_towards(lifeform));
+        match distance(&self.xy(), &lifeform.xy()) == constants::PLAYER_MOVE {
+            true => Some(self.direction_towards(lifeform)),
+            false => None,
         }
-        None 
     }
     
     /// Get the direction you need to move to get to lifeform
     pub fn direction_towards(&self, lifeform: &LifeformComponent) -> Orientation {
         let vector = self.xy() - lifeform.xy();
-        
+
         if vector.data[0] < 0.0 {
             info!("East");
             return Orientation::East

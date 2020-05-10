@@ -40,19 +40,14 @@ impl MeleeAnimation {
     /// Get the current animation sequence
     pub fn get_seq(&mut self) -> Option<usize> {
         //TODO: RATE LIMIT THIS (DON'T ALWAYS RETURN SOME)
-        if self.pec > 0.9 {
-            return Some(self.end_stance);
-        }
-        else {
-            return Some(self.at_stance);
+        match self.pec > 0.9 {
+            true => Some(self.end_stance),
+            false => Some(self.at_stance),
         }
     }
 
     pub fn delete(&self) -> bool {
-        if self.pec >= 1.0 {
-            return true
-        }
-        false
+        self.pec >= 1.0
     }
 }
 

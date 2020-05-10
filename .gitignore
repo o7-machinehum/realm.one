@@ -14,3 +14,7 @@ notes
 test
 cpy.sh
 con.sh
+
+.idea/
+
+resources/config.ron
