@@ -115,6 +115,7 @@ impl Room {
             return None;
         }
         let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
+        info!("{}, {}", x1, y1);
         let tile = self.map.layers[Layers::L4 as usize].tiles[y1 as usize][x1 as usize];
 
         match self.map.get_tileset_by_gid(tile.gid) {
@@ -160,7 +161,6 @@ impl Adj {
     pub fn new(map: &Room, pos: &Transform) -> Self {
         let (x, y): (i32, i32) = Room::get_pos(pos);
         
-        info!("{}, {}", x, y);
 
         Self {
             cur: map.get_prop((x, y), (0, 0)),
