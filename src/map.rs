@@ -107,6 +107,7 @@ impl Room {
         if (x == 0 && xoff <= -1) || (y == 0 && yoff <= -1) {
             return None;
         }
+
         if x + xoff > (self.map.width as i32 - constants::TILE_PER_PLAYER as i32) {
             return None;
         }
@@ -114,8 +115,13 @@ impl Room {
         if y + yoff > (self.map.height as i32 - constants::TILE_PER_PLAYER as i32) {
             return None;
         }
+
         let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
-        info!("{}, {}", x1, y1);
+        
+        if x1 >= 96 || y1 >= 96 {
+            return None;
+        }
+
         let tile = self.map.layers[Layers::L4 as usize].tiles[y1 as usize][x1 as usize];
 
         match self.map.get_tileset_by_gid(tile.gid) {
