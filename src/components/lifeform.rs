@@ -6,7 +6,7 @@ use amethyst::{
 };
 
 use nalgebra::{
-    base::{Vector3, Vector2}, 
+    base::{Vector3}, 
     geometry::Point2, 
     distance
 };

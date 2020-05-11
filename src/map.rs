@@ -8,7 +8,6 @@ use std::{fs::File, io::BufReader, path::Path};
 
 use crate::components::{Monster, Orientation};
 use crate::constants;
-use crate::mech::colision;
 use log::info;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -88,8 +87,8 @@ impl Room {
 
     // Check to see if the resulting position is inside the map
     pub fn allowed_move(&self, pos: &Transform, facing: &Orientation) -> bool {
-        let adj: Adj = self.get_adj(pos);
-        let (x, y) = Room::get_pos(pos);
+        let adj: Adj = Adj::new(self, pos); // Get all the adjasent tiles
+        let (x, y) = Room::get_pos(pos);    // Get x/y coord of transform
 
         let north = (*facing == Orientation::North)
             && ((y >= (self.map.height as i32 - constants::TILE_PER_PLAYER as i32))
@@ -145,16 +144,8 @@ impl Room {
         }
         monsters
     }
-    pub fn get_adj(&self, pos: &Transform) -> Adj {
-        let (x, y): (i32, i32) = Room::get_pos(pos);
-        Adj {
-            cur: self.get_prop((x, y), (0, 0)),
-            n: self.get_prop((x, y), (0, constants::TILE_PER_PLAYER as i32)),
-            e: self.get_prop((x, y), (constants::TILE_PER_PLAYER as i32, 0)),
-            s: self.get_prop((x, y), (0, -constants::TILE_PER_PLAYER as i32)),
-            w: self.get_prop((x, y), (-constants::TILE_PER_PLAYER as i32, 0)),
-        }
-    }
+
+    
 }
 
 pub struct Adj {
@@ -164,6 +155,23 @@ pub struct Adj {
     pub s: Option<tiled::Properties>,
     pub w: Option<tiled::Properties>,
 }
+
+impl Adj {
+    pub fn new(map: &Room, pos: &Transform) -> Self {
+        let (x, y): (i32, i32) = Room::get_pos(pos);
+        
+        info!("{}, {}", x, y);
+
+        Self {
+            cur: map.get_prop((x, y), (0, 0)),
+            n: map.get_prop((x, y), (0, constants::TILE_PER_PLAYER as i32)),
+            e: map.get_prop((x, y), (constants::TILE_PER_PLAYER as i32, 0)),
+            s: map.get_prop((x, y), (0, -constants::TILE_PER_PLAYER as i32)),
+            w: map.get_prop((x, y), (-constants::TILE_PER_PLAYER as i32, 0)),
+        }
+    }
+}
+
 
 impl Component for TilePosition {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
@@ -190,4 +198,18 @@ impl TilePosition {
         );
         transform
     }
+}
+
+pub fn colision(tile: &Option<tiled::Properties>) -> bool {
+    match tile {
+        None => return false,
+        Some(i) => match i.get("Collision") {
+            Some(value) => match value {
+                tiled::PropertyValue::BoolValue(val) => return *val, 
+                _ => (),
+            },
+            None => return false,
+        },
+    }
+    return true
 }
