@@ -8,19 +8,20 @@ use std::{fs::File, io::BufReader, path::Path};
 
 use crate::components::{Monster, Orientation};
 use crate::constants;
-use crate::mech::colision;
 use log::info;
 
+/// Make sure this list matches the list in tiled!
 #[derive(Clone, Debug, PartialEq)]
 #[allow(dead_code)]
 pub enum Layers {
-    L1 = 0,
-    L2,
-    L3,
-    L4,
-    L5,
-    L6,
-    L7,
+    Ground = 0,
+    Floor,
+    Items,
+    Collision,
+    Collision2,
+    Items2,
+    Tp,
+    Monsters,
 }
 
 pub struct Room {
@@ -88,17 +89,17 @@ impl Room {
 
     // Check to see if the resulting position is inside the map
     pub fn allowed_move(&self, pos: &Transform, facing: &Orientation) -> bool {
-        let adj: Adj = self.get_adj(pos);
-        let (x, y) = Room::get_pos(pos);
+        let adj: Adj = Adj::new(self, pos); // Get all the adjasent tiles
+        let (x, y) = Room::get_pos(pos);    // Get x/y coord of transform
 
         let north = (*facing == Orientation::North)
             && ((y >= (self.map.height as i32 - constants::TILE_PER_PLAYER as i32))
-                || colision(&adj.n));
+                || collision(&adj.n));
         let east = (*facing == Orientation::East)
             && ((x >= (self.map.width as i32 - constants::TILE_PER_PLAYER as i32))
-                || colision(&adj.e));
-        let south = (*facing == Orientation::South) && ((y == 0) || colision(&adj.s));
-        let west = (*facing == Orientation::West) && ((x == 0) || colision(&adj.w));
+                || collision(&adj.e));
+        let south = (*facing == Orientation::South) && ((y == 0) || collision(&adj.s));
+        let west = (*facing == Orientation::West) && ((x == 0) || collision(&adj.w));
 
         !north && !east && !south && !west
     }
@@ -108,6 +109,7 @@ impl Room {
         if (x == 0 && xoff <= -1) || (y == 0 && yoff <= -1) {
             return None;
         }
+
         if x + xoff > (self.map.width as i32 - constants::TILE_PER_PLAYER as i32) {
             return None;
         }
@@ -115,8 +117,14 @@ impl Room {
         if y + yoff > (self.map.height as i32 - constants::TILE_PER_PLAYER as i32) {
             return None;
         }
+
         let (x1, y1): (i32, i32) = self.world_2_tiled((x + xoff, y + yoff));
-        let tile = self.map.layers[Layers::L4 as usize].tiles[y1 as usize][x1 as usize];
+        
+        if x1 >= 96 || y1 >= 96 {
+            return None;
+        }
+
+        let tile = self.map.layers[Layers::Collision as usize].tiles[y1 as usize][x1 as usize];
 
         match self.map.get_tileset_by_gid(tile.gid) {
             Some(thing) => Some(thing.tiles[tile.gid as usize].properties.clone()),
@@ -126,8 +134,7 @@ impl Room {
 
     fn get_monsters(map: &tiled::Map) -> Vec<Monster> {
         let mut monsters = Vec::<Monster>::new();
-        // let tile = self.map.layers[Layers::L7 as usize].tiles[y1 as usize][x1 as usize];
-        for (x, row) in map.layers[Layers::L7 as usize]
+        for (x, row) in map.layers[Layers::Monsters as usize]
             .tiles
             .iter()
             .rev()
@@ -145,16 +152,8 @@ impl Room {
         }
         monsters
     }
-    pub fn get_adj(&self, pos: &Transform) -> Adj {
-        let (x, y): (i32, i32) = Room::get_pos(pos);
-        Adj {
-            cur: self.get_prop((x, y), (0, 0)),
-            n: self.get_prop((x, y), (0, constants::TILE_PER_PLAYER as i32)),
-            e: self.get_prop((x, y), (constants::TILE_PER_PLAYER as i32, 0)),
-            s: self.get_prop((x, y), (0, -constants::TILE_PER_PLAYER as i32)),
-            w: self.get_prop((x, y), (-constants::TILE_PER_PLAYER as i32, 0)),
-        }
-    }
+
+    
 }
 
 pub struct Adj {
@@ -164,6 +163,22 @@ pub struct Adj {
     pub s: Option<tiled::Properties>,
     pub w: Option<tiled::Properties>,
 }
+
+impl Adj {
+    pub fn new(map: &Room, pos: &Transform) -> Self {
+        let (x, y): (i32, i32) = Room::get_pos(pos);
+        
+
+        Self {
+            cur: map.get_prop((x, y), (0, 0)),
+            n: map.get_prop((x, y), (0, constants::TILE_PER_PLAYER as i32)),
+            e: map.get_prop((x, y), (constants::TILE_PER_PLAYER as i32, 0)),
+            s: map.get_prop((x, y), (0, -constants::TILE_PER_PLAYER as i32)),
+            w: map.get_prop((x, y), (-constants::TILE_PER_PLAYER as i32, 0)),
+        }
+    }
+}
+
 
 impl Component for TilePosition {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
@@ -190,4 +205,19 @@ impl TilePosition {
         );
         transform
     }
+}
+
+/// Check to see if you can walk through a tile
+pub fn collision(tile: &Option<tiled::Properties>) -> bool {
+    match tile {
+        None => return false,
+        Some(i) => match i.get("Collision") {
+            Some(value) => match value {
+                tiled::PropertyValue::BoolValue(val) => return *val, 
+                _ => (),
+            },
+            None => return false,
+        },
+    }
+    return true
 }

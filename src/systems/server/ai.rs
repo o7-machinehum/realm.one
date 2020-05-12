@@ -6,14 +6,16 @@ use amethyst::{
     Result, 
 };
 
-use log::info;
 use std::time::Instant;
 
 use crate::{
     resources::{LifeformList, MapList},
-    components::{LifeformType, Action, Orientation, LifeformComponent, get_rand_orientation},
+    components::{LifeformType, Action, LifeformComponent, get_rand_orientation},
     systems::server::{LifeformEvent},
 };
+
+#[allow(unused_imports)]
+use log::info;
 
 /// Events that pertain to the Ai System
 

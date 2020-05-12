@@ -81,7 +81,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(input_bundle)?
-        .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 2048))?
+        .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 1048576))?
         .with_bundle(systems::client::TcpSystemBundle)?
         .with_bundle(systems::client::LifeformSystemBundle)?
         .with_bundle(systems::client::PlayerSystemBundle)?
@@ -106,7 +106,7 @@ fn server(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
     let listener = TcpListener::bind(config.server_ip.clone())?;
     listener.set_nonblocking(true)?;
     let game_data = GameDataBuilder::default()
-        .with_bundle(TcpNetworkBundle::new(Some(listener), 2048))?
+        .with_bundle(TcpNetworkBundle::new(Some(listener), 1048576))?
         .with_bundle(systems::server::TcpSystemBundle)?
         .with_bundle(systems::server::AuthSystemBundle)?
         .with_bundle(systems::server::LifeformSystemBundle)?

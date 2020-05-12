@@ -1,6 +1,6 @@
 #!/bin/bash
 
-convert textpack/master.png textpack/10Tile-B.png -append temp.png 
+convert textpack/00master.png textpack/10Tile-B.png -append temp.png 
 convert temp.png textpack/04Tiny16-ExpandedMaleSprites.png -append temp.png 
 convert temp.png textpack/05Tiny16-ExpandedBaseSprites_Nude.png -append temp.png 
 convert temp.png textpack/07Tiny16-ExpandedFemaleSprites.png -append temp.png 
