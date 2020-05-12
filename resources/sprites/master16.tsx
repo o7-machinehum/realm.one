@@ -1269,16 +1269,28 @@
  <tile id="276">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="277">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="278">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="279">
@@ -1314,26 +1326,55 @@
  <tile id="285">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="286">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
+  </properties>
+ </tile>
+ <tile id="287">
+  <properties>
+   <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="288">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="289">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="290">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="291">
@@ -1369,26 +1410,55 @@
  <tile id="297">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="298">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
+  </properties>
+ </tile>
+ <tile id="299">
+  <properties>
+   <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="300">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="301">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="302">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="303">
@@ -1424,26 +1494,55 @@
  <tile id="309">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="310">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
+  </properties>
+ </tile>
+ <tile id="311">
+  <properties>
+   <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="312">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="313">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="314">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Rob"/>
+   <property name="Skin" value="Nude"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="315">
@@ -1479,11 +1578,28 @@
  <tile id="321">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="322">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
+  </properties>
+ </tile>
+ <tile id="323">
+  <properties>
+   <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Skeleton"/>
+   <property name="Skin" value="Skeleton"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="324">

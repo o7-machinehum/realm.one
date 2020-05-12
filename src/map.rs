@@ -10,16 +10,18 @@ use crate::components::{Monster, Orientation};
 use crate::constants;
 use log::info;
 
+/// Make sure this list matches the list in tiled!
 #[derive(Clone, Debug, PartialEq)]
 #[allow(dead_code)]
 pub enum Layers {
-    L1 = 0,
-    L2,
-    L3,
-    L4,
-    L5,
-    L6,
-    L7,
+    Ground = 0,
+    Floor,
+    Items,
+    Collision,
+    Collision2,
+    Items2,
+    Tp,
+    Monsters,
 }
 
 pub struct Room {
@@ -122,7 +124,7 @@ impl Room {
             return None;
         }
 
-        let tile = self.map.layers[Layers::L4 as usize].tiles[y1 as usize][x1 as usize];
+        let tile = self.map.layers[Layers::Collision as usize].tiles[y1 as usize][x1 as usize];
 
         match self.map.get_tileset_by_gid(tile.gid) {
             Some(thing) => Some(thing.tiles[tile.gid as usize].properties.clone()),
@@ -132,8 +134,7 @@ impl Room {
 
     fn get_monsters(map: &tiled::Map) -> Vec<Monster> {
         let mut monsters = Vec::<Monster>::new();
-        // let tile = self.map.layers[Layers::L7 as usize].tiles[y1 as usize][x1 as usize];
-        for (x, row) in map.layers[Layers::L7 as usize]
+        for (x, row) in map.layers[Layers::Monsters as usize]
             .tiles
             .iter()
             .rev()
