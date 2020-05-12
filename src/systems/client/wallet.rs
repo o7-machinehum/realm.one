@@ -1,7 +1,7 @@
 use amethyst::{
     core::{bundle::SystemBundle},
     core::{SystemDesc},
-    ecs::{Read, System, SystemData, World, Write, DispatcherBuilder},
+    ecs::{System, SystemData, World, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
     network::simulation::{NetworkSimulationEvent, NetworkSimulationTime, TransportResource}, 
     Result, 
@@ -11,6 +11,13 @@ use log::{info, error};
 use crate::network::{Pack, Cmd, Dest};
 use crate::resources::{AppConfig};
 use crate::systems::client::{LifeformEvent, PlayerEvent, MapEvent};
+
+use std::{
+    thread,
+    net::{TcpStream, TcpListener, Shutdown},
+    io::{Read, Write},
+    str::from_utf8,
+};
 
 pub struct WalletSystemBundle;
 
@@ -31,81 +38,63 @@ pub struct WalletSystemDesc;
 impl<'a, 'b> SystemDesc<'a, 'b, WalletSystem> for WalletSystemDesc {
     fn build(self, world: &mut World) -> WalletSystem {
         <WalletSystem as System<'_>>::SystemData::setup(world);
-        let net_reader = world
-            .fetch_mut::<EventChannel<NetworkSimulationEvent>>()
-            .register_reader();
-        let packs_reader = world
-            .fetch_mut::<EventChannel<Pack>>()
-            .register_reader();
         
-        WalletSystem::new(net_reader, packs_reader)
+        WalletSystem::new()
     }
 }
 
-pub struct WalletSystem {
-    net_reader: ReaderId<NetworkSimulationEvent>,
-    packs_reader: ReaderId<Pack>,
-    connected: bool,
-}
+pub struct WalletSystem;
 
 impl WalletSystem {
-    pub fn new(net_reader: ReaderId<NetworkSimulationEvent>, packs_reader: ReaderId<Pack>) -> Self {
-        Self { 
-            net_reader,
-            packs_reader,
-            connected: false,
-        }
+    pub fn new() -> Self {
+        Self { }
     }
 }
 
 impl<'a> System<'a> for WalletSystem {
     type SystemData = (
-        Read<'a, EventChannel<Pack>>,
-        Write<'a, EventChannel<LifeformEvent>>,
-        Write<'a, EventChannel<PlayerEvent>>,
-        Write<'a, EventChannel<MapEvent>>,
-        Read<'a, NetworkSimulationTime>,
-        Write<'a, TransportResource>,
-        Read<'a, EventChannel<NetworkSimulationEvent>>,
-        Read<'a, AppConfig>,
     );
-    fn run(&mut self, (in_packs, mut lf_events, mut pl_events, mut map_events, sim_time, mut net, channel, conf): Self::SystemData) {
-
-        // Incoming packets from the wallet
-        let mut packs = Vec::<Pack>::new();
-        for event in channel.read(&mut self.net_reader) {
-            match event {
-                NetworkSimulationEvent::Message(_addr, payload) => {
-                    // info!("Payload: {:?}", payload);
-                    if *payload != b"ok".to_vec() {
-                        let pl =  Pack::from_bin(payload.to_vec());
-                        // info!("Payload: {:?}", pl);
-                        packs.push(pl);
-                    }
+    
+    fn run(&mut self, (): Self::SystemData) {
+        let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
+        // accept connections and process them, spawning a new thread for each one
+        info!("Server listening on port 3333");
+        for stream in listener.incoming() {
+            match stream {
+                Ok(stream) => {
+                    info!("New connection: {}", stream.peer_addr().unwrap());
+                    thread::spawn(move|| {
+                        // connection succeeded
+                        handle_client(stream)
+                    });
                 }
-                NetworkSimulationEvent::Connect(addr) => info!("New wallet connection: {}", addr),
-                NetworkSimulationEvent::Disconnect(addr) => {
-                    info!("Wallet Disconnected: {}", addr);
+                Err(e) => {
+                    info!("Error: {}", e);
+                    /* connection failed */
                 }
-                NetworkSimulationEvent::RecvError(e) => {
-                    error!("Recv Error: {:?}", e);
-                }
-                NetworkSimulationEvent::SendError(e, msg) => {
-                    error!("Send Error: {:?}, {:?}", e, msg);
-                }
-                _ => {}
             }
         }
-        
-        for pack in packs.pop() {
-            match pack.cmd {
-                Cmd::UpdatePlayer(pl) => lf_events.single_write(LifeformEvent::UpdatePlayer(pl)),
-                Cmd::RemovePlayer(u64) => lf_events.single_write(LifeformEvent::RemovePlayer(u64)),
-                Cmd::InsertPlayer(pl) => pl_events.single_write(PlayerEvent::InsertPlayer(pl)),
-                Cmd::InsertPlayer1(pl) => pl_events.single_write(PlayerEvent::InsertPlayer1(pl)),
-                Cmd::TransferMap(map) => map_events.single_write(MapEvent::TransferMap(map)),
-                _ => ()
-            }
-        }
+        print!("michael out");
+	    // close the socket server
+        drop(listener);
     }
+}
+
+fn handle_client(mut stream: TcpStream) {
+    let mut data = [0 as u8; 50]; // using 50 byte buffer
+    while match stream.read(&mut data) {
+        Ok(size) => {
+            if size > 0 {
+                let text = from_utf8(&data[0..size]).unwrap();
+                info!("{:?}", text);
+                stream.write(&data[0..size]).unwrap();
+            }
+            true
+        },
+        Err(_) => {
+            info!("An error occurred, terminating connection with {}", stream.peer_addr().unwrap());
+            stream.shutdown(Shutdown::Both).unwrap();
+            false
+        }
+    } {}
 }
