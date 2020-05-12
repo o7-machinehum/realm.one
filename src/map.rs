@@ -94,12 +94,12 @@ impl Room {
 
         let north = (*facing == Orientation::North)
             && ((y >= (self.map.height as i32 - constants::TILE_PER_PLAYER as i32))
-                || colision(&adj.n));
+                || collision(&adj.n));
         let east = (*facing == Orientation::East)
             && ((x >= (self.map.width as i32 - constants::TILE_PER_PLAYER as i32))
-                || colision(&adj.e));
-        let south = (*facing == Orientation::South) && ((y == 0) || colision(&adj.s));
-        let west = (*facing == Orientation::West) && ((x == 0) || colision(&adj.w));
+                || collision(&adj.e));
+        let south = (*facing == Orientation::South) && ((y == 0) || collision(&adj.s));
+        let west = (*facing == Orientation::West) && ((x == 0) || collision(&adj.w));
 
         !north && !east && !south && !west
     }
@@ -207,7 +207,8 @@ impl TilePosition {
     }
 }
 
-pub fn colision(tile: &Option<tiled::Properties>) -> bool {
+/// Check to see if you can walk through a tile
+pub fn collision(tile: &Option<tiled::Properties>) -> bool {
     match tile {
         None => return false,
         Some(i) => match i.get("Collision") {
