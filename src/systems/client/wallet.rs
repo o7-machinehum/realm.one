@@ -81,7 +81,7 @@ impl<'a> System<'a> for WalletSystem {
 }
 
 fn handle_client(mut stream: TcpStream) {
-    let mut data = [0 as u8; 50]; // using 50 byte buffer
+    let mut data = [0 as u8; 4098]; // using 50 byte buffer
     while match stream.read(&mut data) {
         Ok(size) => {
             if size > 0 {
