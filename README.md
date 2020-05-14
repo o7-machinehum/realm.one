@@ -74,6 +74,7 @@ Other outfits: bat, skeleton, slime, ghost, spider
 * [x] [F006 - IO Refactor](features/F006/)
 * [x] [F001 - Monster Instantiation](features/F001/)
 * [x] [F015 - Monster AI](features/F015/)
+* [ ] [F016 - Items](features/F016/)
 * [ ] [F003 - Blood Splat during combat](features/F003/)
 * [ ] [F009 - Other player actions should be visable](features/F009) 
 * [ ] (machinehum) The Lifeformlist needs to remove ids from players and monsters when remove() is called.
