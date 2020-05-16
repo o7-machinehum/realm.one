@@ -4,6 +4,7 @@ use amethyst::{
     ecs::{System, SystemData, World, DispatcherBuilder},
     shrev::{EventChannel, ReaderId}, 
     network::simulation::{NetworkSimulationEvent, NetworkSimulationTime, TransportResource}, 
+    ecs,
     Result, 
 };
 use log::{info, error};
@@ -54,7 +55,7 @@ impl WalletSystem {
 
 impl<'s> System<'s> for WalletSystem {
     type SystemData = (
-        Read<'s, SpritesContainer>,
+        ecs::Read<'s, SpritesContainer>,
     );
     
     fn run(&mut self, (sprites): Self::SystemData) {

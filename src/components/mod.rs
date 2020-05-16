@@ -24,3 +24,7 @@ pub use self::melee_animation::MeleeAnimation;
 
 mod movement;
 pub use self::movement::Move;
+
+mod item;
+pub use self::item::Item;
+
