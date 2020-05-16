@@ -10,6 +10,7 @@ use amethyst::{
 use log::{info, error};
 
 use crate::{
+    components::Item,
     network::Pack,
     resources::{SpritesContainer},
 };
@@ -88,9 +89,8 @@ fn handle_client(mut stream: TcpStream) {
     while match stream.read(&mut data) {
         Ok(size) => {
             if size > 0 {
-                let text = from_utf8(&data[0..size]).unwrap();
-                info!("{:?}", text);
-                stream.write(&data[0..size]).unwrap();
+                let item = Item::new(from_utf8(&data[0..size]).unwrap().to_string()); 
+                info!("{:?}", item);
             }
             true
         },

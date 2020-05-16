@@ -2625,6 +2625,7 @@ dependencies = [
  "rand 0.7.3",
  "ron",
  "serde",
+ "serde_json",
  "stringreader",
  "tiled",
 ]

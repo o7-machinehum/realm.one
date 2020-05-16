@@ -1,17 +1,27 @@
+use serde::{Deserialize, Serialize};
+use serde_json::{Result, Value};
+
 use amethyst::{
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 
 /// Item component
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[allow(non_camel_case_types)]
 pub struct Item {
-    item_string: String,
+  ItemName: String, 
+  ItemClass: String, 
+  Nuance: String,
+  Owner: String,
+  OriginWorld: String,
+  GenesisTime: String,
+  Stake: String,
+  Hash: String, 
 }
 
 impl Item {
     pub fn new(item_string: String) -> Self {
-        Self {
-            item_string,
-        }
+        serde_json::from_str(&item_string).unwrap()
     }
 }
 

@@ -35,6 +35,7 @@ impl Pack {
     pub fn new(cmd: Cmd, dest: Dest) -> Self {
         Self { cmd, dest }
     }
+
     pub fn ip(&self) -> Option<SocketAddr> {
         match self.dest {
             Dest::Ip(ip) => return Some(ip),
@@ -45,6 +46,7 @@ impl Pack {
     pub fn from_bin(bin: Vec<u8>) -> Self {
         bincode::deserialize(&bin[..]).unwrap()
     }
+
     pub fn to_bin(&self) -> Vec<u8> {
         bincode::serialize(self).unwrap()
     }
