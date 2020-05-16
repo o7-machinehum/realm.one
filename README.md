@@ -1,4 +1,4 @@
-![Rust](https://github.com/maikwoehl/realm.one/workflows/Rust/badge.svg)
+![Rust](https://github.com/Machine-Hum/realm.one/workflows/Rust/badge.svg)
 
 # realm.one
 ![alt text](resources/img/screen3.png)
