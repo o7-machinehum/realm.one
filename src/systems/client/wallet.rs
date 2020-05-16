@@ -8,9 +8,10 @@ use amethyst::{
 };
 use log::{info, error};
 
-use crate::network::{Pack, Cmd, Dest};
-use crate::resources::{AppConfig};
-use crate::systems::client::{LifeformEvent, PlayerEvent, MapEvent};
+use crate::{
+    network::Pack,
+    resources::{SpritesContainer},
+};
 
 use std::{
     thread,
@@ -51,11 +52,12 @@ impl WalletSystem {
     }
 }
 
-impl<'a> System<'a> for WalletSystem {
+impl<'s> System<'s> for WalletSystem {
     type SystemData = (
+        Read<'s, SpritesContainer>,
     );
     
-    fn run(&mut self, (): Self::SystemData) {
+    fn run(&mut self, (sprites): Self::SystemData) {
         let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
         // accept connections and process them, spawning a new thread for each one
         info!("Server listening on port 3333");
