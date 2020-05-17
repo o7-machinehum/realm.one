@@ -20,6 +20,7 @@ use std::{
     net::{TcpStream, TcpListener, Shutdown},
     io::{Read, Write},
     str::from_utf8,
+    sync::mpsc,
 };
 
 pub struct WalletSystemBundle;
@@ -46,11 +47,19 @@ impl<'a, 'b> SystemDesc<'a, 'b, WalletSystem> for WalletSystemDesc {
     }
 }
 
-pub struct WalletSystem;
+pub struct WalletSystem { 
+    listener: TcpListener,
+}
 
 impl WalletSystem {
     pub fn new() -> Self {
-        Self { }
+        info!("Server listening on port 3333");
+        let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
+        listener.set_nonblocking(true).expect("Cannot set non-blocking");
+
+        Self { 
+            listener,
+        }
     }
 }
 
@@ -60,36 +69,47 @@ impl<'s> System<'s> for WalletSystem {
     );
     
     fn run(&mut self, (sprites): Self::SystemData) {
-        let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
-        // accept connections and process them, spawning a new thread for each one
-        info!("Server listening on port 3333");
-        for stream in listener.incoming() {
-            match stream {
-                Ok(stream) => {
-                    info!("New connection: {}", stream.peer_addr().unwrap());
-                    thread::spawn(move|| {
-                        // connection succeeded
-                        handle_client(stream)
-                    });
-                }
-                Err(e) => {
-                    info!("Error: {}", e);
-                    /* connection failed */
-                }
+        match self.listener.accept() {
+            Ok(stream) => {
+                info!("New connection: {}", stream.1);
+                thread::spawn(move|| {
+                    // connection succeeded
+                    handle_client(stream.0)
+                });
+            }
+            Err(e) => {
+                /* connection failed */
             }
         }
-        print!("michael out");
-	    // close the socket server
-        drop(listener);
+        
+        // for stream in self.listener.incoming() {
+        //     match stream {
+        //         Ok(stream) => {
+        //             info!("New connection: {}", stream.peer_addr().unwrap());
+        //             thread::spawn(move|| {
+        //                 // connection succeeded
+        //                 handle_client(stream)
+        //             });
+        //         }
+        //         Err(e) => {
+        //             info!("Error: {}", e);
+        //             /* connection failed */
+        //         }
+        //     }
+        //     info!("Hello");
+        // }
+        // print!("michael out");
     }
 }
 
 fn handle_client(mut stream: TcpStream) {
-    let mut data = [0 as u8; 4098]; // using 50 byte buffer
+    let mut data = [0 as u8; 4098]; // buffer size 
     while match stream.read(&mut data) {
         Ok(size) => {
             if size > 0 {
-                let item = Item::new(from_utf8(&data[0..size]).unwrap().to_string()); 
+                let msg = from_utf8(&data[0..size]).unwrap().to_string(); 
+                info!("{:?}", msg);
+                let item = Item::new(msg);
                 info!("{:?}", item);
             }
             true
