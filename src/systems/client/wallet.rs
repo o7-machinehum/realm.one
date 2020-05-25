@@ -79,16 +79,19 @@ impl<'s> System<'s> for WalletSystem {
 fn listen_client() {
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
     info!("Server listening on port 3333");
-    match listener.accept() {
-        Ok(stream) => {
-            info!("New connection: {}", stream.1);
-            thread::spawn(move|| {
-                // connection succeeded
-                handle_client(stream.0)
-            });
-        }
-        Err(e) => {
-            /* connection failed */
+    // match listener.accept() {
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                info!("New connection: {}", stream.peer_addr().unwrap());
+                thread::spawn(move|| {
+                    // connection succeeded
+                    handle_client(stream)
+                });
+            },
+            Err(e) => {
+                /* connection failed */
+            }
         }
     }
 }
