@@ -48,17 +48,14 @@ impl<'a, 'b> SystemDesc<'a, 'b, WalletSystem> for WalletSystemDesc {
 }
 
 pub struct WalletSystem { 
-    listener: TcpListener,
+    up: bool,
 }
 
 impl WalletSystem {
     pub fn new() -> Self {
-        info!("Server listening on port 3333");
-        let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
-        listener.set_nonblocking(true).expect("Cannot set non-blocking");
 
         Self { 
-            listener,
+            up: false,
         }
     }
 }
@@ -69,36 +66,30 @@ impl<'s> System<'s> for WalletSystem {
     );
     
     fn run(&mut self, (sprites): Self::SystemData) {
-        match self.listener.accept() {
-            Ok(stream) => {
-                info!("New connection: {}", stream.1);
-                thread::spawn(move|| {
-                    // connection succeeded
-                    handle_client(stream.0)
-                });
-            }
-            Err(e) => {
-                /* connection failed */
-            }
+        // Just do this once.
+        if !self.up {
+            thread::spawn(|| {
+                listen_client()        
+            });
+            self.up = true;
         }
-        
-        // for stream in self.listener.incoming() {
-        //     match stream {
-        //         Ok(stream) => {
-        //             info!("New connection: {}", stream.peer_addr().unwrap());
-        //             thread::spawn(move|| {
-        //                 // connection succeeded
-        //                 handle_client(stream)
-        //             });
-        //         }
-        //         Err(e) => {
-        //             info!("Error: {}", e);
-        //             /* connection failed */
-        //         }
-        //     }
-        //     info!("Hello");
-        // }
-        // print!("michael out");
+    }
+}
+
+fn listen_client() {
+    let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
+    info!("Server listening on port 3333");
+    match listener.accept() {
+        Ok(stream) => {
+            info!("New connection: {}", stream.1);
+            thread::spawn(move|| {
+                // connection succeeded
+                handle_client(stream.0)
+            });
+        }
+        Err(e) => {
+            /* connection failed */
+        }
     }
 }
 
