@@ -46,17 +46,14 @@ impl<'a, 'b> SystemDesc<'a, 'b, WalletSystem> for WalletSystemDesc {
 
 pub struct WalletSystem { 
     up: bool,
-    tx: mpsc::Sender<Item>,
-    rx: mpsc::Receiver<Item>,
+    rx: Option<mpsc::Receiver<Item>>,
 }
 
 impl WalletSystem {
     pub fn new() -> Self {
-        let (tx, rx) = mpsc::channel();
         Self { 
             up: false,
-            tx,
-            rx,
+            rx: None,
         }
     }
 }
@@ -69,25 +66,38 @@ impl<'s> System<'s> for WalletSystem {
     fn run(&mut self, (sprites): Self::SystemData) {
         // Just do this once.
         if !self.up {
+            let (tx, rx) = mpsc::channel();
+            self.rx = Some(rx);
             thread::spawn(move|| {
-                listen_client(self.tx)        
+                listen_client(tx)
             });
             self.up = true;
         }
+        
+        match self.rx.as_ref().unwrap().try_recv() {
+                Ok(item) => {
+                    info!("New Item: {:?}", item);
+                }
+                Err(e) => (),
+            }
     }
 }
 
-fn listen_client(tx: mpsc::Sender<Item>) {
+fn listen_client(tx_main: mpsc::Sender<Item>) {
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
     info!("Server listening on port 3333");
     // match listener.accept() {
+    let mut rx_list = Vec::<mpsc::Receiver<Item>>::new();
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
                 info!("New connection: {}", stream.peer_addr().unwrap());
+                let (tx, rx) = mpsc::channel();
+                rx_list.push(rx);
+
                 thread::spawn(move|| {
                     // connection succeeded
-                    handle_client(stream)
+                    handle_client(stream, tx)
                 });
             },
             Err(e) => {
@@ -95,18 +105,28 @@ fn listen_client(tx: mpsc::Sender<Item>) {
                 /* connection failed */
             }
         }
+        for rx in &rx_list {
+            match rx.try_recv() {
+                Ok(item) => {
+                    info!("{:?}", item);
+                    tx_main.send(item).unwrap();
+                },
+                Err(_e) => (),
+            }
+        }
     }
 }
 
-fn handle_client(mut stream: TcpStream) {
+fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<Item>) {
     let mut data = [0 as u8; 4098]; // buffer size 
     while match stream.read(&mut data) {
         Ok(size) => {
             if size > 0 {
                 let msg = from_utf8(&data[0..size]).unwrap().to_string(); 
-                info!("{:?}", msg);
+                // info!("{:?}", msg.as_bytes());
                 let item = Item::new(msg);
-                info!("{:?}", item);
+                // info!("{:?}", item);
+                tx.send(item).unwrap();
             }
             true
         },
