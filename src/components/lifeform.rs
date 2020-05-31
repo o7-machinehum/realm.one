@@ -223,7 +223,7 @@ impl LifeformComponent {
     
     /// Is lifeform in front of you
     pub fn is_in_front(&self, lifeform: &LifeformComponent) -> bool {
-        (&self.in_front() == &lifeform.trans())
+        &self.in_front() == &lifeform.trans()
     }
     
     /// Is lifeform in an adjasent block

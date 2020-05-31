@@ -2,23 +2,20 @@ use amethyst::{
     core::{bundle::SystemBundle},
     core::{SystemDesc},
     ecs::{System, SystemData, World, DispatcherBuilder},
-    shrev::{EventChannel, ReaderId}, 
-    network::simulation::{NetworkSimulationEvent, NetworkSimulationTime, TransportResource}, 
     ecs,
     Result, 
 };
-use log::{info, error};
+use log::{info};
 
 use crate::{
     components::Item,
-    network::Pack,
     resources::{SpritesContainer},
 };
 
 use std::{
     thread,
     net::{TcpStream, TcpListener, Shutdown},
-    io::{Read, Write},
+    io::{Read},
     str::from_utf8,
     sync::mpsc,
 };
@@ -49,13 +46,17 @@ impl<'a, 'b> SystemDesc<'a, 'b, WalletSystem> for WalletSystemDesc {
 
 pub struct WalletSystem { 
     up: bool,
+    tx: mpsc::Sender<Item>,
+    rx: mpsc::Receiver<Item>,
 }
 
 impl WalletSystem {
     pub fn new() -> Self {
-
+        let (tx, rx) = mpsc::channel();
         Self { 
             up: false,
+            tx,
+            rx,
         }
     }
 }
@@ -68,15 +69,15 @@ impl<'s> System<'s> for WalletSystem {
     fn run(&mut self, (sprites): Self::SystemData) {
         // Just do this once.
         if !self.up {
-            thread::spawn(|| {
-                listen_client()        
+            thread::spawn(move|| {
+                listen_client(self.tx)        
             });
             self.up = true;
         }
     }
 }
 
-fn listen_client() {
+fn listen_client(tx: mpsc::Sender<Item>) {
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
     info!("Server listening on port 3333");
     // match listener.accept() {
@@ -90,6 +91,7 @@ fn listen_client() {
                 });
             },
             Err(e) => {
+                info!("{:?}", e);
                 /* connection failed */
             }
         }

@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use serde_json::{Result, Value};
 
 use amethyst::{
     ecs::{Component, DenseVecStorage, FlaggedStorage},
