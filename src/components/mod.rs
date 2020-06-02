@@ -10,6 +10,9 @@ pub use self::monster::Monster;
 mod player_action;
 pub use self::player_action::Action;
 
+mod item_event;
+pub use self::item_event::ItemEvent;
+
 mod outfits;
 pub use self::outfits::Skins;
 pub use self::outfits::Outfit;

@@ -1,6 +1,9 @@
 mod lifeformlist;
 pub use self::lifeformlist::LifeformList;
 
+mod inventory;
+pub use self::inventory::Inventory;
+
 mod appconfig;
 pub use self::appconfig::AppConfig;
 

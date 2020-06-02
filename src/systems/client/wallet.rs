@@ -1,7 +1,7 @@
 use amethyst::{
-    core::{bundle::SystemBundle},
-    core::{SystemDesc},
-    ecs::{System, SystemData, World, DispatcherBuilder},
+    core::{{bundle::SystemBundle}, Transform, SystemDesc},
+    ecs::{System, SystemData, World, DispatcherBuilder, WriteStorage},
+    renderer::SpriteRender,
     ecs,
     Result, 
 };
@@ -9,7 +9,7 @@ use log::{info};
 
 use crate::{
     components::Item,
-    resources::{SpritesContainer},
+    resources::{SpritesContainer, Inventory},
 };
 
 use std::{
@@ -61,9 +61,14 @@ impl WalletSystem {
 impl<'s> System<'s> for WalletSystem {
     type SystemData = (
         ecs::Read<'s, SpritesContainer>,
+        ecs::WriteStorage<'s, SpriteRender>,
+        ecs::WriteStorage<'s, Item>,
+        ecs::WriteStorage<'s, Transform>,
+        ecs::Write<'s, Inventory>,
+        ecs::Entities<'s>,
     );
     
-    fn run(&mut self, (sprites): Self::SystemData) {
+    fn run(&mut self, (sc, mut renders, mut items, mut transforms, mut inventory, entities): Self::SystemData) {
         // Just do this once.
         if !self.up {
             let (tx, rx) = mpsc::channel();
@@ -74,12 +79,25 @@ impl<'s> System<'s> for WalletSystem {
             self.up = true;
         }
         
+        // Get all the items from the thread
+        // and stick them into the ECS system
         match self.rx.as_ref().unwrap().try_recv() {
-                Ok(item) => {
-                    info!("New Item: {:?}", item);
+            Ok(item) => {
+                info!("New Item: {:?}", item);
+                match inventory.take() {
+                    Some(spot) => {
+                        entities
+                            .build_entity()
+                            .with(item, &mut items)
+                            .with(spot, &mut transforms)
+                            .with(sc.sprites[963].clone(), &mut renders)
+                            .build();
+                    },
+                    None => info!("Inventory is full!"),
                 }
-                Err(e) => (),
             }
+            Err(e) => (),
+        }
     }
 }
 
@@ -117,16 +135,42 @@ fn listen_client(tx_main: mpsc::Sender<Item>) {
     }
 }
 
+fn as_u32_be(array: &[u8; 4]) -> u32 {
+    ((array[0] as u32) << 24) +
+    ((array[1] as u32) << 16) +
+    ((array[2] as u32) <<  8) +
+    ((array[3] as u32) <<  0)
+}
+
 fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<Item>) {
     let mut data = [0 as u8; 4098]; // buffer size 
+    let mut ptr: usize = 0;
+    let mut pack_size: usize = 0;
+
     while match stream.read(&mut data) {
         Ok(size) => {
-            if size > 0 {
-                let msg = from_utf8(&data[0..size]).unwrap().to_string(); 
-                // info!("{:?}", msg.as_bytes());
-                let item = Item::new(msg);
+            info!("Size: {}", size);
+            while ptr < size {
+                // First four bytes are the size of the pack 
+                if pack_size == 0 {
+                    // pack_size = as_u32_be(&data[0..4]) as usize;
+					pack_size = u32::from_be_bytes(&data[0..4]);
+                    info!("Pack Size: {}", pack_size);
+                    ptr += 4;
+                    if size < pack_size {
+                        info!("Shit, this shouldn't have happend. We got half a pack");
+                    }
+                    else {
+                        let msg = from_utf8(&data[ptr..ptr+pack_size]).unwrap().to_string(); 
+                        info!("{:?}", msg);
+                        let item = Item::new(msg);
+                        tx.send(item).unwrap();
+                        ptr += pack_size;
+                        info!("Ptr: {}", ptr);
+                        pack_size = 0;
+                    }
+                }
                 // info!("{:?}", item);
-                tx.send(item).unwrap();
             }
             true
         },
