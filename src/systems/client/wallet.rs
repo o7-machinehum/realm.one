@@ -18,6 +18,7 @@ use std::{
     io::{Read},
     str::from_utf8,
     sync::mpsc,
+    convert::TryInto,
 };
 
 pub struct WalletSystemBundle;
@@ -154,7 +155,7 @@ fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<Item>) {
                 // First four bytes are the size of the pack 
                 if pack_size == 0 {
                     // pack_size = as_u32_be(&data[0..4]) as usize;
-                    Pack_size = u32::from_be_bytes(&data[0..4]);
+                    pack_size = usize::from_be_bytes(data[0..4].try_into().unwrap());
                     info!("Pack Size: {}", pack_size);
                     ptr += 4;
                     if size < pack_size {
