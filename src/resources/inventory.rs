@@ -1,8 +1,8 @@
 use amethyst::{
     core::{Transform},
 };
-/// Inventory. This is used to keep track of items in the players inventory.
 
+/// Inventory. This is used to keep track of items in the players inventory.
 const inv_size: usize = 4;
 pub struct Inventory {
     slots: [bool; inv_size],

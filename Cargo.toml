@@ -21,8 +21,8 @@ nalgebra = "0.19.0"
 rand = "0.7.3"
 
 [features]
-#default = ["vulkan"]   # Windows / Linux (make sure you have alsa-utils on linux installed)
-default = ["metal"]     # macOS
+default = ["vulkan"]   # Windows / Linux (make sure you have alsa-utils on linux installed)
+#default = ["metal"]     # macOS
 
 vulkan = ["amethyst/vulkan"]
 # nightly = ["amethyst/nightly"]

@@ -9,7 +9,7 @@ use log::{info};
 
 use crate::{
     components::Item,
-    resources::{SpritesContainer, Inventory},
+    resources::{SpritesContainer, Inventory, Items},
 };
 
 use std::{
@@ -62,6 +62,7 @@ impl WalletSystem {
 impl<'s> System<'s> for WalletSystem {
     type SystemData = (
         ecs::Read<'s, SpritesContainer>,
+        ecs::Read<'s, Items>,
         ecs::WriteStorage<'s, SpriteRender>,
         ecs::WriteStorage<'s, Item>,
         ecs::WriteStorage<'s, Transform>,
@@ -69,7 +70,7 @@ impl<'s> System<'s> for WalletSystem {
         ecs::Entities<'s>,
     );
     
-    fn run(&mut self, (sc, mut renders, mut items, mut transforms, mut inventory, entities): Self::SystemData) {
+    fn run(&mut self, (sc, item_res, mut renders, mut item_comp, mut transforms, mut inventory, entities): Self::SystemData) {
         // Just do this once.
         if !self.up {
             let (tx, rx) = mpsc::channel();
@@ -89,7 +90,7 @@ impl<'s> System<'s> for WalletSystem {
                     Some(spot) => {
                         entities
                             .build_entity()
-                            .with(item, &mut items)
+                            .with(item, &mut item_comp)
                             .with(spot, &mut transforms)
                             .with(sc.sprites[963].clone(), &mut renders)
                             .build();

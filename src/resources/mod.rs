@@ -19,3 +19,6 @@ pub use self::command::CommandQueue;
 
 mod lifeform_uid;
 pub use self::lifeform_uid::LifeformUID;
+
+mod items;
+pub use self::items::Items;

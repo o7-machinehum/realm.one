@@ -1,4 +1,4 @@
 (
   title: "Realm_One",
-  dimensions: Some((768, 768)),
+  dimensions: Some((784, 768)),
 )
