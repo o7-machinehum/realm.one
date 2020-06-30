@@ -8,14 +8,14 @@ use amethyst::{
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[allow(non_snake_case)]
 pub struct Item {
-  ItemName: String, 
-  ItemClass: String, 
+  ItemName: String,
+  ItemClass: String,
   Nuance: String,
   Owner: String,
   OriginWorld: String,
   GenesisTime: String,
   Stake: String,
-  Hash: String, 
+  Hash: String,
 }
 
 impl Item {
