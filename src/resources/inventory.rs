@@ -58,9 +58,4 @@ impl Inventory {
         }
         None
     }
-
-    ///// Return a slot
-    //pub fn rtn(&mut self, t: Transform) { 
-    //    self.slots.pop()
-    //}
 } 
