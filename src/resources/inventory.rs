@@ -7,6 +7,15 @@ struct Slot {
     location: Transform,
 }
 
+impl Slot {
+    fn new() -> Self {
+        Self {
+            taken: false,
+            location: Transform::default(),
+        }
+    }
+}
+
 /// Inventory. This is used to keep track of items in the players inventory.
 const INV_SIZE: usize = 4;
 pub struct Inventory {
@@ -21,16 +30,21 @@ impl Default for Inventory {
 
 impl Inventory {
     pub fn new() -> Self {
-        let mut slots: [Slot; INV_SIZE];
+        unsafe { 
+            let mut slots: [Slot; INV_SIZE] = std::mem::uninitialized();
+            
+            let mut i = 0;
+            let mut loc = Transform::default();
+            loc.set_translation_xyz(768.0, 800.0, 1.0); 
+            for slot in &mut slots {
+                slot.taken = false;
+                loc.move_down(16.0);
+                slot.location = loc.clone();
+            }
 
-        for slot in &mut slots { 
-           slot.taken = false;
-           slot.location = Transform::default();
-        }
-
-
-        Self {
-            slots
+            Self {
+                slots
+            }
         }
     }
     
