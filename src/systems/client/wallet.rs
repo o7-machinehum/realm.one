@@ -5,7 +5,7 @@ use amethyst::{
     ecs,
     Result, 
 };
-use log::{info};
+use log::{info, warn};
 
 use crate::{
     components::Item,
@@ -86,16 +86,21 @@ impl<'s> System<'s> for WalletSystem {
         match self.rx.as_ref().unwrap().try_recv() {
             Ok(item) => {
                 info!("New Item: {:?}", item);
-                match inventory.take() {
-                    Some(spot) => {
-                        entities
-                            .build_entity()
-                            .with(item, &mut item_comp)
-                            .with(spot, &mut transforms)
-                            .with(sc.sprites[963].clone(), &mut renders)
-                            .build();
-                    },
-                    None => info!("Inventory is full!"),
+                if let Some(item_index) = item_res.items.get(&item.ItemName) {
+                    match inventory.take() {
+                        Some(spot) => {
+                            entities
+                                .build_entity()
+                                .with(item, &mut item_comp)
+                                .with(spot, &mut transforms)
+                                .with(sc.sprites[*item_index].clone(), &mut renders)
+                                .build();
+                        },
+                        None => info!("Inventory is full!"),
+                    }
+                }
+                else {
+                    warn!("Item has been sent that doesn't exist in game");
                 }
             }
             Err(e) => (),

@@ -8,6 +8,7 @@ use amethyst::{
 pub struct SpritesContainer {
     pub sprites: Vec<SpriteRender>,
     pub text: Vec<SpriteRender>,
+    pub background: Vec<SpriteRender>,
 }
 
 fn load(world: &World, img: String, ron: String, num_sprites: u32) -> Vec<SpriteRender> {
@@ -52,10 +53,16 @@ impl SpritesContainer {
                           "sprites/master16.png".to_string(), 
                           "sprites/master16.ron".to_string(),
                           1068),
+            
             text: load(world,
                        "fonts/text.png".to_string(),
                        "fonts/text.ron".to_string(),
                        225),
+            
+            background: load(world,
+                       "background/background.png".to_string(),
+                       "background/background.ron".to_string(),
+                       1),
         }
     }
 }

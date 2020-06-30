@@ -1,5 +1,6 @@
 use amethyst::{
     core::transform::Transform, ecs::World, prelude::*, renderer::Camera, window::ScreenDimensions,
+    renderer::{SpriteRender},
 };
 
 use crate::components::LifeformComponent;
@@ -23,12 +24,28 @@ impl SimpleState for GamePlayState {
 
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
         init_camera(world, &dimensions);
+        draw_background(world, &sprites.background[0], &dimensions);
+
         world.insert(self.config.clone());
         world.insert(sprites);
         world.insert(room);
         world.insert(player_list);
         world.insert(command_queue);
     }
+}
+
+fn draw_background(world: &mut World, background: &SpriteRender, dimensions: &ScreenDimensions) {
+    let mut transform = Transform::default();
+    let width = dimensions.width() as f64 / dimensions.hidpi_factor();
+    let height = dimensions.height() as f64 / dimensions.hidpi_factor();
+    transform.set_translation_xyz(width as f32 * 0.5, height as f32 * 0.5, -10.);
+    
+    world
+        .create_entity()
+        .with(background.clone())
+        .with(transform)
+        .build();
+
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {

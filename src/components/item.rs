@@ -8,7 +8,7 @@ use amethyst::{
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[allow(non_snake_case)]
 pub struct Item {
-  ItemName: String,
+  pub ItemName: String,
   ItemClass: String,
   Nuance: String,
   Owner: String,
