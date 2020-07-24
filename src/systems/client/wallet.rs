@@ -129,27 +129,42 @@ fn listen_client(tx_main: mpsc::Sender<Item>) {
 }
 
 fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<Item>) {
-    let mut data = [0 as u8; 4098]; // buffer size 
+    let mut raw_data = [0 as u8; 4098]; // buffer size 
     let mut ptr: usize = 0;
-    let mut string_size: usize;
-
-    while match stream.read(&mut data) {
-        Ok(size) => {
-            while ptr < size {
-                string_size = u32::from_le_bytes(data[ptr..ptr+4].try_into().unwrap()) as usize;
-                ptr += 4;
-
-                if size < string_size {
-                    info!("Shit, this shouldn't have happend. We got half a pack");
+    let mut item_size: usize = 0;
+    let mut item_data = String::new(); 
+    
+    while match stream.read(&mut raw_data) {
+        Ok(tcp_pack_size) => {
+            while ptr < tcp_pack_size {
+                info!("Size: {}", tcp_pack_size);
+                // If we need to get the new item size
+                if item_size == 0 {
+                    item_size = u32::from_le_bytes(raw_data[ptr..ptr+4].try_into().unwrap()) as usize;
+                    info!("Pointer: {}", ptr);
+                    info!("Item String Size: {}", item_size);
+                    ptr += 4;
                 }
+                
+                // We don't have enough data. We need another TCP packet
+                if tcp_pack_size < (ptr + item_size) {
+                    // Push the entire packet to the string
+                    item_data.push_str(&from_utf8(&raw_data[ptr..tcp_pack_size]).unwrap().to_string()); 
+                    item_size -= tcp_pack_size;
+                    break
+                }
+
                 else {
-                    let msg = from_utf8(&data[ptr..ptr+string_size]).unwrap().to_string(); 
-                    let item = Item::new(msg);
-                    // info!("Item: {:?}", item);
+                    // We have a full item
+                    item_data.push_str(&from_utf8(&raw_data[ptr..(item_size+ptr)]).unwrap().to_string()); 
+                    let item = Item::new(item_data.clone());  // Create the item
+                    item_data.clear();
                     tx.send(item).unwrap();
-                    ptr += string_size;
+                    ptr += item_size;
+                    item_size = 0;
                 }
             }
+            ptr = 0;
             true
         },
         Err(_) => {

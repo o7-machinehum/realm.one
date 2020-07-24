@@ -1,6 +1,6 @@
 AppConfig(
     // server_ip: "3.21.236.56:3457", //<Server
-    server_ip: "192.168.10.31:3457",       //<Invalid - local user only
+    server_ip: "192.168.10.16:3457",       //<Invalid - local user only
     
     // player_name: "Nicola",
     player_name: "machinehum",

@@ -5033,7 +5033,7 @@
   <properties>
    <property name="Collision" type="bool" value="false"/>
    <property name="item_class" value="Wepon"/>
-   <property name="item_name" value="Hammer Sword"/>
+   <property name="item_name" value="Fat Sword"/>
   </properties>
  </tile>
  <tile id="951">
@@ -5154,11 +5154,15 @@
  <tile id="972">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="item_class" value="Armor"/>
+   <property name="item_name" value="Helmet"/>
   </properties>
  </tile>
  <tile id="973">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="item_class" value="Armor"/>
+   <property name="item_name" value="Knights Helmet"/>
   </properties>
  </tile>
  <tile id="974">
@@ -5214,6 +5218,8 @@
  <tile id="984">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="item_class" value="Helmet"/>
+   <property name="item_name" value="Gold Helmet"/>
   </properties>
  </tile>
  <tile id="985">
@@ -5299,11 +5305,15 @@
  <tile id="1001">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="item_class" value="Shield"/>
+   <property name="item_name" value="Square Wood Shield"/>
   </properties>
  </tile>
  <tile id="1002">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="item_class" value="Shield"/>
+   <property name="item_name" value="Round Wood Shield"/>
   </properties>
  </tile>
  <tile id="1003">
@@ -5464,6 +5474,8 @@
  <tile id="1034">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="item_class" value="Wepon"/>
+   <property name="item_name" value="Bow"/>
   </properties>
  </tile>
  <tile id="1035">
@@ -5484,6 +5496,8 @@
  <tile id="1038">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="item_class" value="Key"/>
+   <property name="item_name" value="Key 0000"/>
   </properties>
  </tile>
  <tile id="1039">
