@@ -83,6 +83,7 @@ fn client(resources: std::path::PathBuf, config: AppConfig) -> amethyst::Result<
         .with_bundle(input_bundle)?
         .with_bundle(TcpNetworkBundle::new(/*Some(listener)*/ None, 1048576))?
         .with_bundle(systems::client::TcpSystemBundle)?
+        .with_bundle(systems::client::WalletSystemBundle)?
         .with_bundle(systems::client::LifeformSystemBundle)?
         .with_bundle(systems::client::PlayerSystemBundle)?
         .with_bundle(systems::client::MapSystemBundle)?

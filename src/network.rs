@@ -2,7 +2,7 @@ use bincode;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
-use crate::components::{Action, LifeformComponent};
+use crate::components::{Action, LifeformComponent, ItemEvent};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Cmd {
@@ -14,6 +14,7 @@ pub enum Cmd {
     Action(Action),
     UpdatePlayer(LifeformComponent),
     RemovePlayer(u64),
+    // ItemEvent(ItemEvent), 
 }
 
 /// Destination
@@ -35,6 +36,7 @@ impl Pack {
     pub fn new(cmd: Cmd, dest: Dest) -> Self {
         Self { cmd, dest }
     }
+
     pub fn ip(&self) -> Option<SocketAddr> {
         match self.dest {
             Dest::Ip(ip) => return Some(ip),
@@ -45,6 +47,7 @@ impl Pack {
     pub fn from_bin(bin: Vec<u8>) -> Self {
         bincode::deserialize(&bin[..]).unwrap()
     }
+
     pub fn to_bin(&self) -> Vec<u8> {
         bincode::serialize(self).unwrap()
     }

@@ -61,7 +61,6 @@ dependencies = [
 [[package]]
 name = "amethyst"
 version = "0.15.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_animation",
  "amethyst_assets",
@@ -97,7 +96,6 @@ dependencies = [
 [[package]]
 name = "amethyst_animation"
 version = "0.10.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_assets",
  "amethyst_core",
@@ -116,7 +114,6 @@ dependencies = [
 [[package]]
 name = "amethyst_assets"
 version = "0.11.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_core",
  "amethyst_derive",
@@ -140,7 +137,6 @@ dependencies = [
 [[package]]
 name = "amethyst_audio"
 version = "0.10.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_assets",
  "amethyst_core",
@@ -156,7 +152,6 @@ dependencies = [
 [[package]]
 name = "amethyst_config"
 version = "0.14.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "log",
  "ron",
@@ -166,7 +161,6 @@ dependencies = [
 [[package]]
 name = "amethyst_controls"
 version = "0.9.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_assets",
  "amethyst_core",
@@ -182,7 +176,6 @@ dependencies = [
 [[package]]
 name = "amethyst_core"
 version = "0.10.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "alga",
  "alga_derive",
@@ -204,7 +197,6 @@ dependencies = [
 [[package]]
 name = "amethyst_derive"
 version = "0.8.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "heck",
  "proc-macro-crate",
@@ -217,7 +209,6 @@ dependencies = [
 [[package]]
 name = "amethyst_error"
 version = "0.5.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "backtrace",
 ]
@@ -225,7 +216,6 @@ dependencies = [
 [[package]]
 name = "amethyst_input"
 version = "0.11.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_config",
  "amethyst_core",
@@ -242,7 +232,6 @@ dependencies = [
 [[package]]
 name = "amethyst_locale"
 version = "0.9.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_assets",
  "amethyst_core",
@@ -255,7 +244,6 @@ dependencies = [
 [[package]]
 name = "amethyst_network"
 version = "0.8.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_core",
  "amethyst_error",
@@ -267,7 +255,6 @@ dependencies = [
 [[package]]
 name = "amethyst_rendy"
 version = "0.5.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_assets",
  "amethyst_config",
@@ -295,7 +282,6 @@ dependencies = [
 [[package]]
 name = "amethyst_ui"
 version = "0.10.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_assets",
  "amethyst_audio",
@@ -328,7 +314,6 @@ dependencies = [
 [[package]]
 name = "amethyst_utils"
 version = "0.10.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_assets",
  "amethyst_controls",
@@ -347,7 +332,6 @@ dependencies = [
 [[package]]
 name = "amethyst_window"
 version = "0.5.0"
-source = "git+https://github.com/machine-hum/amethyst#2064f8166fd4a41734cf352deae95d7884ba5298"
 dependencies = [
  "amethyst_config",
  "amethyst_core",
@@ -391,6 +375,12 @@ checksum = "f0e60b75072ecd4168020818c0107f2857bb6c4e64252d8d3983f6263b40a5c3"
 dependencies = [
  "num-traits 0.2.11",
 ]
+
+[[package]]
+name = "array-init"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f30bbe2f5e3d117f55bd8c7a1f9191e4a5deba9f15f595bbea4f670c59c765db"
 
 [[package]]
 name = "arrayref"
@@ -2619,12 +2609,14 @@ name = "realm-one"
 version = "0.0.1"
 dependencies = [
  "amethyst",
+ "array-init",
  "bincode",
  "log",
  "nalgebra",
  "rand 0.7.3",
  "ron",
  "serde",
+ "serde_json",
  "stringreader",
  "tiled",
 ]

@@ -89,3 +89,6 @@ Other outfits: bat, skeleton, slime, ghost, spider
 * [ ] F013 - Build more maps
 * [ ] Gameplay ideas
 * [ ] A story lol
+
+## Gotchas
+- Make sure that all tiles on tiled have at least on property

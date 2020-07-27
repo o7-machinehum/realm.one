@@ -65,7 +65,7 @@ impl<'s> System<'s> for LifeformSystem {
                 LifeformEvent::UpdatePlayer(new) => {
                     for (transform, player, sprite_render, tint) in (&mut transforms, &mut players, &mut sprite_renders, &mut tints).join() { 
                         if player.id() == new.id() {
-                            info!("Updating Player: {:?}", player);
+                            // info!("Updating Player: {:?}", player);
 
                             if *player.trans().translation() != new.xyz() { 
                                 transform.set_translation(new.xyz()); 

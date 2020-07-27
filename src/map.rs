@@ -46,6 +46,7 @@ impl Room {
         let reader = BufReader::new(file);
         let map =
             tiled::parse_with_path(reader, &Path::new("resources/sprites/master16.tsx")).unwrap();
+
         let monsters = match server {
             true => Room::get_monsters(&map),
             false => Vec::<Monster>::new(),
