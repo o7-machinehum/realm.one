@@ -35,10 +35,10 @@ impl Inventory {
             
             let mut i = 0;
             let mut loc = Transform::default();
-            loc.set_translation_xyz(768.0, 800.0, 1.0); 
+            loc.set_translation_xyz(776.0, 680.0, 1.0); 
             for slot in &mut slots {
                 slot.taken = false;
-                loc.move_down(16.0);
+                loc.move_right(16.0);
                 slot.location = loc.clone();
             }
 
