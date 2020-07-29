@@ -3,13 +3,23 @@
 # realm.one
 ![alt text](resources/img/screen3.png)
 
-Realm one is an open source tile based game written in Rust using the Amethyst game engine. It is the first game that will be integrated into the distributed MMO platform [Worlds](https://github.com/Machine-Hum/Worlds). Following the implementation anyone will be able to fork this repository and add to the universe!
+Realm one is an open source tile based game written in Rust using the Amethyst
+game engine. It is the first game that will be integrated into the distributed
+MMO platform [Worlds](https://github.com/Machine-Hum/Worlds). Following the
+implementation anyone will be able to fork this repository and add to the
+universe!
 
 ## Contribution
-The project is under heavy development and we are always looking for people to help out! Please see the CONTRIBUTING document for development information. Join us on IRC! (#realm.one on Freenode), we also have a [Discord server]( https://discord.gg/ghJSrJk)!
+The project is under heavy development and we are always looking for people to
+help out! Please see the CONTRIBUTING document for development information. Join
+us on IRC! (#realm.one on Freenode), we also have a [Discord server](
+https://discord.gg/ghJSrJk)!
 
 ### Tiles
-Tiles are taken from [here](https://opengameart.org/content/tiny-16-basic?page=1) credit to Lanea Zimmerman! Tiles are arranged using the [Tiled Map Editor](https://www.mapeditor.org/).
+Tiles are taken from
+[here](https://opengameart.org/content/tiny-16-basic?page=1) credit to Lanea
+Zimmerman! Tiles are arranged using the [Tiled Map
+Editor](https://www.mapeditor.org/).
 
 ## Running
 You need to configure either metal or vulkan. This is shown in the cargo.Toml file.
@@ -55,7 +65,10 @@ cargo run --release server
 ```
 
 ## Gameplay
-Once connected, you can move your character around with 'wasd' controls. There is also a command system that allows configuration of your character. To get into this command system press the '/' key, you can you freely type. Once you have finished your command press enter.
+Once connected, you can move your character around with 'wasd' controls. There
+is also a command system that allows configuration of your character. To get
+into this command system press the '/' key, you can you freely type. Once you
+have finished your command press enter.
 
 ### Command listing
 Commands are of the form: cmd arg subargs
