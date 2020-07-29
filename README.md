@@ -9,11 +9,17 @@ MMO platform [Worlds](https://github.com/Machine-Hum/Worlds). Following the
 implementation anyone will be able to fork this repository and add to the
 universe!
 
+## Pre-alpha Release!
+The pre-alpha will be "released" August 8th. It will have the following features.
+- There will be a raspberry Pi image so players may host their own server.
+- There will be a blockchain public testnet.
+- Players will be able to move from World to World. 
+- Players may move their items from World to World.
+
 ## Contribution
 The project is under heavy development and we are always looking for people to
 help out! Please see the CONTRIBUTING document for development information. Join
-us on IRC! (#realm.one on Freenode), we also have a [Discord server](
-https://discord.gg/ghJSrJk)!
+us on [Discord](https://discord.gg/ghJSrJk)!
 
 ### Tiles
 Tiles are taken from
@@ -22,7 +28,7 @@ Zimmerman! Tiles are arranged using the [Tiled Map
 Editor](https://www.mapeditor.org/).
 
 ## Running
-You need to configure either metal or vulkan. This is shown in the cargo.Toml file.
+You need to configure either metal or vulkan. This is shown in the cargo.toml file.
 
 ### Client
 
