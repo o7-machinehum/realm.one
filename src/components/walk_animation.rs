@@ -2,10 +2,7 @@ use amethyst::{
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 
-
 use serde::{Serialize, Deserialize};
-
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Step {

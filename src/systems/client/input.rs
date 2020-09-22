@@ -1,9 +1,10 @@
 use crate::{
     components::Orientation,
-    constants,
     key_bindings::MovementBindingTypes,
     resources::{Command, CommandQueue},
+    constants
 };
+
 use amethyst::{
     core::{bundle::SystemBundle, timing::Time, SystemDesc},
     derive::SystemDesc,

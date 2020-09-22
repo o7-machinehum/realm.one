@@ -2,10 +2,8 @@ use amethyst::{
     ecs::{Component, DenseVecStorage, FlaggedStorage},
 };
 
-
 use serde::{Serialize, Deserialize};
 use nalgebra::base::{Vector3};
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Move {

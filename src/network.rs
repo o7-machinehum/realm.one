@@ -2,7 +2,7 @@ use bincode;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
-use crate::components::{Action, LifeformComponent, ItemEvent};
+use crate::components::{Action, LifeformComponent, Item};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Cmd {
@@ -14,7 +14,8 @@ pub enum Cmd {
     Action(Action),
     UpdatePlayer(LifeformComponent),
     RemovePlayer(u64),
-    // ItemEvent(ItemEvent), 
+    NewItem(Item),
+    // ItemAction(ItemAction),
 }
 
 /// Destination

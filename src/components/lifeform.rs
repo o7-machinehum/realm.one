@@ -13,7 +13,7 @@ use nalgebra::{
 
 use crate::{
     components::{get_outfit, Monster, Outfit, Skins},
-    constants
+    constants,
 };
 
 use rand::{

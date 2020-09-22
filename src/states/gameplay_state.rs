@@ -7,6 +7,7 @@ use crate::components::LifeformComponent;
 use crate::map;
 use crate::resources::{AppConfig, CommandQueue, LifeformList, SpritesContainer};
 use log::info;
+use nalgebra::base::Vector3;
 
 pub struct GamePlayState {
     pub config: AppConfig,
@@ -50,6 +51,7 @@ fn draw_background(world: &mut World, background: &SpriteRender, dimensions: &Sc
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
     let mut transform = Transform::default();
+    // transform.set_scale(Vector3::new(0.2, 0.2, 0.2));
     let width = dimensions.width() as f64 / dimensions.hidpi_factor();
     let height = dimensions.height() as f64 / dimensions.hidpi_factor();
 

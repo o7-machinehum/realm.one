@@ -5,9 +5,10 @@ authors = ["Team Awesome"]
 edition = "2018"
 
 [dependencies]
-# amethyst = { git = "https://github.com/machine-hum/amethyst" }
+amethyst = { git = "https://github.com/machine-hum/amethyst" }
 # amethyst = { git = "https://github.com/amethyst/amethyst" }
-amethyst = { path = "../amethyst" }
+# amethyst = { path = "../amethyst" }
+# amethyst = { path = "../amethyst_nightly" }
 
 # amethyst = "0.15.0"
 log = { version = "0.4.8", features = ["serde"] }
@@ -20,6 +21,7 @@ ron = "*"
 nalgebra = "0.19.0"
 rand = "0.7.3"
 array-init = "0.1.1"
+im = "15.0.0"
 
 [features]
 default = ["vulkan"]   # Windows / Linux (make sure you have alsa-utils on linux installed)

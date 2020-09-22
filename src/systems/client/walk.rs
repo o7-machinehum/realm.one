@@ -4,7 +4,6 @@ use amethyst::{
     renderer::SpriteRender
 };
 
-
 use crate::{
     components::{WalkAnimation, LifeformComponent},
 };

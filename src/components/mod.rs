@@ -10,8 +10,11 @@ pub use self::monster::Monster;
 mod player_action;
 pub use self::player_action::Action;
 
-mod item_event;
-pub use self::item_event::ItemEvent;
+mod item_action;
+pub use self::item_action::ItemAction;
+
+mod sync;
+pub use self::sync::SyncComponent;
 
 mod outfits;
 pub use self::outfits::Skins;

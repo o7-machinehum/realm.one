@@ -1819,6 +1819,10 @@
  <tile id="335">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Spider"/>
+   <property name="Skin" value="Spider"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="336">
@@ -1923,6 +1927,10 @@
  <tile id="347">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Spider"/>
+   <property name="Skin" value="Spider"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="348">
@@ -2027,6 +2035,10 @@
  <tile id="359">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Spider"/>
+   <property name="Skin" value="Spider"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="360">
@@ -2131,6 +2143,10 @@
  <tile id="371">
   <properties>
    <property name="Collision" type="bool" value="false"/>
+   <property name="HP" type="float" value="100"/>
+   <property name="Name" value="Spider"/>
+   <property name="Skin" value="Spider"/>
+   <property name="Type" value="Monster"/>
   </properties>
  </tile>
  <tile id="372">

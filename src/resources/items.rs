@@ -25,17 +25,17 @@ impl Items {
 
         for tile in tileset.tiles {
             match (tile.properties.get("item_name"), tile.properties.get("item_class")) {
-                (Some(name), Some(class)) => {
-                    match (name, class) {
-                        (StringValue(name), StringValue(class)) => {
-                            items.insert(name.to_string(), tile.id as usize); 
+                (Some(_name), Some(_class)) => {
+                    match (_name, _class) {
+                        (StringValue(_name), StringValue(_class)) => {
+                            items.insert(_name.to_string(), tile.id as usize); 
                             // info!("{} {}", name, class);
                         },
                         _ => (),
                     }
                 },
-                (None, Some(class))       => warn!("Item Class with no name!"),
-                (Some(name), None )       => warn!("Item Name with no class!"),
+                (None, Some(_class))       => warn!("Item Class with no name!"),
+                (Some(_name), None )       => warn!("Item Name with no class!"),
                 (None, None)              => (),
             }
         }

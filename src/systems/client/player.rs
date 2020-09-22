@@ -13,11 +13,11 @@ use std::time::Instant;
 
 use crate::{
     components::{Action, LifeformComponent, MeleeAnimation, Move, WalkAnimation},
-    constants,
     map::Room,
     mech::get_letter,
     network::{Cmd, Dest, Pack},
     resources::{Command, CommandQueue, SpritesContainer},
+    constants
 };
 
 pub enum PlayerEvent {
@@ -165,11 +165,11 @@ impl<'s> System<'s> for PlayerSystem {
             let now = Instant::now();
             let p1 = self.p1.unwrap();
             if now.duration_since(self.timer.unwrap()).as_millis() >= constants::ACTION_DELAY_MS {
-                self.timer = Some(now.clone());
                 let cmd = command_queue.get(); // Get the move
                 if cmd.is_some() {
                     match cmd.unwrap() {
                         Command::Move(dir) => {
+                            self.timer = Some(now.clone());
                             // Get player and transform component of yourself
                             let adj_player_tr = {
                                 let player = players.get_mut(p1).unwrap(); // Get yourself
@@ -197,13 +197,14 @@ impl<'s> System<'s> for PlayerSystem {
                             if room.allowed_move(&player.trans(), &player.orientation)
                                 && !adj_player.is_some()
                             {
+                                info!("Walking");
                                 let tr = transforms.get_mut(p1).unwrap();
                                 player.walk(); // Walk one step in forward direction
 
                                 let mv = Move::new(
                                     *tr.translation(),
                                     *player.trans().translation(),
-                                    (constants::ACTION_DELAY_MS as f32) / 1000.0,
+                                    (constants::PLAYER_SPEED_MS as f32) / 1000.0,
                                 );
 
                                 walk.insert(

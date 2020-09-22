@@ -3,6 +3,7 @@ pub const PLAYER_MOVE: f32 = 16.0;
 pub const TILE_PER_PLAYER: f32 = PLAYER_MOVE / TILE_SIZE;
 pub const ACTION_DELAY_MS: u128 = 500;
 pub const TYPING_DELAY_MS: u128 = 150;
+pub const PLAYER_SPEED_MS: f32 = 500.0;
 
 // pub const SERVER_IP : &str = "127.0.0.1:3456";
 // pub const CLIENT_IP: &str = "127.0.0.1:3455";

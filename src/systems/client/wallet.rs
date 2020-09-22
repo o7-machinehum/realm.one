@@ -1,6 +1,6 @@
 use amethyst::{
     core::{{bundle::SystemBundle}, Transform, SystemDesc},
-    ecs::{System, SystemData, World, DispatcherBuilder, WriteStorage},
+    ecs::{System, SystemData, World, DispatcherBuilder},
     renderer::SpriteRender,
     ecs,
     Result, 
@@ -8,7 +8,7 @@ use amethyst::{
 use log::{info, warn};
 
 use crate::{
-    components::Item,
+    components::{Item, SyncComponent},
     resources::{SpritesContainer, Inventory, Items},
 };
 
@@ -65,12 +65,13 @@ impl<'s> System<'s> for WalletSystem {
         ecs::Read<'s, Items>,
         ecs::WriteStorage<'s, SpriteRender>,
         ecs::WriteStorage<'s, Item>,
+        ecs::WriteStorage<'s, SyncComponent>,
         ecs::WriteStorage<'s, Transform>,
         ecs::Write<'s, Inventory>,
         ecs::Entities<'s>,
     );
     
-    fn run(&mut self, (sc, item_res, mut renders, mut item_comp, mut transforms, mut inventory, entities): Self::SystemData) {
+    fn run(&mut self, (sc, item_res, mut renders, mut item_comp, mut sync, mut transforms, mut inventory, entities): Self::SystemData) {
         // Just do this once.
         if !self.up {
             let (tx, rx) = mpsc::channel();
@@ -91,6 +92,7 @@ impl<'s> System<'s> for WalletSystem {
                         Some(spot) => {
                             entities
                                 .build_entity()
+                                .with(SyncComponent::Item, &mut sync)
                                 .with(item, &mut item_comp)
                                 .with(spot, &mut transforms)
                                 .with(sc.sprites[*item_index].clone(), &mut renders)
@@ -103,7 +105,7 @@ impl<'s> System<'s> for WalletSystem {
                     warn!("Item has been sent that doesn't exist in game");
                 }
             }
-            Err(e) => (),
+            Err(_e) => (),
         }
     }
 }

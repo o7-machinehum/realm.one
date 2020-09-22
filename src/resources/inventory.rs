@@ -1,3 +1,4 @@
+
 use amethyst::{
     core::{Transform},
 };
@@ -8,6 +9,7 @@ struct Slot {
 }
 
 impl Slot {
+    #[allow(dead_code)]
     fn new() -> Self {
         Self {
             taken: false,
@@ -31,9 +33,9 @@ impl Default for Inventory {
 impl Inventory {
     pub fn new() -> Self {
         unsafe { 
+            #[allow(deprecated)]
             let mut slots: [Slot; INV_SIZE] = std::mem::uninitialized();
             
-            let mut i = 0;
             let mut loc = Transform::default();
             loc.set_translation_xyz(776.0, 680.0, 1.0); 
             for slot in &mut slots {

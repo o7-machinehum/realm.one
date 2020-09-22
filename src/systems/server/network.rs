@@ -72,9 +72,10 @@ impl<'a> System<'a> for TcpSystem {
         Read<'a, NetworkSimulationTime>,
         Read<'a, EventChannel<NetworkSimulationEvent>>,
         Write<'a, LifeformList>,
+        // Write<'a, EventChannel<WalletEvents>>,
     );
 
-    fn run(&mut self, (mut in_packs, mut lf, mut auth, mut net, sim_time, channel, mut pl): Self::SystemData) {
+    fn run(&mut self, (mut in_packs, mut lf, mut auth, mut net, sim_time, channel, mut pl/*, mut wallet_events*/): Self::SystemData) {
         let mut packs = Vec::<Pack>::new();
         // First we get the Events
         for event in channel.read(&mut self.net_reader) {
@@ -122,6 +123,14 @@ impl<'a> System<'a> for TcpSystem {
                     }
                 },
                 Cmd::RemovePlayer(uid) => lf.single_write(LifeformEvent::RemovePlayer(*uid)),
+                Cmd::NewItem(_item) => {
+                    if let Some(_player) = pl.get_from_ip(pack.ip().unwrap()) {
+                        // wallet_events.single_write();
+                    }
+                    else {
+                        warn!("Pack from someone not on the playerlist!");
+                    }
+                }
                 _ => (),
             }
         }

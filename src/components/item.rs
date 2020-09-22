@@ -5,7 +5,7 @@ use amethyst::{
 };
 
 /// Item component
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[allow(non_snake_case)]
 pub struct Item {
   pub ItemName: String,
