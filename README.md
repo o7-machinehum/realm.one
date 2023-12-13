@@ -5,27 +5,9 @@
 
 Realm one is an open source tile based game written in Rust using the Amethyst
 game engine. It is the first game that will be integrated into the distributed
-MMO platform [Worlds](https://github.com/Machine-Hum/Worlds). Following the
+MMO platform [Worlds](https://github.com/o7-machinehum/Worlds). Following the
 implementation anyone will be able to fork this repository and add to the
 universe!
-
-## Pre-alpha Release!
-The pre-alpha will be "released" August 8th. It will have the following features.
-- There will be a raspberry Pi image so players may host their own server.
-- There will be a blockchain public testnet.
-- Players will be able to move from World to World. 
-- Players may move their items from World to World.
-
-## Contribution
-The project is under heavy development and we are always looking for people to
-help out! Please see the CONTRIBUTING document for development information. Join
-us on [Discord](https://discord.gg/ghJSrJk)!
-
-### Tiles
-Tiles are taken from
-[here](https://opengameart.org/content/tiny-16-basic?page=1) credit to Lanea
-Zimmerman! Tiles are arranged using the [Tiled Map
-Editor](https://www.mapeditor.org/).
 
 ## Running
 You need to configure either metal or vulkan. This is shown in the cargo.toml file.
